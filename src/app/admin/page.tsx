@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 interface Stats {
-  totals: { conversions: number; shares: number; feedbackUp: number; copies: number; cacheSize: number };
+  totals: { visits: number; conversions: number; shares: number; wehomeClicks: number; feedbackUp: number; copies: number; cacheSize: number };
   daily: [string, number][];
   weekly: [string, number][];
   monthly: [string, number][];
@@ -143,10 +143,12 @@ export default function AdminPage() {
         </div>
 
         {/* Totals */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
           {[
+            { label: "방문자", value: stats.totals.visits, color: "text-sky-600" },
             { label: "총 변환", value: stats.totals.conversions, color: "text-blue-600" },
             { label: "공유", value: stats.totals.shares, color: "text-emerald-600" },
+            { label: "위홈 클릭", value: stats.totals.wehomeClicks, color: "text-orange-500" },
             { label: "좋아요", value: stats.totals.feedbackUp, color: "text-green-600" },
             { label: "복사", value: stats.totals.copies, color: "text-purple-600" },
             { label: "캐시 항목", value: stats.totals.cacheSize, color: "text-amber-600" },

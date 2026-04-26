@@ -65,6 +65,32 @@ function IconTelegram() {
   );
 }
 
+function IconKakao() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+      <path d="M12 3C6.477 3 2 6.477 2 10.8c0 2.75 1.61 5.17 4.07 6.67l-.96 3.57c-.08.32.27.57.55.38L9.9 18.9c.68.1 1.39.15 2.1.15 5.523 0 10-3.477 10-7.8S17.523 3 12 3z"/>
+    </svg>
+  );
+}
+
+function IconInstagram() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+      <circle cx="12" cy="12" r="4"/>
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+    </svg>
+  );
+}
+
+function IconTikTok() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15.3a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V9.27a8.19 8.19 0 0 0 4.83 1.55V7.37a4.85 4.85 0 0 1-1.06-.68z"/>
+    </svg>
+  );
+}
+
 // ─── Share Sheet ─────────────────────────────────────────────────────────────
 
 interface ShareSheetProps {
@@ -80,6 +106,7 @@ interface ShareSheetProps {
 
 function ShareSheet({ text, originalName, imageDataUrl, imageBlob, isKo, uiLang, onClose, onLog }: ShareSheetProps) {
   const [copied, setCopied] = useState(false);
+  const [toast, setToast] = useState("");
   const [nativeSharing, setNativeSharing] = useState(false);
 
   const shareUrl = `${window.location.origin}/?name=${encodeURIComponent(originalName)}`;
@@ -90,37 +117,56 @@ function ShareSheet({ text, originalName, imageDataUrl, imageBlob, isKo, uiLang,
 
   const enc = encodeURIComponent;
 
-  const SNS = [
-    {
-      name: "X",
-      bg: "#000000",
-      icon: <IconX />,
-      url: `https://x.com/intent/tweet?text=${enc(shareMsg + "\n")}&url=${enc(shareUrl)}`,
-    },
-    {
-      name: "Facebook",
-      bg: "#1877F2",
-      icon: <IconFacebook />,
-      url: `https://www.facebook.com/sharer.php?u=${enc(shareUrl)}&quote=${enc(shareMsg)}`,
-    },
-    {
-      name: "WhatsApp",
-      bg: "#25D366",
-      icon: <IconWhatsApp />,
-      url: `https://wa.me/?text=${enc(shareMsg + "\n" + shareUrl)}`,
-    },
-    {
-      name: "Line",
-      bg: "#00B900",
-      icon: <IconLine />,
-      url: `https://social-plugins.line.me/lineit/share?url=${enc(shareUrl)}&text=${enc(shareMsg)}`,
-    },
-    {
-      name: "Telegram",
-      bg: "#2AABEE",
-      icon: <IconTelegram />,
-      url: `https://t.me/share/url?url=${enc(shareUrl)}&text=${enc(shareMsg)}`,
-    },
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 2500);
+  };
+
+  const downloadImage = () => {
+    const url = URL.createObjectURL(imageBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${text}.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Instagram/TikTok: download image then open site
+  const shareImageApp = (platform: "Instagram" | "TikTok") => {
+    downloadImage();
+    const msg = isKo
+      ? `이미지를 저장했습니다. ${platform}에서 업로드하세요!`
+      : `Image saved! Upload it on ${platform}.`;
+    showToast(msg);
+    setTimeout(() => {
+      window.open(platform === "Instagram" ? "https://www.instagram.com/" : "https://www.tiktok.com/", "_blank", "noopener,noreferrer");
+    }, 400);
+    onLog?.({ type: "share_sns", platform, name: text, uiLang });
+  };
+
+  // KakaoTalk: copy text then try deep link
+  const shareKakao = async () => {
+    const fullText = `${shareMsg}\n${shareUrl}`;
+    await navigator.clipboard.writeText(fullText).catch(() => {});
+    showToast(isKo ? "텍스트가 복사됐습니다. 카카오톡에 붙여넣기 하세요!" : "Copied! Paste into KakaoTalk.");
+    // Try app deep link (works on mobile)
+    window.location.href = `kakaotalk://msg/send?msg=${enc(fullText)}`;
+    onLog?.({ type: "share_sns", platform: "KakaoTalk", name: text, uiLang });
+  };
+
+  type UrlSNS = { kind: "url"; name: string; bg: string; icon: React.ReactNode; url: string };
+  type ActionSNS = { kind: "action"; name: string; bg: string; icon: React.ReactNode; action: () => void };
+  type SNSItem = UrlSNS | ActionSNS;
+
+  const SNS: SNSItem[] = [
+    { kind: "url",    name: "X",         bg: "#000000", icon: <IconX />,         url: `https://x.com/intent/tweet?text=${enc(shareMsg + "\n")}&url=${enc(shareUrl)}` },
+    { kind: "url",    name: "Facebook",  bg: "#1877F2", icon: <IconFacebook />,  url: `https://www.facebook.com/sharer.php?u=${enc(shareUrl)}&quote=${enc(shareMsg)}` },
+    { kind: "url",    name: "WhatsApp",  bg: "#25D366", icon: <IconWhatsApp />,  url: `https://wa.me/?text=${enc(shareMsg + "\n" + shareUrl)}` },
+    { kind: "url",    name: "Line",      bg: "#00B900", icon: <IconLine />,      url: `https://social-plugins.line.me/lineit/share?url=${enc(shareUrl)}&text=${enc(shareMsg)}` },
+    { kind: "url",    name: "Telegram",  bg: "#2AABEE", icon: <IconTelegram />,  url: `https://t.me/share/url?url=${enc(shareUrl)}&text=${enc(shareMsg)}` },
+    { kind: "action", name: "KakaoTalk", bg: "#FEE500", icon: <IconKakao />,     action: shareKakao },
+    { kind: "action", name: "Instagram", bg: "linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)", icon: <IconInstagram />, action: () => shareImageApp("Instagram") },
+    { kind: "action", name: "TikTok",    bg: "#010101", icon: <IconTikTok />,    action: () => shareImageApp("TikTok") },
   ];
 
   const copyLink = async () => {
@@ -176,24 +222,38 @@ function ShareSheet({ text, originalName, imageDataUrl, imageBlob, isKo, uiLang,
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={imageDataUrl} alt={text} className="w-full rounded-2xl shadow-sm" />
 
-        {/* SNS 버튼 */}
-        <div className="flex justify-around gap-1">
+        {/* Toast */}
+        {toast && (
+          <div className="bg-slate-800 text-white text-xs rounded-xl px-4 py-2.5 text-center">
+            {toast}
+          </div>
+        )}
+
+        {/* SNS 버튼 — 4×2 그리드 */}
+        <div className="grid grid-cols-4 gap-3">
           {SNS.map((s) => (
             <button
               key={s.name}
               onClick={() => {
-                window.open(s.url, "_blank", "noopener,noreferrer,width=600,height=500");
-                onLog?.({ type: "share_sns", platform: s.name, name: text, uiLang });
+                if (s.kind === "url") {
+                  window.open(s.url, "_blank", "noopener,noreferrer,width=600,height=500");
+                  onLog?.({ type: "share_sns", platform: s.name, name: text, uiLang });
+                } else {
+                  s.action();
+                }
               }}
               className="flex flex-col items-center gap-1.5"
             >
               <div
-                className="w-11 h-11 rounded-full flex items-center justify-center text-white shadow-sm"
+                className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-sm"
                 style={{ background: s.bg }}
               >
-                {s.icon}
+                {/* KakaoTalk icon is dark on yellow */}
+                <span className={s.name === "KakaoTalk" ? "text-[#3C1E1E]" : "text-white"}>
+                  {s.icon}
+                </span>
               </div>
-              <span className="text-[10px] text-slate-400">{s.name}</span>
+              <span className="text-[9px] text-slate-400 leading-tight text-center">{s.name}</span>
             </button>
           ))}
         </div>

@@ -58,6 +58,8 @@ export async function GET(req: NextRequest) {
   const feedbacks = logs.filter((l) => l.type === "feedback" && l.value === "up");
   const copies = logs.filter((l) => l.type === "copy");
   const fontSelects = logs.filter((l) => l.type === "font_select");
+  const visits = logs.filter((l) => l.type === "visit");
+  const wehomeClicks = logs.filter((l) => l.type === "wehome_click");
 
   // daily / weekly / monthly conversion counts
   const byPeriod = (period: "day" | "week" | "month") => {
@@ -117,8 +119,10 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     totals: {
+      visits: visits.length,
       conversions: conversions.length,
       shares: shares.length,
+      wehomeClicks: wehomeClicks.length,
       feedbackUp: feedbacks.length,
       copies: copies.length,
       cacheSize,

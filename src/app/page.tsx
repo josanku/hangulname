@@ -78,6 +78,16 @@ export default function Home() {
     setCount(stored);
     window.speechSynthesis.getVoices();
 
+    // 방문자 로그 (세션당 1회)
+    if (!sessionStorage.getItem("hg_visited")) {
+      sessionStorage.setItem("hg_visited", "1");
+      fetch("/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "visit", uiLang: detectedLang }),
+      }).catch(() => {});
+    }
+
     // Auto-convert from shared link (?name=...)
     const params = new URLSearchParams(window.location.search);
     const nameParam = params.get("name");
@@ -449,6 +459,7 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-400 hover:text-blue-500 font-semibold transition"
+              onClick={() => logAction({ type: "wehome_click", uiLang: lang })}
             >
               Wehome.me
             </a>
