@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&family=Black+Han+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&family=Black+Han+Sans&family=Gaegu:wght@700&family=Do+Hyeon&display=swap');
 @import "tailwindcss";
 
 :root { --background: #ffffff; --foreground: #171717; }

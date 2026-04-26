@@ -9,9 +9,12 @@ export const FONTS = [
   { id: "hunmin-hancom", labelKo: "훈민정음(한컴)", labelEn: "Hunminjeongeum(Hancom)", css: "HancomHunminjeongeum, serif" },
   { id: "hunmin-ebs",    labelKo: "훈민정음(EBS)", labelEn: "Hunminjeongeum(EBS)",   css: "EBSHunminjeongeum, serif" },
   { id: "pretendard",    labelKo: "Pretendard",    labelEn: "Pretendard",            css: "Pretendard, sans-serif" },
-  { id: "gowun-batang",  labelKo: "고운바탕",       labelEn: "Gowun Batang",          css: "GowunBatang, serif" },
-  { id: "hahmlet",       labelKo: "함렛",          labelEn: "Hahmlet",               css: "Hahmlet, serif" },
-  { id: "brush",         labelKo: "나눔붓글씨",     labelEn: "Brush Script",          css: "'Nanum Brush Script', cursive" },
+  { id: "gowun-batang",  labelKo: "고운바탕",  labelEn: "Gowun Batang",  css: "GowunBatang, serif" },
+  { id: "hahmlet",       labelKo: "함렛",      labelEn: "Hahmlet",       css: "Hahmlet, serif" },
+  { id: "brush",         labelKo: "나눔붓글씨", labelEn: "Brush Script",  css: "'Nanum Brush Script', cursive" },
+  { id: "black-han",     labelKo: "검은고딕",  labelEn: "Black Han",     css: "'Black Han Sans', sans-serif" },
+  { id: "gaegu",         labelKo: "개구",      labelEn: "Gaegu",         css: "Gaegu, cursive" },
+  { id: "do-hyeon",      labelKo: "도현",      labelEn: "Do Hyeon",      css: "'Do Hyeon', sans-serif" },
 ] as const;
 
 interface Props {
@@ -144,13 +147,18 @@ function ShareSheet({ text, originalName, imageDataUrl, imageBlob, isKo, uiLang,
     onLog?.({ type: "share_sns", platform, name: text, uiLang });
   };
 
-  // KakaoTalk: copy text then try deep link
+  // KakaoTalk: copy text then try deep link via hidden anchor (safe — won't navigate away on failure)
   const shareKakao = async () => {
     const fullText = `${shareMsg}\n${shareUrl}`;
     await navigator.clipboard.writeText(fullText).catch(() => {});
-    showToast(isKo ? "텍스트가 복사됐습니다. 카카오톡에 붙여넣기 하세요!" : "Copied! Paste into KakaoTalk.");
-    // Try app deep link (works on mobile)
-    window.location.href = `kakaotalk://msg/send?msg=${enc(fullText)}`;
+    showToast(isKo ? "복사됐습니다! 카카오톡에 붙여넣기 하세요 😊" : "Copied! Paste into KakaoTalk.");
+    // Hidden anchor click triggers app if installed; silently fails if not
+    const a = document.createElement("a");
+    a.href = `kakaotalk://msg/send?msg=${enc(fullText)}`;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     onLog?.({ type: "share_sns", platform: "KakaoTalk", name: text, uiLang });
   };
 
