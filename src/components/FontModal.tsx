@@ -114,10 +114,14 @@ function ShareSheet({ text, originalName, imageDataUrl, imageBlob, isKo, uiLang,
 
   const shareUrl = `${window.location.origin}/?name=${encodeURIComponent(originalName)}`;
   const shareTitle = isKo ? "내 이름을 한글로" : "My Name in Hangul";
-  const hashtags = "#Hangul #한글 #한글이름 #HangulName";
-  const shareMsg = isKo
-    ? `${originalName} → ${text} 🇰🇷\n내 이름도 한글로 확인해보세요!\n${hashtags}`
-    : `${originalName} → ${text} 🇰🇷\nFind your name in Korean Hangul!\n${hashtags}`;
+
+  // 플랫폼별 최적화된 공유 텍스트
+  const mainMsg = isKo
+    ? `${originalName} → ${text} 🇰🇷 내 이름도 한글로 확인해보세요!`
+    : `${originalName} → ${text} 🇰🇷 Find your name in Korean Hangul!`;
+
+  // 메신저용 (WhatsApp/Telegram/LINE): 해시태그 + URL 포함
+  const fullMsg = `${mainMsg}\n#Hangul #한글 #한글이름 #HangulName\n${shareUrl}`;
 
   const enc = encodeURIComponent;
 
@@ -154,25 +158,19 @@ function ShareSheet({ text, originalName, imageDataUrl, imageBlob, isKo, uiLang,
     onLog?.({ type: "share_sns", platform, name: text, uiLang });
   };
 
-  // KakaoTalk: clipboard copy → open app → user pastes
-  // (Kakao Link API requires SDK+app key; this approach works without registration)
+  // KakaoTalk: SDK 없이는 클립보드 복사가 유일한 신뢰할 수 있는 방법
   const shareKakao = async () => {
-    const fullText = `${shareMsg}\n${shareUrl}`;
-    await navigator.clipboard.writeText(fullText).catch(() => {});
-    const toast = isKo
-      ? "텍스트가 복사됐습니다 😊\n카카오톡 채팅창에 붙여넣기 하세요!"
-      : "Copied! Open KakaoTalk and paste in a chat.";
-    showToast(toast);
-    // Open KakaoTalk app (mobile); hidden anchor avoids page navigation on desktop
-    setTimeout(() => {
-      const a = document.createElement("a");
-      a.href = "kakaotalk://";
-      a.style.display = "none";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }, 300);
+    await navigator.clipboard.writeText(fullMsg).catch(() => {});
+    showToast(isKo
+      ? "복사됐습니다! 카카오톡 채팅창에 붙여넣기 하세요 😊"
+      : "Copied! Paste into a KakaoTalk chat.");
     onLog?.({ type: "share_sns", platform: "KakaoTalk", name: text, uiLang });
+  };
+
+  // URL 공유 플랫폼 — 새 탭으로 열기 (popup dimension 제거: 모바일 차단 방지)
+  const openShare = (url: string, platform: string) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+    onLog?.({ type: "share_sns", platform, name: text, uiLang });
   };
 
   type UrlSNS = { kind: "url"; name: string; bg: string; icon: React.ReactNode; url: string };
@@ -180,14 +178,34 @@ function ShareSheet({ text, originalName, imageDataUrl, imageBlob, isKo, uiLang,
   type SNSItem = UrlSNS | ActionSNS;
 
   const SNS: SNSItem[] = [
-    { kind: "url",    name: "X",         bg: "#000000", icon: <IconX />,         url: `https://x.com/intent/tweet?text=${enc(shareMsg + "\n")}&url=${enc(shareUrl)}` },
-    { kind: "url",    name: "Facebook",  bg: "#1877F2", icon: <IconFacebook />,  url: `https://www.facebook.com/sharer.php?u=${enc(shareUrl)}&quote=${enc(shareMsg)}` },
-    { kind: "url",    name: "WhatsApp",  bg: "#25D366", icon: <IconWhatsApp />,  url: `https://wa.me/?text=${enc(shareMsg + "\n" + shareUrl)}` },
-    { kind: "url",    name: "Line",      bg: "#00B900", icon: <IconLine />,      url: `https://social-plugins.line.me/lineit/share?url=${enc(shareUrl)}&text=${enc(shareMsg)}` },
-    { kind: "url",    name: "Telegram",  bg: "#2AABEE", icon: <IconTelegram />,  url: `https://t.me/share/url?url=${enc(shareUrl)}&text=${enc(shareMsg)}` },
-    { kind: "action", name: "KakaoTalk", bg: "#FEE500", icon: <IconKakao />,     action: shareKakao },
+    {
+      // X: text(본문) + url(별도) + hashtags(쉼표구분, # 없이) — 세 파라미터 분리가 표준
+      kind: "url", name: "X", bg: "#000000", icon: <IconX />,
+      url: `https://x.com/intent/tweet?text=${enc(mainMsg)}&url=${enc(shareUrl)}&hashtags=Hangul,HangulName,한글이름`,
+    },
+    {
+      // Facebook: u(URL)만 지원. quote 파라미터는 무시됨. OG 태그로 미리보기 표시
+      kind: "url", name: "Facebook", bg: "#1877F2", icon: <IconFacebook />,
+      url: `https://www.facebook.com/sharer.php?u=${enc(shareUrl)}&hashtag=${enc("#Hangul")}`,
+    },
+    {
+      // WhatsApp: text에 메시지+URL 전부 포함 (wa.me 표준)
+      kind: "url", name: "WhatsApp", bg: "#25D366", icon: <IconWhatsApp />,
+      url: `https://wa.me/?text=${enc(fullMsg)}`,
+    },
+    {
+      // LINE: line.me/R/msg/text/ 형식이 모바일 앱 연동 표준
+      kind: "url", name: "Line", bg: "#00B900", icon: <IconLine />,
+      url: `https://line.me/R/msg/text/?${enc(fullMsg)}`,
+    },
+    {
+      // Telegram: url + text 분리 파라미터 (공식 표준)
+      kind: "url", name: "Telegram", bg: "#2AABEE", icon: <IconTelegram />,
+      url: `https://t.me/share/url?url=${enc(shareUrl)}&text=${enc(mainMsg + "\n#Hangul #한글이름 #HangulName")}`,
+    },
+    { kind: "action", name: "KakaoTalk", bg: "#FEE500", icon: <IconKakao />, action: shareKakao },
     { kind: "action", name: "Instagram", bg: "linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)", icon: <IconInstagram />, action: () => shareImageApp("Instagram") },
-    { kind: "action", name: "TikTok",    bg: "#010101", icon: <IconTikTok />,    action: () => shareImageApp("TikTok") },
+    { kind: "action", name: "TikTok",    bg: "#010101", icon: <IconTikTok />, action: () => shareImageApp("TikTok") },
   ];
 
   const copyLink = async () => {
@@ -203,9 +221,9 @@ function ShareSheet({ text, originalName, imageDataUrl, imageBlob, isKo, uiLang,
       const file = new File([imageBlob], `${text}.png`, { type: "image/png" });
       const canShareFiles = navigator.canShare?.({ files: [file] });
       if (canShareFiles) {
-        await navigator.share({ title: shareTitle, text: shareMsg, url: shareUrl, files: [file] });
+        await navigator.share({ title: shareTitle, text: mainMsg, url: shareUrl, files: [file] });
       } else {
-        await navigator.share({ title: shareTitle, text: shareMsg, url: shareUrl });
+        await navigator.share({ title: shareTitle, text: mainMsg, url: shareUrl });
       }
       onLog?.({ type: "share_native", name: text, uiLang });
     } catch {
@@ -256,12 +274,8 @@ function ShareSheet({ text, originalName, imageDataUrl, imageBlob, isKo, uiLang,
             <button
               key={s.name}
               onClick={() => {
-                if (s.kind === "url") {
-                  window.open(s.url, "_blank", "noopener,noreferrer,width=600,height=500");
-                  onLog?.({ type: "share_sns", platform: s.name, name: text, uiLang });
-                } else {
-                  s.action();
-                }
+                if (s.kind === "url") openShare(s.url, s.name);
+                else s.action();
               }}
               className="flex flex-col items-center gap-1.5"
             >
