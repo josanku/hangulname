@@ -114,9 +114,10 @@ function ShareSheet({ text, originalName, imageDataUrl, imageBlob, isKo, uiLang,
 
   const shareUrl = `${window.location.origin}/?name=${encodeURIComponent(originalName)}`;
   const shareTitle = isKo ? "내 이름을 한글로" : "My Name in Hangul";
+  const hashtags = "#Hangul #한글 #한글이름 #HangulName";
   const shareMsg = isKo
-    ? `${originalName} → ${text} 🇰🇷\n내 이름도 한글로 확인해보세요!`
-    : `${originalName} → ${text} 🇰🇷\nFind your name in Korean Hangul!`;
+    ? `${originalName} → ${text} 🇰🇷\n내 이름도 한글로 확인해보세요!\n${hashtags}`
+    : `${originalName} → ${text} 🇰🇷\nFind your name in Korean Hangul!\n${hashtags}`;
 
   const enc = encodeURIComponent;
 
@@ -147,18 +148,24 @@ function ShareSheet({ text, originalName, imageDataUrl, imageBlob, isKo, uiLang,
     onLog?.({ type: "share_sns", platform, name: text, uiLang });
   };
 
-  // KakaoTalk: copy text then try deep link via hidden anchor (safe — won't navigate away on failure)
+  // KakaoTalk: clipboard copy → open app → user pastes
+  // (Kakao Link API requires SDK+app key; this approach works without registration)
   const shareKakao = async () => {
     const fullText = `${shareMsg}\n${shareUrl}`;
     await navigator.clipboard.writeText(fullText).catch(() => {});
-    showToast(isKo ? "복사됐습니다! 카카오톡에 붙여넣기 하세요 😊" : "Copied! Paste into KakaoTalk.");
-    // Hidden anchor click triggers app if installed; silently fails if not
-    const a = document.createElement("a");
-    a.href = `kakaotalk://msg/send?msg=${enc(fullText)}`;
-    a.style.display = "none";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const toast = isKo
+      ? "텍스트가 복사됐습니다 😊\n카카오톡 채팅창에 붙여넣기 하세요!"
+      : "Copied! Open KakaoTalk and paste in a chat.";
+    showToast(toast);
+    // Open KakaoTalk app (mobile); hidden anchor avoids page navigation on desktop
+    setTimeout(() => {
+      const a = document.createElement("a");
+      a.href = "kakaotalk://";
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }, 300);
     onLog?.({ type: "share_sns", platform: "KakaoTalk", name: text, uiLang });
   };
 
@@ -359,7 +366,8 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
     const fs = Math.min(fontSize, 100);
     const lineH = fs * 1.25;
 
-    ctx.font = `bold ${fs}px ${targetFont.css}`;
+    const fontWeightStr = targetFont.id === "hunmin-ebs" ? "900" : "bold";
+    ctx.font = `${fontWeightStr} ${fs}px ${targetFont.css}`;
     ctx.fillStyle = "#1e293b";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -452,7 +460,7 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
                   key={i}
                   style={{
                     fontFamily: font.css,
-                    fontWeight: 700,
+                    fontWeight: font.id === "hunmin-ebs" ? 900 : 700,
                     fontSize: arr.length >= 2
                       ? "clamp(2.8rem, 12vw, 5rem)"
                       : "clamp(3.5rem, 15vw, 6.5rem)",
@@ -531,7 +539,7 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
                   {isKo ? f.labelKo : f.labelEn}
                 </span>
                 <span
-                  style={{ fontFamily: f.css, fontWeight: 700, fontSize: "1.05rem", lineHeight: 1.3 }}
+                  style={{ fontFamily: f.css, fontWeight: f.id === "hunmin-ebs" ? 900 : 700, fontSize: "1.05rem", lineHeight: 1.3 }}
                   className={selectedFont === f.id ? "text-blue-600" : "text-slate-700"}
                 >
                   {text}

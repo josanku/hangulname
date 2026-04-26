@@ -94,3 +94,18 @@
 {"type":"visit","uiLang":"ko","ts":"2026-04-26T18:29:30.000Z"}
 {"type":"visit","uiLang":"ko","ts":"2026-04-26T18:29:30.072Z"}
 {"type":"visit","uiLang":"ko","ts":"2026-04-26T18:29:30.074Z"}
+{"type":"conversion","inputName":"sanku jo","uiLang":"ko","sourceLang":"en-US","results":[{"country":"미국","options":["생쿠 조"]}],"ts":"2026-04-26T18:47:32.140Z"}
+{"type":"font_modal_open","name":"생쿠 조","inputName":"sanku jo","uiLang":"ko","ts":"2026-04-26T18:47:49.903Z"}
+{"type":"font_select","name":"생쿠 조","font":"hunmin-ebs","uiLang":"ko","ts":"2026-04-26T18:47:54.208Z"}
+{"type":"font_select","name":"생쿠 조","font":"gungsuh","uiLang":"ko","ts":"2026-04-26T18:48:00.636Z"}
+{"type":"font_select","name":"생쿠 조","font":"hunmin-hancom","uiLang":"ko","ts":"2026-04-26T18:48:01.274Z"}
+{"type":"font_select","name":"생쿠 조","font":"gungsuh","uiLang":"ko","ts":"2026-04-26T18:48:02.270Z"}
+{"type":"font_select","name":"생쿠 조","font":"myeongjo","uiLang":"ko","ts":"2026-04-26T18:48:03.420Z"}
+{"type":"font_select","name":"생쿠 조","font":"hunmin-hancom","uiLang":"ko","ts":"2026-04-26T18:48:04.150Z"}
+{"type":"font_select","name":"생쿠 조","font":"gothic","uiLang":"ko","ts":"2026-04-26T18:48:05.254Z"}
+{"type":"font_select","name":"생쿠 조","font":"pretendard","uiLang":"ko","ts":"2026-04-26T18:48:05.704Z"}
+{"type":"font_select","name":"생쿠 조","font":"brush","uiLang":"ko","ts":"2026-04-26T18:48:07.089Z"}
+{"type":"font_select","name":"생쿠 조","font":"do-hyeon","uiLang":"ko","ts":"2026-04-26T18:48:07.732Z"}
+{"type":"share_open","name":"생쿠 조","font":"do-hyeon","uiLang":"ko","ts":"2026-04-26T18:48:10.348Z"}
+{"type":"share_sns","platform":"KakaoTalk","name":"생쿠 조","uiLang":"ko","ts":"2026-04-26T18:48:11.454Z"}
+{"type":"share_sns","platform":"X","name":"생쿠 조","uiLang":"ko","ts":"2026-04-26T18:48:20.299Z"}
