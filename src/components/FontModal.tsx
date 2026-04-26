@@ -85,18 +85,32 @@ export default function FontModal({ text, originalName, isKo, onClose }: Props) 
       ctx.roundRect(0, 0, W, H, 24);
       ctx.fill();
 
-      // 한글 이름 (볼드, 크게)
-      const fontSize = Math.min(120, Math.floor(W * 0.88 / Math.max(text.length, 1) * 1.3));
-      ctx.font = `bold ${Math.min(fontSize, 120)}px ${font.css}`;
+      // 한글 이름: 공백 기준으로 두 줄 분리
+      const parts = text.trim().split(/\s+/);
+      const lines = parts.length >= 2
+        ? [parts[0], parts.slice(1).join(" ")]
+        : [text];
+
+      const longestLen = Math.max(...lines.map((l) => l.length));
+      const fontSize = Math.min(100, Math.floor(W * 0.88 / Math.max(longestLen, 1) * 1.3));
+      const fs = Math.min(fontSize, 100);
+      const lineH = fs * 1.25;
+
+      ctx.font = `bold ${fs}px ${font.css}`;
       ctx.fillStyle = "#1e293b";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(text, W / 2, H / 2 - 16);
+
+      const totalH = lines.length * lineH;
+      const startY = H / 2 - totalH / 2 - 10;
+      lines.forEach((line, idx) => {
+        ctx.fillText(line, W / 2, startY + lineH * idx + lineH / 2);
+      });
 
       // 원어 이름 (작게, 아래)
-      ctx.font = `400 20px NanumGothic, sans-serif`;
+      ctx.font = `400 18px NanumGothic, sans-serif`;
       ctx.fillStyle = "#94a3b8";
-      ctx.fillText(originalName, W / 2, H / 2 + 76);
+      ctx.fillText(originalName, W / 2, startY + totalH + 32);
 
       canvas.toBlob((blob) => {
         if (!blob) return;
@@ -133,26 +147,30 @@ export default function FontModal({ text, originalName, isKo, onClose }: Props) 
           </svg>
         </button>
 
-        {/* 이름 대형 표시 (볼드) */}
+        {/* 이름 대형 표시 (볼드, 두 줄) */}
         <div
           className="w-full bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl flex items-center justify-center"
           style={{ minHeight: "220px", padding: "2rem" }}
         >
-          <span
-            style={{
-              fontFamily: font.css,
-              fontWeight: 700,
-              fontSize: "clamp(3.5rem, 15vw, 6.5rem)",
-              lineHeight: 1.2,
-              color: "#1e293b",
-              letterSpacing: "0.04em",
-              textAlign: "center",
-              display: "block",
-              wordBreak: "keep-all",
-            }}
-          >
-            {text}
-          </span>
+          <div style={{ textAlign: "center" }}>
+            {text.trim().split(/\s+/).map((part, i, arr) => (
+              <div
+                key={i}
+                style={{
+                  fontFamily: font.css,
+                  fontWeight: 700,
+                  fontSize: arr.length >= 2
+                    ? "clamp(2.8rem, 12vw, 5rem)"
+                    : "clamp(3.5rem, 15vw, 6.5rem)",
+                  lineHeight: 1.25,
+                  color: "#1e293b",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                {i === 0 ? part : arr.slice(1).join(" ")}
+              </div>
+            )).filter((_, i) => i < 2)}
+          </div>
         </div>
 
         {/* 현재 폰트 이름 + 다운로드 버튼 */}
