@@ -59,15 +59,6 @@ export default function Home() {
   const [feedback, setFeedback] = useState<"up" | null>(null);
   const [modalText, setModalText] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLang(detectLang());
-    const stored = parseInt(localStorage.getItem("convertCount") ?? "0", 10);
-    setCount(stored);
-    window.speechSynthesis.getVoices();
-  }, []);
-
-  const t = translations[lang];
-
   const logAction = useCallback(async (data: Record<string, unknown>) => {
     try {
       await fetch("/api/log", {
@@ -79,6 +70,43 @@ export default function Home() {
       // ignore
     }
   }, []);
+
+  useEffect(() => {
+    const detectedLang = detectLang();
+    setLang(detectedLang);
+    const stored = parseInt(localStorage.getItem("convertCount") ?? "0", 10);
+    setCount(stored);
+    window.speechSynthesis.getVoices();
+
+    // Auto-convert from shared link (?name=...)
+    const params = new URLSearchParams(window.location.search);
+    const nameParam = params.get("name");
+    if (nameParam) {
+      setInput(nameParam);
+      setLoading(true);
+      fetch("/api/transliterate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: nameParam.trim(), uiLang: detectedLang }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.variants) {
+            setResult(data);
+            setCurrentInput(nameParam.trim());
+            const next = stored + 1;
+            setCount(next);
+            localStorage.setItem("convertCount", String(next));
+          } else if (data.error) {
+            setError(data.error);
+          }
+        })
+        .catch(() => setError("An error occurred"))
+        .finally(() => setLoading(false));
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const t = translations[lang];
 
   const convert = async () => {
     if (!input.trim()) return;
@@ -107,10 +135,7 @@ export default function Home() {
         inputName: input.trim(),
         uiLang: lang,
         sourceLang: data.sourceLang,
-        results: data.variants?.map((v: Variant) => ({
-          country: v.country,
-          options: v.options,
-        })),
+        results: data.variants?.map((v: Variant) => ({ country: v.country, options: v.options })),
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : t.errorGeneral);
@@ -413,30 +438,26 @@ export default function Home() {
           </div>
         )}
 
-        {/* Wehome 푸터 */}
-        <footer className="mt-10 pb-2 text-center space-y-1">
-          <p className="text-xs text-slate-400">
-            <a
-              href="https://wehome.me"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-500 font-medium transition"
-            >
-              Wehome.me
-            </a>
-            {", 대한민국 공유숙박 위홈과 함께합니다"}
+        {/* Wehome 바이라인 */}
+        <footer className="mt-10 pb-2 text-center space-y-0.5" dir="ltr">
+          <p className="text-[11px] text-slate-300 font-medium tracking-wide uppercase">
+            Powered by
           </p>
           <p className="text-xs text-slate-400">
             <a
               href="https://wehome.me"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-500 font-medium transition"
+              className="text-blue-400 hover:text-blue-500 font-semibold transition"
             >
               Wehome.me
             </a>
             {", Your Home in Korea"}
           </p>
+          {t.wehomeTagline1 && (
+            <p className="text-xs text-slate-400">{t.wehomeTagline1}</p>
+          )}
+          <p className="text-xs text-slate-400">{t.wehomeTagline2}</p>
         </footer>
       </div>
     </main>

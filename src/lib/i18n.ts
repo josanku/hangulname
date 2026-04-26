@@ -11,6 +11,8 @@ export const translations = {
     feedbackThanks: "감사합니다 😊", feedbackBetter: "다음엔 더 잘할게요 🙏",
     counter: "{n}번째 변환", counterFirst: "첫 변환을 해보세요",
     errorEmpty: "이름을 입력하세요", errorGeneral: "오류가 발생했습니다",
+    wehomeTagline1: "한국에서의 나만의 집",
+    wehomeTagline2: "에어비앤비보다 좋은 가격의 같은 숙소",
     dir: "ltr" as const,
   },
   en: {
@@ -25,6 +27,8 @@ export const translations = {
     feedbackThanks: "Thank you! 😊", feedbackBetter: "We'll improve! 🙏",
     counter: "#{n} conversion", counterFirst: "Try your first conversion",
     errorEmpty: "Please enter a name", errorGeneral: "An error occurred",
+    wehomeTagline1: "",
+    wehomeTagline2: "Same Home in Better Value than Airbnb",
     dir: "ltr" as const,
   },
   zh: {
@@ -39,6 +43,8 @@ export const translations = {
     feedbackThanks: "谢谢！😊", feedbackBetter: "我们会改进！🙏",
     counter: "第{n}次转换", counterFirst: "开始您的第一次转换",
     errorEmpty: "请输入姓名", errorGeneral: "发生错误",
+    wehomeTagline1: "您在韩国的家",
+    wehomeTagline2: "与Airbnb同款房源，价格更优惠",
     dir: "ltr" as const,
   },
   ja: {
@@ -53,6 +59,8 @@ export const translations = {
     feedbackThanks: "ありがとうございます！😊", feedbackBetter: "改善します！🙏",
     counter: "{n}回目の変換", counterFirst: "最初の変換を試してみてください",
     errorEmpty: "名前を入力してください", errorGeneral: "エラーが発生しました",
+    wehomeTagline1: "韓国でのあなたの家",
+    wehomeTagline2: "Airbnbより良いコスパの同じ宿泊先",
     dir: "ltr" as const,
   },
   es: {
@@ -67,6 +75,8 @@ export const translations = {
     feedbackThanks: "¡Gracias! 😊", feedbackBetter: "¡Mejoraremos! 🙏",
     counter: "Conversión #{n}", counterFirst: "Prueba tu primera conversión",
     errorEmpty: "Por favor ingrese un nombre", errorGeneral: "Ocurrió un error",
+    wehomeTagline1: "Tu hogar en Corea",
+    wehomeTagline2: "Mismo alojamiento a mejor precio que Airbnb",
     dir: "ltr" as const,
   },
   fr: {
@@ -81,6 +91,8 @@ export const translations = {
     feedbackThanks: "Merci ! 😊", feedbackBetter: "Nous allons améliorer ! 🙏",
     counter: "Conversion n°{n}", counterFirst: "Essayez votre première conversion",
     errorEmpty: "Veuillez entrer un nom", errorGeneral: "Une erreur s'est produite",
+    wehomeTagline1: "Votre maison en Corée",
+    wehomeTagline2: "Même hébergement à meilleur prix qu'Airbnb",
     dir: "ltr" as const,
   },
   de: {
@@ -95,6 +107,8 @@ export const translations = {
     feedbackThanks: "Danke! 😊", feedbackBetter: "Wir verbessern uns! 🙏",
     counter: "Konvertierung #{n}", counterFirst: "Versuchen Sie Ihre erste Konvertierung",
     errorEmpty: "Bitte geben Sie einen Namen ein", errorGeneral: "Ein Fehler ist aufgetreten",
+    wehomeTagline1: "Ihr Zuhause in Korea",
+    wehomeTagline2: "Gleiche Unterkunft, besserer Preis als Airbnb",
     dir: "ltr" as const,
   },
   ar: {
@@ -109,6 +123,8 @@ export const translations = {
     feedbackThanks: "شكراً! 😊", feedbackBetter: "سنتحسن! 🙏",
     counter: "التحويل رقم {n}", counterFirst: "جرّب أول تحويل",
     errorEmpty: "الرجاء إدخال اسم", errorGeneral: "حدث خطأ",
+    wehomeTagline1: "منزلك في كوريا",
+    wehomeTagline2: "نفس المسكن بسعر أفضل من Airbnb",
     dir: "rtl" as const,
   },
   ru: {
@@ -123,6 +139,8 @@ export const translations = {
     feedbackThanks: "Спасибо! 😊", feedbackBetter: "Мы улучшимся! 🙏",
     counter: "Конвертация #{n}", counterFirst: "Попробуйте первую конвертацию",
     errorEmpty: "Пожалуйста, введите имя", errorGeneral: "Произошла ошибка",
+    wehomeTagline1: "Ваш дом в Корее",
+    wehomeTagline2: "То же жильё, но выгоднее чем Airbnb",
     dir: "ltr" as const,
   },
   pt: {
@@ -137,6 +155,8 @@ export const translations = {
     feedbackThanks: "Obrigado! 😊", feedbackBetter: "Vamos melhorar! 🙏",
     counter: "Conversão #{n}", counterFirst: "Tente sua primeira conversão",
     errorEmpty: "Por favor, insira um nome", errorGeneral: "Ocorreu um erro",
+    wehomeTagline1: "Sua casa na Coreia",
+    wehomeTagline2: "Mesma acomodação com melhor custo que o Airbnb",
     dir: "ltr" as const,
   },
   vi: {
@@ -151,6 +171,8 @@ export const translations = {
     feedbackThanks: "Cảm ơn! 😊", feedbackBetter: "Chúng tôi sẽ cải thiện! 🙏",
     counter: "Lần chuyển đổi #{n}", counterFirst: "Thử lần chuyển đổi đầu tiên",
     errorEmpty: "Vui lòng nhập tên", errorGeneral: "Đã xảy ra lỗi",
+    wehomeTagline1: "Ngôi nhà của bạn ở Hàn Quốc",
+    wehomeTagline2: "Cùng chỗ ở, giá tốt hơn Airbnb",
     dir: "ltr" as const,
   },
   id: {
@@ -165,6 +187,8 @@ export const translations = {
     feedbackThanks: "Terima kasih! 😊", feedbackBetter: "Kami akan meningkatkan! 🙏",
     counter: "Konversi #{n}", counterFirst: "Coba konversi pertama Anda",
     errorEmpty: "Silakan masukkan nama", errorGeneral: "Terjadi kesalahan",
+    wehomeTagline1: "Rumah Anda di Korea",
+    wehomeTagline2: "Akomodasi sama, harga lebih baik dari Airbnb",
     dir: "ltr" as const,
   },
   th: {
@@ -179,6 +203,8 @@ export const translations = {
     feedbackThanks: "ขอบคุณ! 😊", feedbackBetter: "เราจะปรับปรุง! 🙏",
     counter: "การแปลงครั้งที่ {n}", counterFirst: "ลองการแปลงครั้งแรกของคุณ",
     errorEmpty: "กรุณากรอกชื่อ", errorGeneral: "เกิดข้อผิดพลาด",
+    wehomeTagline1: "บ้านของคุณในเกาหลี",
+    wehomeTagline2: "ที่พักเดียวกัน ราคาดีกว่า Airbnb",
     dir: "ltr" as const,
   },
   ms: {
@@ -193,6 +219,8 @@ export const translations = {
     feedbackThanks: "Terima kasih! 😊", feedbackBetter: "Kami akan bertambah baik! 🙏",
     counter: "Penukaran #{n}", counterFirst: "Cuba penukaran pertama anda",
     errorEmpty: "Sila masukkan nama", errorGeneral: "Ralat berlaku",
+    wehomeTagline1: "Rumah Anda di Korea",
+    wehomeTagline2: "Penginapan sama, nilai lebih baik dari Airbnb",
     dir: "ltr" as const,
   },
   hi: {
@@ -207,6 +235,8 @@ export const translations = {
     feedbackThanks: "धन्यवाद! 😊", feedbackBetter: "हम सुधार करेंगे! 🙏",
     counter: "#{n}वाँ रूपांतरण", counterFirst: "अपना पहला रूपांतरण आज़माएं",
     errorEmpty: "कृपया नाम दर्ज करें", errorGeneral: "एक त्रुटि हुई",
+    wehomeTagline1: "कोरिया में आपका घर",
+    wehomeTagline2: "Airbnb से बेहतर मूल्य पर एक जैसी आवास",
     dir: "ltr" as const,
   },
   bn: {
@@ -221,6 +251,8 @@ export const translations = {
     feedbackThanks: "ধন্যবাদ! 😊", feedbackBetter: "আমরা উন্নতি করব! 🙏",
     counter: "#{n} রূপান্তর", counterFirst: "আপনার প্রথম রূপান্তর চেষ্টা করুন",
     errorEmpty: "অনুগ্রহ করে নাম লিখুন", errorGeneral: "একটি ত্রুটি ঘটেছে",
+    wehomeTagline1: "কোরিয়ায় আপনার বাড়ি",
+    wehomeTagline2: "Airbnb-র চেয়ে ভালো মূল্যে একই আবাসন",
     dir: "ltr" as const,
   },
   tl: {
@@ -235,6 +267,8 @@ export const translations = {
     feedbackThanks: "Salamat! 😊", feedbackBetter: "Magpapabuti kami! 🙏",
     counter: "Conversion #{n}", counterFirst: "Subukan ang iyong unang conversion",
     errorEmpty: "Mangyaring maglagay ng pangalan", errorGeneral: "May naganap na error",
+    wehomeTagline1: "Ang Iyong Tahanan sa Korea",
+    wehomeTagline2: "Parehong tirahan sa mas mababang halaga kaysa Airbnb",
     dir: "ltr" as const,
   },
   my: {
@@ -249,6 +283,8 @@ export const translations = {
     feedbackThanks: "ကျေးဇူးတင်ပါသည်! 😊", feedbackBetter: "ကျွန်ုပ်တို့တိုးတက်မည်! 🙏",
     counter: "ပြောင်းလဲမှု #{n}", counterFirst: "ပထမဆုံးပြောင်းလဲမှုကိုစမ်းကြည့်ပါ",
     errorEmpty: "နာမည်ထည့်ပါ", errorGeneral: "အမှားတစ်ခုဖြစ်ပွားသည်",
+    wehomeTagline1: "ကိုရီးယားရှိ သင်၏နေရာ",
+    wehomeTagline2: "Airbnb ထက် ပိုကောင်းသောဈေးနှုန်းဖြင့် တူညီသောလိပ်စာ",
     dir: "ltr" as const,
   },
   mn: {
@@ -263,6 +299,8 @@ export const translations = {
     feedbackThanks: "Баярлалаа! 😊", feedbackBetter: "Бид сайжруулна! 🙏",
     counter: "#{n}-р хөрвүүлэлт", counterFirst: "Эхний хөрвүүлэлтээ туршина уу",
     errorEmpty: "Нэр оруулна уу", errorGeneral: "Алдаа гарлаа",
+    wehomeTagline1: "Солонгос дахь таны гэр",
+    wehomeTagline2: "Airbnb-с илүү хямд үнэтэй ижил байр",
     dir: "ltr" as const,
   },
 };

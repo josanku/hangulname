@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&family=Black+Han+Sans&display=swap');
 @import "tailwindcss";
 
 :root { --background: #ffffff; --foreground: #171717; }
@@ -5,7 +6,6 @@ body { background: var(--background); color: var(--foreground); font-family: 'Na
 
 /* ── 자체 호스팅 폰트 (public/fonts/) ── */
 
-/* 궁서 계열 — JSong Myung (송명체) */
 @font-face {
   font-family: 'JSongMyung';
   src: url('/fonts/JSongMyung.woff2') format('woff2');
@@ -13,7 +13,6 @@ body { background: var(--background); color: var(--foreground); font-family: 'Na
   font-display: swap;
 }
 
-/* 명조 — Nanum Myeongjo */
 @font-face {
   font-family: 'NanumMyeongjo';
   src: url('/fonts/NanumMyeongjo.woff2') format('woff2');
@@ -27,7 +26,6 @@ body { background: var(--background); color: var(--foreground); font-family: 'Na
   font-display: swap;
 }
 
-/* 고딕 — Nanum Gothic */
 @font-face {
   font-family: 'NanumGothic';
   src: url('/fonts/NanumGothic.woff2') format('woff2');
@@ -41,7 +39,6 @@ body { background: var(--background); color: var(--foreground); font-family: 'Na
   font-display: swap;
 }
 
-/* 훈민정음 (한컴) 가로쓰기 — 실제 한컴 훈민정음체 */
 @font-face {
   font-family: 'HancomHunminjeongeum';
   src: url('/fonts/HancomHunminjeongeum.woff') format('woff');
@@ -49,7 +46,6 @@ body { background: var(--background); color: var(--foreground); font-family: 'Na
   font-display: swap;
 }
 
-/* 훈민정음 (EBS) — EBS 훈민정음체 (실제 EBS 공개 폰트) */
 @font-face {
   font-family: 'EBSHunminjeongeum';
   src: url('/fonts/EBSHunminjeongeum.woff') format('woff');
@@ -57,10 +53,37 @@ body { background: var(--background); color: var(--foreground); font-family: 'Na
   font-display: swap;
 }
 
-/* Pretendard — 변수형 폰트 */
 @font-face {
   font-family: 'Pretendard';
   src: url('/fonts/PretendardVariable.woff2') format('woff2-variations');
   font-weight: 100 900;
+  font-display: swap;
+}
+
+/* 고운바탕 — 현대적이고 우아한 바탕체 */
+@font-face {
+  font-family: 'GowunBatang';
+  src: url('/fonts/GowunBatang.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GowunBatang';
+  src: url('/fonts/GowunBatang-Bold.woff2') format('woff2');
+  font-weight: 700 900;
+  font-display: swap;
+}
+
+/* 함렛체 — 인문학적 감성의 세리프 */
+@font-face {
+  font-family: 'Hahmlet';
+  src: url('/fonts/Hahmlet.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Hahmlet';
+  src: url('/fonts/Hahmlet-Bold.woff2') format('woff2');
+  font-weight: 700 900;
   font-display: swap;
 }

@@ -1,0 +1,33 @@
+{"type":"conversion","inputName":"caroline","uiLang":"ko","sourceLang":"en-US","results":[{"country":"미국","options":["캐롤라인","캐롤린"]},{"country":"영국","options":["캐롤라인","캐롤린"]},{"country":"프랑스","options":["카롤린"]},{"country":"독일","options":["카롤리네"]}],"ts":"2026-04-26T17:33:58.164Z"}
+{"type":"conversion","inputName":"caroline","uiLang":"en","sourceLang":"en-US","results":[{"country":"United States","options":["캐롤라인","캐롤린"]},{"country":"United Kingdom","options":["캐롤라인","캐롤린"]},{"country":"France","options":["카롤린"]},{"country":"Germany","options":["카롤리네"]}],"ts":"2026-04-26T17:34:25.246Z"}
+{"type":"conversion","inputName":"caroline","uiLang":"ar","sourceLang":"en-US","results":[{"country":"الولايات المتحدة","options":["캐롤라인","캐롤린"]},{"country":"المملكة المتحدة","options":["캐롤라인","캐롤린"]},{"country":"فرنسا","options":["카롤린"]}],"ts":"2026-04-26T17:34:46.841Z"}
+{"type":"conversion","inputName":"caroline","uiLang":"zh","sourceLang":"en-US","results":[{"country":"美国","options":["캐롤라인","캐롤린"]},{"country":"英国","options":["캐롤라인","캐롤린"]},{"country":"法国","options":["카롤린"]},{"country":"德国","options":["카롤리네"]}],"ts":"2026-04-26T17:35:10.585Z"}
+{"type":"feedback","value":"up","inputName":"caroline","uiLang":"zh","ts":"2026-04-26T17:35:23.765Z"}
+{"type":"font_modal_open","name":"카롤리네","inputName":"caroline","uiLang":"zh","ts":"2026-04-26T17:35:32.095Z"}
+{"type":"font_select","name":"카롤리네","font":"hunmin-ebs","uiLang":"zh","ts":"2026-04-26T17:35:38.079Z"}
+{"type":"font_select","name":"카롤리네","font":"hunmin-hancom","uiLang":"zh","ts":"2026-04-26T17:35:39.376Z"}
+{"type":"font_select","name":"카롤리네","font":"gungsuh","uiLang":"zh","ts":"2026-04-26T17:35:40.162Z"}
+{"type":"font_select","name":"카롤리네","font":"myeongjo","uiLang":"zh","ts":"2026-04-26T17:35:40.928Z"}
+{"type":"font_select","name":"카롤리네","font":"gothic","uiLang":"zh","ts":"2026-04-26T17:35:41.661Z"}
+{"type":"font_select","name":"카롤리네","font":"pretendard","uiLang":"zh","ts":"2026-04-26T17:35:42.260Z"}
+{"type":"font_select","name":"카롤리네","font":"hunmin-ebs","uiLang":"zh","ts":"2026-04-26T17:35:43.044Z"}
+{"type":"font_select","name":"카롤리네","font":"myeongjo","uiLang":"zh","ts":"2026-04-26T17:35:43.644Z"}
+{"type":"font_select","name":"카롤리네","font":"gungsuh","uiLang":"zh","ts":"2026-04-26T17:35:44.194Z"}
+{"type":"font_select","name":"카롤리네","font":"hunmin-hancom","uiLang":"zh","ts":"2026-04-26T17:35:44.960Z"}
+{"type":"font_select","name":"카롤리네","font":"hunmin-ebs","uiLang":"zh","ts":"2026-04-26T17:35:45.996Z"}
+{"type":"font_select","name":"카롤리네","font":"myeongjo","uiLang":"zh","ts":"2026-04-26T17:35:46.610Z"}
+{"type":"font_select","name":"카롤리네","font":"gungsuh","uiLang":"zh","ts":"2026-04-26T17:35:47.228Z"}
+{"type":"font_select","name":"카롤리네","font":"myeongjo","uiLang":"zh","ts":"2026-04-26T17:35:47.829Z"}
+{"type":"font_select","name":"카롤리네","font":"gothic","uiLang":"zh","ts":"2026-04-26T17:35:48.544Z"}
+{"type":"font_select","name":"카롤리네","font":"pretendard","uiLang":"zh","ts":"2026-04-26T17:35:49.395Z"}
+{"type":"font_select","name":"카롤리네","font":"hunmin-ebs","uiLang":"zh","ts":"2026-04-26T17:35:50.378Z"}
+{"type":"font_select","name":"카롤리네","font":"hunmin-hancom","uiLang":"zh","ts":"2026-04-26T17:35:51.477Z"}
+{"type":"font_select","name":"카롤리네","font":"gungsuh","uiLang":"zh","ts":"2026-04-26T17:35:52.879Z"}
+{"type":"font_select","name":"카롤리네","font":"myeongjo","uiLang":"zh","ts":"2026-04-26T17:35:53.811Z"}
+{"type":"font_select","name":"카롤리네","font":"gothic","uiLang":"zh","ts":"2026-04-26T17:35:57.062Z"}
+{"type":"font_select","name":"카롤리네","font":"pretendard","uiLang":"zh","ts":"2026-04-26T17:35:57.677Z"}
+{"type":"font_select","name":"카롤리네","font":"hunmin-ebs","uiLang":"zh","ts":"2026-04-26T17:35:58.360Z"}
+{"type":"font_select","name":"카롤리네","font":"myeongjo","uiLang":"zh","ts":"2026-04-26T17:35:58.996Z"}
+{"type":"share","name":"카롤리네","uiLang":"zh","ts":"2026-04-26T17:36:58.320Z"}
+{"type":"font_modal_open","name":"캐롤린","inputName":"caroline","uiLang":"zh","ts":"2026-04-26T17:37:29.333Z"}
+{"type":"share","name":"캐롤린","uiLang":"zh","ts":"2026-04-26T17:38:08.664Z"}

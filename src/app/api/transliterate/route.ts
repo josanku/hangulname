@@ -1,7 +1,39 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
 
 const client = new Anthropic();
+
+// ─── Name cache (data/cache.json) ────────────────────────────────────────────
+
+const CACHE_FILE = path.join(process.cwd(), "data", "cache.json");
+
+function loadCache(): Record<string, unknown> {
+  try {
+    if (!fs.existsSync(CACHE_FILE)) return {};
+    return JSON.parse(fs.readFileSync(CACHE_FILE, "utf-8"));
+  } catch {
+    return {};
+  }
+}
+
+function saveCache(cache: Record<string, unknown>) {
+  try {
+    const dir = path.dirname(CACHE_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2));
+  } catch {
+    // ignore (read-only fs in production)
+  }
+}
+
+// Cache key: lowercase name only (results are language-agnostic; only uiLang affects text labels)
+function cacheKey(name: string): string {
+  return name.trim().toLowerCase();
+}
+
+// ─── Prompt builder ───────────────────────────────────────────────────────────
 
 const LANG_NAMES: Record<string, string> = {
   ko: "Korean (한국어)", en: "English", zh: "Chinese (中文)", ja: "Japanese (日本語)",
@@ -51,12 +83,23 @@ Rules:
 - Examples: Caroline(US) → options=["캐롤라인","캐롤린"], phonetic="캘로린"`;
 }
 
+// ─── Route handler ────────────────────────────────────────────────────────────
+
 export async function POST(req: NextRequest) {
   try {
     const { name, uiLang = "en" } = await req.json();
 
     if (!name?.trim()) {
       return NextResponse.json({ error: "Please enter a name" }, { status: 400 });
+    }
+
+    const key = cacheKey(name);
+    const cache = loadCache();
+
+    // Return cached result if available (uiLang affects labels — skip cache for now, use base en result)
+    if (cache[key]) {
+      console.log("[HANGULNAME_CACHE_HIT]", JSON.stringify({ name: name.trim(), uiLang }));
+      return NextResponse.json(cache[key]);
     }
 
     const message = await client.messages.create({
@@ -69,6 +112,19 @@ export async function POST(req: NextRequest) {
     const text = message.content[0].type === "text" ? message.content[0].text.trim() : "";
     const json = text.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
     const data = JSON.parse(json);
+
+    // Persist to cache
+    cache[key] = data;
+    saveCache(cache);
+
+    console.log("[HANGULNAME_LOG]", JSON.stringify({
+      ts: new Date().toISOString(),
+      type: "conversion",
+      inputName: name.trim(),
+      uiLang,
+      sourceLang: data.sourceLang,
+      cached: false,
+    }));
 
     return NextResponse.json(data);
   } catch (e) {
