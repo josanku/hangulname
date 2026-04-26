@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 interface Stats {
+  storage: "vercel-kv" | "local-files";
   totals: { visits: number; conversions: number; shares: number; wehomeClicks: number; feedbackUp: number; copies: number; cacheSize: number };
   daily: [string, number][];
   weekly: [string, number][];
@@ -132,7 +133,18 @@ export default function AdminPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-slate-800">통계 대시보드</h1>
-            <p className="text-xs text-slate-400 mt-0.5">My Name in Hangul · 60초마다 자동 갱신</p>
+            <div className="flex items-center gap-2 mt-0.5">
+              <p className="text-xs text-slate-400">My Name in Hangul · 60초마다 자동 갱신</p>
+              {stats && (
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                  stats.storage === "vercel-kv"
+                    ? "bg-green-100 text-green-600"
+                    : "bg-amber-100 text-amber-600"
+                }`}>
+                  {stats.storage === "vercel-kv" ? "Vercel KV ✓" : "⚠ 로컬 파일 — 배포 시 초기화"}
+                </span>
+              )}
+            </div>
           </div>
           <button
             onClick={() => fetchStats(password)}

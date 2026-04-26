@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { getAllLogs, getCacheSize, usingKV } from "@/lib/store";
 
-const LOG_FILE = path.join(process.cwd(), "data", "conversions.jsonl");
-const CACHE_FILE = path.join(process.cwd(), "data", "cache.json");
 const ADMIN_PASS = process.env.ADMIN_PASSWORD ?? "wehome2024";
 
 interface LogEntry {
@@ -16,52 +13,38 @@ interface LogEntry {
   font?: string;
   platform?: string;
   value?: string;
-  results?: Array<{ country: string; options: string[] }>;
 }
 
 function auth(req: NextRequest): boolean {
-  const header = req.headers.get("authorization") ?? "";
-  const token = header.replace("Bearer ", "");
+  const token = (req.headers.get("authorization") ?? "").replace("Bearer ", "");
   return token === ADMIN_PASS;
-}
-
-function readLogs(): LogEntry[] {
-  try {
-    if (!fs.existsSync(LOG_FILE)) return [];
-    const content = fs.readFileSync(LOG_FILE, "utf-8");
-    return content.trim().split("\n").filter(Boolean).map((l) => JSON.parse(l));
-  } catch {
-    return [];
-  }
 }
 
 function bucket(ts: string, period: "day" | "week" | "month"): string {
   const d = new Date(ts);
-  if (period === "day") return d.toISOString().slice(0, 10);
   if (period === "month") return d.toISOString().slice(0, 7);
-  // week: Monday of that week
-  const day = d.getDay();
-  const diff = (day === 0 ? -6 : 1 - day);
-  const mon = new Date(d);
-  mon.setDate(d.getDate() + diff);
-  return mon.toISOString().slice(0, 10);
+  if (period === "week") {
+    const day = d.getDay();
+    const mon = new Date(d);
+    mon.setDate(d.getDate() + (day === 0 ? -6 : 1 - day));
+    return mon.toISOString().slice(0, 10);
+  }
+  return d.toISOString().slice(0, 10);
 }
 
 export async function GET(req: NextRequest) {
-  if (!auth(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  if (!auth(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const logs = readLogs();
-  const conversions = logs.filter((l) => l.type === "conversion");
-  const shares = logs.filter((l) => l.type?.startsWith("share"));
-  const feedbacks = logs.filter((l) => l.type === "feedback" && l.value === "up");
-  const copies = logs.filter((l) => l.type === "copy");
-  const fontSelects = logs.filter((l) => l.type === "font_select");
-  const visits = logs.filter((l) => l.type === "visit");
+  const logs = (await getAllLogs()) as unknown as LogEntry[];
+
+  const conversions  = logs.filter((l) => l.type === "conversion");
+  const shares       = logs.filter((l) => l.type?.startsWith("share"));
+  const feedbacks    = logs.filter((l) => l.type === "feedback" && l.value === "up");
+  const copies       = logs.filter((l) => l.type === "copy");
+  const fontSelects  = logs.filter((l) => l.type === "font_select");
+  const visits       = logs.filter((l) => l.type === "visit");
   const wehomeClicks = logs.filter((l) => l.type === "wehome_click");
 
-  // daily / weekly / monthly conversion counts
   const byPeriod = (period: "day" | "week" | "month") => {
     const map: Record<string, number> = {};
     for (const e of conversions) {
@@ -72,68 +55,44 @@ export async function GET(req: NextRequest) {
     return Object.entries(map).sort(([a], [b]) => a.localeCompare(b)).slice(-30);
   };
 
-  // language usage
-  const langCount: Record<string, number> = {};
-  for (const e of conversions) {
-    const l = e.uiLang ?? "unknown";
-    langCount[l] = (langCount[l] ?? 0) + 1;
-  }
+  const tally = <T extends LogEntry>(arr: T[], key: keyof T) => {
+    const map: Record<string, number> = {};
+    for (const e of arr) {
+      const v = String(e[key] ?? "unknown");
+      map[v] = (map[v] ?? 0) + 1;
+    }
+    return Object.entries(map).sort(([, a], [, b]) => b - a);
+  };
 
-  // source language (name origin)
-  const sourceLangCount: Record<string, number> = {};
-  for (const e of conversions) {
-    const s = e.sourceLang?.split("-")[0] ?? "unknown";
-    sourceLangCount[s] = (sourceLangCount[s] ?? 0) + 1;
-  }
-
-  // top searched names
   const nameCount: Record<string, number> = {};
   for (const e of conversions) {
     if (e.inputName) nameCount[e.inputName] = (nameCount[e.inputName] ?? 0) + 1;
   }
-  const topNames = Object.entries(nameCount)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 50);
 
-  // font selection
-  const fontCount: Record<string, number> = {};
-  for (const e of fontSelects) {
-    if (e.font) fontCount[e.font] = (fontCount[e.font] ?? 0) + 1;
-  }
-
-  // share platform
   const platformCount: Record<string, number> = {};
   for (const e of shares) {
     const p = e.platform ?? e.type?.replace("share_", "") ?? "unknown";
     platformCount[p] = (platformCount[p] ?? 0) + 1;
   }
 
-  // cache size
-  let cacheSize = 0;
-  try {
-    if (fs.existsSync(CACHE_FILE)) {
-      const c = JSON.parse(fs.readFileSync(CACHE_FILE, "utf-8"));
-      cacheSize = Object.keys(c).length;
-    }
-  } catch { /* ignore */ }
-
   return NextResponse.json({
+    storage: usingKV() ? "vercel-kv" : "local-files",
     totals: {
-      visits: visits.length,
-      conversions: conversions.length,
-      shares: shares.length,
+      visits:       visits.length,
+      conversions:  conversions.length,
+      shares:       shares.length,
       wehomeClicks: wehomeClicks.length,
-      feedbackUp: feedbacks.length,
-      copies: copies.length,
-      cacheSize,
+      feedbackUp:   feedbacks.length,
+      copies:       copies.length,
+      cacheSize:    await getCacheSize(),
     },
-    daily: byPeriod("day"),
-    weekly: byPeriod("week"),
+    daily:   byPeriod("day"),
+    weekly:  byPeriod("week"),
     monthly: byPeriod("month"),
-    langCount: Object.entries(langCount).sort(([, a], [, b]) => b - a),
-    sourceLangCount: Object.entries(sourceLangCount).sort(([, a], [, b]) => b - a),
-    topNames,
-    fontCount: Object.entries(fontCount).sort(([, a], [, b]) => b - a),
+    langCount:       tally(conversions, "uiLang"),
+    sourceLangCount: tally(conversions.map(e => ({ ...e, sl: e.sourceLang?.split("-")[0] ?? "unknown" })), "sl" as keyof LogEntry),
+    topNames: Object.entries(nameCount).sort(([, a], [, b]) => b - a).slice(0, 50),
+    fontCount:    tally(fontSelects, "font"),
     platformCount: Object.entries(platformCount).sort(([, a], [, b]) => b - a),
   });
 }
