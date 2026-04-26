@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAllLogs, getCacheSize, usingKV } from "@/lib/store";
+import { getAllLogs, getCacheSize, getAllFeedback, usingKV } from "@/lib/store";
 
-const ADMIN_PASS = process.env.ADMIN_PASSWORD ?? "wehome2024";
+const ADMIN_PASS = process.env.ADMIN_PASSWORD ?? "33hangul";
 
 interface LogEntry {
   ts: string;
@@ -75,16 +75,32 @@ export async function GET(req: NextRequest) {
     platformCount[p] = (platformCount[p] ?? 0) + 1;
   }
 
+  // Country tally — use visit events (have country from Vercel header)
+  const countryCount: Record<string, number> = {};
+  for (const e of visits) {
+    const c = (e as LogEntry & { country?: string }).country ?? "unknown";
+    countryCount[c] = (countryCount[c] ?? 0) + 1;
+  }
+  // Also tally conversions by country for richer data
+  const convCountryCount: Record<string, number> = {};
+  for (const e of conversions) {
+    const c = (e as LogEntry & { country?: string }).country ?? "unknown";
+    convCountryCount[c] = (convCountryCount[c] ?? 0) + 1;
+  }
+
+  const allFeedback = await getAllFeedback();
+
   return NextResponse.json({
     storage: usingKV() ? "vercel-kv" : "local-files",
     totals: {
-      visits:       visits.length,
-      conversions:  conversions.length,
-      shares:       shares.length,
-      wehomeClicks: wehomeClicks.length,
-      feedbackUp:   feedbacks.length,
-      copies:       copies.length,
-      cacheSize:    await getCacheSize(),
+      visits:        visits.length,
+      conversions:   conversions.length,
+      shares:        shares.length,
+      wehomeClicks:  wehomeClicks.length,
+      feedbackUp:    feedbacks.length,
+      feedbackCount: allFeedback.length,
+      copies:        copies.length,
+      cacheSize:     await getCacheSize(),
     },
     daily:   byPeriod("day"),
     weekly:  byPeriod("week"),
@@ -94,5 +110,7 @@ export async function GET(req: NextRequest) {
     topNames: Object.entries(nameCount).sort(([, a], [, b]) => b - a).slice(0, 50),
     fontCount:    tally(fontSelects, "font"),
     platformCount: Object.entries(platformCount).sort(([, a], [, b]) => b - a),
+    countryCount:  Object.entries(countryCount).sort(([, a], [, b]) => b - a),
+    convCountryCount: Object.entries(convCountryCount).sort(([, a], [, b]) => b - a),
   });
 }

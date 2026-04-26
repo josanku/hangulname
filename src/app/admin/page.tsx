@@ -2,9 +2,21 @@
 
 import { useState, useEffect, useCallback } from "react";
 
+interface FeedbackEntry {
+  ts: string;
+  message: string;
+  contact?: string;
+  uiLang?: string;
+  country?: string;
+}
+
 interface Stats {
   storage: "vercel-kv" | "local-files";
-  totals: { visits: number; conversions: number; shares: number; wehomeClicks: number; feedbackUp: number; copies: number; cacheSize: number };
+  totals: {
+    visits: number; conversions: number; shares: number;
+    wehomeClicks: number; feedbackUp: number; feedbackCount: number;
+    copies: number; cacheSize: number;
+  };
   daily: [string, number][];
   weekly: [string, number][];
   monthly: [string, number][];
@@ -13,7 +25,27 @@ interface Stats {
   topNames: [string, number][];
   fontCount: [string, number][];
   platformCount: [string, number][];
+  countryCount: [string, number][];
+  convCountryCount: [string, number][];
 }
+
+// ISO 3166-1 alpha-2 → flag emoji
+function flag(code: string) {
+  if (!code || code.length !== 2 || code === "un") return "🌐";
+  return String.fromCodePoint(
+    0x1F1E6 + code.toUpperCase().charCodeAt(0) - 65,
+    0x1F1E6 + code.toUpperCase().charCodeAt(1) - 65,
+  );
+}
+
+const COUNTRY_NAMES: Record<string, string> = {
+  KR: "대한민국", US: "미국", JP: "일본", CN: "중국", TW: "대만",
+  HK: "홍콩", VN: "베트남", TH: "태국", SG: "싱가포르", PH: "필리핀",
+  ID: "인도네시아", MY: "말레이시아", IN: "인도", GB: "영국", DE: "독일",
+  FR: "프랑스", ES: "스페인", IT: "이탈리아", BR: "브라질", MX: "멕시코",
+  RU: "러시아", AU: "호주", CA: "캐나다", SA: "사우디", AE: "UAE",
+  TR: "터키", PL: "폴란드", NL: "네덜란드", AR: "아르헨티나", unknown: "기타",
+};
 
 function BarChart({ data, color = "#3b82f6", maxBars = 20 }: { data: [string, number][]; color?: string; maxBars?: number }) {
   const sliced = data.slice(-maxBars);
@@ -36,14 +68,21 @@ function BarChart({ data, color = "#3b82f6", maxBars = 20 }: { data: [string, nu
   );
 }
 
-function HBar({ data, color = "#3b82f6", maxItems = 15 }: { data: [string, number][]; color?: string; maxItems?: number }) {
+function HBar({ data, color = "#3b82f6", maxItems = 15, renderLabel }: {
+  data: [string, number][];
+  color?: string;
+  maxItems?: number;
+  renderLabel?: (key: string) => React.ReactNode;
+}) {
   const sliced = data.slice(0, maxItems);
   const max = Math.max(...sliced.map(([, v]) => v), 1);
   return (
     <div className="space-y-1.5">
       {sliced.map(([label, val]) => (
         <div key={label} className="flex items-center gap-2">
-          <span className="text-xs text-slate-500 w-28 truncate shrink-0">{label}</span>
+          <span className="text-xs text-slate-500 w-32 truncate shrink-0">
+            {renderLabel ? renderLabel(label) : label}
+          </span>
           <div className="flex-1 bg-slate-100 rounded-full h-3 overflow-hidden">
             <div
               className="h-full rounded-full"
@@ -57,23 +96,29 @@ function HBar({ data, color = "#3b82f6", maxItems = 15 }: { data: [string, numbe
   );
 }
 
+type Tab = "stats" | "feedback";
+
 export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [authed, setAuthed] = useState(false);
   const [authError, setAuthError] = useState(false);
   const [stats, setStats] = useState<Stats | null>(null);
+  const [feedbacks, setFeedbacks] = useState<FeedbackEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [period, setPeriod] = useState<"daily" | "weekly" | "monthly">("daily");
+  const [tab, setTab] = useState<Tab>("stats");
 
   const fetchStats = useCallback(async (pass: string) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/stats", {
-        headers: { Authorization: `Bearer ${pass}` },
-      });
-      if (res.status === 401) { setAuthError(true); return; }
-      const data = await res.json();
-      setStats(data);
+      const [statsRes, fbRes] = await Promise.all([
+        fetch("/api/admin/stats", { headers: { Authorization: `Bearer ${pass}` } }),
+        fetch("/api/feedback",    { headers: { Authorization: `Bearer ${pass}` } }),
+      ]);
+      if (statsRes.status === 401) { setAuthError(true); return; }
+      setStats(await statsRes.json());
+      const fbData = await fbRes.json();
+      setFeedbacks(fbData.feedbacks ?? []);
       setAuthed(true);
       setAuthError(false);
     } finally {
@@ -86,25 +131,25 @@ export default function AdminPage() {
     fetchStats(password);
   };
 
-  // auto-refresh every 60s
   useEffect(() => {
     if (!authed || !password) return;
     const id = setInterval(() => fetchStats(password), 60_000);
     return () => clearInterval(id);
   }, [authed, password, fetchStats]);
 
+  // ── Login ──────────────────────────────────────────────────────────────────
   if (!authed) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 w-full max-w-sm">
           <h1 className="text-xl font-bold text-slate-800 mb-1">Admin</h1>
-          <p className="text-sm text-slate-400 mb-6">My Name in Hangul — 통계 대시보드</p>
+          <p className="text-sm text-slate-400 mb-6">My Name in Hangul — 관리자</p>
           <form onSubmit={handleLogin} className="flex flex-col gap-3">
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="관리자 비밀번호"
+              placeholder="비밀번호"
               className="border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-400"
               autoFocus
             />
@@ -129,21 +174,20 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="max-w-5xl mx-auto space-y-6">
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-slate-800">통계 대시보드</h1>
+            <h1 className="text-xl font-bold text-slate-800">관리자 대시보드</h1>
             <div className="flex items-center gap-2 mt-0.5">
-              <p className="text-xs text-slate-400">My Name in Hangul · 60초마다 자동 갱신</p>
-              {stats && (
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                  stats.storage === "vercel-kv"
-                    ? "bg-green-100 text-green-600"
-                    : "bg-amber-100 text-amber-600"
-                }`}>
-                  {stats.storage === "vercel-kv" ? "Vercel KV ✓" : "⚠ 로컬 파일 — 배포 시 초기화"}
-                </span>
-              )}
+              <p className="text-xs text-slate-400">My Name in Hangul · 60초 자동 갱신</p>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                stats.storage === "vercel-kv"
+                  ? "bg-green-100 text-green-600"
+                  : "bg-amber-100 text-amber-600"
+              }`}>
+                {stats.storage === "vercel-kv" ? "Vercel KV ✓" : "⚠ 로컬 파일"}
+              </span>
             </div>
           </div>
           <button
@@ -154,83 +198,164 @@ export default function AdminPage() {
           </button>
         </div>
 
-        {/* Totals */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-          {[
-            { label: "방문자", value: stats.totals.visits, color: "text-sky-600" },
-            { label: "총 변환", value: stats.totals.conversions, color: "text-blue-600" },
-            { label: "공유", value: stats.totals.shares, color: "text-emerald-600" },
-            { label: "위홈 클릭", value: stats.totals.wehomeClicks, color: "text-orange-500" },
-            { label: "좋아요", value: stats.totals.feedbackUp, color: "text-green-600" },
-            { label: "복사", value: stats.totals.copies, color: "text-purple-600" },
-            { label: "캐시 항목", value: stats.totals.cacheSize, color: "text-amber-600" },
-          ].map((item) => (
-            <div key={item.label} className="bg-white rounded-2xl border border-slate-100 p-4 text-center">
-              <div className={`text-2xl font-bold ${item.color}`}>{item.value.toLocaleString()}</div>
-              <div className="text-xs text-slate-400 mt-0.5">{item.label}</div>
-            </div>
+        {/* Tabs */}
+        <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
+          {([["stats", "📊 통계"], ["feedback", `💬 피드백 (${feedbacks.length})`]] as [Tab, string][]).map(([t, label]) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`text-sm px-4 py-1.5 rounded-lg transition font-medium ${
+                tab === t ? "bg-white text-slate-800 shadow-sm" : "text-slate-400 hover:text-slate-600"
+              }`}
+            >
+              {label}
+            </button>
           ))}
         </div>
 
-        {/* Conversion trend */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-slate-700">변환 추이</h2>
-            <div className="flex gap-1">
-              {(["daily", "weekly", "monthly"] as const).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPeriod(p)}
-                  className={`text-xs px-3 py-1 rounded-lg transition
-                    ${period === p ? "bg-blue-500 text-white" : "text-slate-400 hover:bg-slate-100"}`}
-                >
-                  {p === "daily" ? "일별" : p === "weekly" ? "주별" : "월별"}
-                </button>
+        {/* ── 통계 탭 ── */}
+        {tab === "stats" && (
+          <>
+            {/* Totals */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+              {[
+                { label: "방문자",    value: stats.totals.visits,        color: "text-sky-600" },
+                { label: "변환",      value: stats.totals.conversions,   color: "text-blue-600" },
+                { label: "공유",      value: stats.totals.shares,        color: "text-emerald-600" },
+                { label: "위홈클릭",  value: stats.totals.wehomeClicks,  color: "text-orange-500" },
+                { label: "좋아요",    value: stats.totals.feedbackUp,    color: "text-green-600" },
+                { label: "피드백",    value: stats.totals.feedbackCount, color: "text-violet-600" },
+                { label: "복사",      value: stats.totals.copies,        color: "text-purple-600" },
+                { label: "캐시",      value: stats.totals.cacheSize,     color: "text-amber-600" },
+              ].map((item) => (
+                <div key={item.label} className="bg-white rounded-2xl border border-slate-100 p-4 text-center">
+                  <div className={`text-2xl font-bold ${item.color}`}>{item.value.toLocaleString()}</div>
+                  <div className="text-xs text-slate-400 mt-0.5">{item.label}</div>
+                </div>
               ))}
             </div>
-          </div>
-          <BarChart data={chartData} color="#3b82f6" />
-        </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* UI language */}
-          <div className="bg-white rounded-2xl border border-slate-100 p-5">
-            <h2 className="text-sm font-semibold text-slate-700 mb-4">UI 언어별 사용 횟수</h2>
-            <HBar data={stats.langCount} color="#8b5cf6" />
-          </div>
-
-          {/* Source language (name origin) */}
-          <div className="bg-white rounded-2xl border border-slate-100 p-5">
-            <h2 className="text-sm font-semibold text-slate-700 mb-4">검색 이름 언어별</h2>
-            <HBar data={stats.sourceLangCount} color="#f59e0b" />
-          </div>
-
-          {/* Font selection */}
-          <div className="bg-white rounded-2xl border border-slate-100 p-5">
-            <h2 className="text-sm font-semibold text-slate-700 mb-4">선택 폰트</h2>
-            <HBar data={stats.fontCount} color="#10b981" />
-          </div>
-
-          {/* Share platforms */}
-          <div className="bg-white rounded-2xl border border-slate-100 p-5">
-            <h2 className="text-sm font-semibold text-slate-700 mb-4">공유 플랫폼</h2>
-            <HBar data={stats.platformCount} color="#ec4899" />
-          </div>
-        </div>
-
-        {/* Top names */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-5">
-          <h2 className="text-sm font-semibold text-slate-700 mb-4">인기 검색 이름 Top 50</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
-            {stats.topNames.map(([name, count], i) => (
-              <div key={name} className="flex items-center gap-2 py-1.5 px-3 bg-slate-50 rounded-xl">
-                <span className="text-xs text-slate-300 w-5 shrink-0">{i + 1}</span>
-                <span className="text-sm font-medium text-slate-700 truncate flex-1">{name}</span>
-                <span className="text-xs text-slate-400 shrink-0">{count}</span>
+            {/* Conversion trend */}
+            <div className="bg-white rounded-2xl border border-slate-100 p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-sm font-semibold text-slate-700">변환 추이</h2>
+                <div className="flex gap-1">
+                  {(["daily", "weekly", "monthly"] as const).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setPeriod(p)}
+                      className={`text-xs px-3 py-1 rounded-lg transition
+                        ${period === p ? "bg-blue-500 text-white" : "text-slate-400 hover:bg-slate-100"}`}
+                    >
+                      {p === "daily" ? "일별" : p === "weekly" ? "주별" : "월별"}
+                    </button>
+                  ))}
+                </div>
               </div>
-            ))}
+              <BarChart data={chartData} color="#3b82f6" />
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* 국가별 방문자 */}
+              <div className="bg-white rounded-2xl border border-slate-100 p-5">
+                <h2 className="text-sm font-semibold text-slate-700 mb-4">🌍 국가별 방문자</h2>
+                <HBar
+                  data={stats.countryCount}
+                  color="#0ea5e9"
+                  renderLabel={(code) => (
+                    <span>{flag(code)} {COUNTRY_NAMES[code.toUpperCase()] ?? code.toUpperCase()}</span>
+                  )}
+                />
+              </div>
+
+              {/* 국가별 변환 */}
+              <div className="bg-white rounded-2xl border border-slate-100 p-5">
+                <h2 className="text-sm font-semibold text-slate-700 mb-4">🌍 국가별 변환</h2>
+                <HBar
+                  data={stats.convCountryCount}
+                  color="#6366f1"
+                  renderLabel={(code) => (
+                    <span>{flag(code)} {COUNTRY_NAMES[code.toUpperCase()] ?? code.toUpperCase()}</span>
+                  )}
+                />
+              </div>
+
+              {/* UI 언어 */}
+              <div className="bg-white rounded-2xl border border-slate-100 p-5">
+                <h2 className="text-sm font-semibold text-slate-700 mb-4">UI 언어별 사용</h2>
+                <HBar data={stats.langCount} color="#8b5cf6" />
+              </div>
+
+              {/* 이름 원어 */}
+              <div className="bg-white rounded-2xl border border-slate-100 p-5">
+                <h2 className="text-sm font-semibold text-slate-700 mb-4">검색 이름 언어</h2>
+                <HBar data={stats.sourceLangCount} color="#f59e0b" />
+              </div>
+
+              {/* 폰트 */}
+              <div className="bg-white rounded-2xl border border-slate-100 p-5">
+                <h2 className="text-sm font-semibold text-slate-700 mb-4">선택 폰트</h2>
+                <HBar data={stats.fontCount} color="#10b981" />
+              </div>
+
+              {/* 공유 플랫폼 */}
+              <div className="bg-white rounded-2xl border border-slate-100 p-5">
+                <h2 className="text-sm font-semibold text-slate-700 mb-4">공유 플랫폼</h2>
+                <HBar data={stats.platformCount} color="#ec4899" />
+              </div>
+            </div>
+
+            {/* 인기 이름 */}
+            <div className="bg-white rounded-2xl border border-slate-100 p-5">
+              <h2 className="text-sm font-semibold text-slate-700 mb-4">인기 검색 이름 Top 50</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                {stats.topNames.map(([name, count], i) => (
+                  <div key={name} className="flex items-center gap-2 py-1.5 px-3 bg-slate-50 rounded-xl">
+                    <span className="text-xs text-slate-300 w-5 shrink-0">{i + 1}</span>
+                    <span className="text-sm font-medium text-slate-700 truncate flex-1">{name}</span>
+                    <span className="text-xs text-slate-400 shrink-0">{count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ── 피드백 탭 ── */}
+        {tab === "feedback" && (
+          <div className="space-y-3">
+            {feedbacks.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center text-slate-400 text-sm">
+                아직 피드백이 없습니다.
+              </div>
+            ) : (
+              feedbacks.map((fb, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-slate-100 p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-slate-700 whitespace-pre-wrap">{fb.message}</p>
+                      {fb.contact && (
+                        <p className="text-xs text-blue-500 mt-2">
+                          📬 {fb.contact}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-right shrink-0 text-xs text-slate-400 space-y-0.5">
+                      <div>{fb.ts ? new Date(fb.ts).toLocaleString("ko-KR") : ""}</div>
+                      <div className="flex items-center justify-end gap-1">
+                        {fb.country && fb.country !== "unknown" && (
+                          <span>{flag(fb.country)}</span>
+                        )}
+                        {fb.uiLang && <span className="uppercase">{fb.uiLang}</span>}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
-        </div>
+        )}
+
       </div>
     </div>
   );

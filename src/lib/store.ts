@@ -127,3 +127,41 @@ export async function getCacheSize(): Promise<number> {
 }
 
 export const usingKV = isKVConfigured;
+
+// ─── Feedback ─────────────────────────────────────────────────────────────────
+
+const KV_FEEDBACK = "hg:feedback";
+const FEEDBACK_FILE = path.join(DATA_DIR, "feedback.jsonl");
+
+export async function appendFeedback(entry: Record<string, unknown>): Promise<void> {
+  const record = { ...entry, ts: new Date().toISOString() };
+
+  const kv = await getKV();
+  if (kv) {
+    try {
+      await kv.lpush(KV_FEEDBACK, JSON.stringify(record));
+      await kv.ltrim(KV_FEEDBACK, 0, 9999);
+    } catch (e) { console.error("KV feedback error:", e); }
+    return;
+  }
+
+  try {
+    await ensureDataDir();
+    await fs.appendFile(FEEDBACK_FILE, JSON.stringify(record) + "\n");
+  } catch { /* read-only fs */ }
+}
+
+export async function getAllFeedback(): Promise<Record<string, unknown>[]> {
+  const kv = await getKV();
+  if (kv) {
+    try {
+      const items = await kv.lrange(KV_FEEDBACK, 0, -1) as string[];
+      return items.reverse().map((s) => JSON.parse(s));
+    } catch { return []; }
+  }
+
+  try {
+    const content = await fs.readFile(FEEDBACK_FILE, "utf-8");
+    return content.trim().split("\n").filter(Boolean).map((l) => JSON.parse(l));
+  } catch { return []; }
+}

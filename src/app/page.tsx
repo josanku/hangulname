@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { translations, LANG_LABELS, detectLang, type Lang } from "@/lib/i18n";
 import FontModal from "@/components/FontModal";
 import KoreaBackground from "@/components/KoreaBackground";
+import FeedbackButton from "@/components/FeedbackButton";
 
 interface Variant {
   country: string;
@@ -482,6 +483,7 @@ export default function Home() {
         onLog={logAction}
       />
     )}
+    <FeedbackButton lang={lang} />
     </>
   );
 }
