@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { translations, LANG_LABELS, detectLang, type Lang } from "@/lib/i18n";
 import FontModal from "@/components/FontModal";
+import KoreaBackground from "@/components/KoreaBackground";
 
 interface Variant {
   country: string;
@@ -194,9 +195,10 @@ export default function Home() {
 
   return (
     <>
+    <KoreaBackground />
     <main
       dir={t.dir}
-      className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-6"
+      className="min-h-screen flex items-center justify-center p-6 relative z-10"
       onClick={() => setShowLangMenu(false)}
     >
       <div className="w-full max-w-lg">
@@ -245,13 +247,13 @@ export default function Home() {
 
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-slate-800 mb-1">{t.title}</h1>
-          <p className="text-sm text-slate-400">{t.subtitle}</p>
+          <h1 className="text-3xl font-bold text-white mb-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{t.title}</h1>
+          <p className="text-sm text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">{t.subtitle}</p>
         </div>
 
         {/* Input */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-4">
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <input
               type="text"
               value={input}
@@ -259,22 +261,19 @@ export default function Home() {
               onKeyDown={(e) => e.key === "Enter" && convert()}
               placeholder={t.placeholder}
               dir="auto"
-              className="flex-1 text-slate-700 placeholder:text-slate-300 focus:outline-none text-base"
+              className="flex-1 min-w-0 text-slate-700 placeholder:text-slate-300 focus:outline-none text-base"
               autoFocus
             />
             <button
               onClick={convert}
               disabled={loading || !input.trim()}
-              className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-blue-200 text-white px-5 py-2 rounded-xl font-medium transition text-sm whitespace-nowrap"
+              className="shrink-0 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-blue-200 text-white px-4 py-2.5 rounded-xl font-medium transition text-sm"
             >
               {loading ? (
-                <span className="flex items-center gap-1.5">
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                  </svg>
-                  {t.converting}
-                </span>
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                </svg>
               ) : t.convert}
             </button>
           </div>
@@ -291,7 +290,7 @@ export default function Home() {
         {result && (
           <div className="grid gap-2">
             {result.origin && (
-              <p className="text-xs text-slate-400 px-1">{result.origin}</p>
+              <p className="text-xs text-white/70 px-1 drop-shadow-sm">{result.origin}</p>
             )}
 
             {/* 원어 발음 카드 */}
@@ -427,7 +426,7 @@ export default function Home() {
 
             {/* 피드백 — 좋아요만 */}
             <div className="flex items-center justify-center gap-3 pt-1">
-              <span className="text-xs text-slate-300">{t.feedbackQ}</span>
+              <span className="text-xs text-white/60">{t.feedbackQ}</span>
               <button
                 onClick={() => {
                   const next = feedback === "up" ? null : "up";
@@ -442,7 +441,7 @@ export default function Home() {
                 {t.feedbackYes}
               </button>
               {feedback === "up" && (
-                <span className="text-xs text-slate-400">{t.feedbackThanks}</span>
+                <span className="text-xs text-white/70">{t.feedbackThanks}</span>
               )}
             </div>
           </div>
@@ -450,15 +449,15 @@ export default function Home() {
 
         {/* Wehome 바이라인 */}
         <footer className="mt-10 pb-2 text-center space-y-0.5" dir="ltr">
-          <p className="text-[11px] text-slate-300 font-medium tracking-wide uppercase">
+          <p className="text-[11px] text-white/40 font-medium tracking-wide uppercase">
             Powered by
           </p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-white/70">
             <a
               href="https://wehome.me"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-500 font-semibold transition"
+              className="text-blue-300 hover:text-blue-200 font-semibold transition"
               onClick={() => logAction({ type: "wehome_click", uiLang: lang })}
             >
               Wehome.me
@@ -466,9 +465,9 @@ export default function Home() {
             {", Your Home in Korea"}
           </p>
           {t.wehomeTagline1 && (
-            <p className="text-xs text-slate-400">{t.wehomeTagline1}</p>
+            <p className="text-xs text-white/60">{t.wehomeTagline1}</p>
           )}
-          <p className="text-xs text-slate-400">{t.wehomeTagline2}</p>
+          <p className="text-xs text-white/60">{t.wehomeTagline2}</p>
         </footer>
       </div>
     </main>

@@ -131,8 +131,14 @@ function ShareSheet({ text, originalName, imageDataUrl, imageBlob, isKo, uiLang,
     const a = document.createElement("a");
     a.href = url;
     a.download = `${text}.png`;
+    if (/iP(hone|ad|od)/i.test(navigator.userAgent)) {
+      a.target = "_blank";
+      a.rel = "noopener";
+    }
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   // Instagram/TikTok: download image then open site
@@ -382,11 +388,11 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
     ctx.fillStyle = "#94a3b8";
     ctx.fillText(originalName, W / 2, startY + totalH + 32);
 
-    // wehome.me watermark
+    // URL watermark
     ctx.font = `400 13px NanumGothic, sans-serif`;
     ctx.fillStyle = "#cbd5e1";
     ctx.textAlign = "right";
-    ctx.fillText("wehome.me", W - 20, H - 14);
+    ctx.fillText("name.hangulmaru.com", W - 20, H - 14);
 
     return canvas;
   }, [text, originalName]);
@@ -401,8 +407,15 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
         const a = document.createElement("a");
         a.href = url;
         a.download = `${text}.png`;
+        // iOS Safari: open in new tab so user can long-press to save to Photos
+        if (/iP(hone|ad|od)/i.test(navigator.userAgent)) {
+          a.target = "_blank";
+          a.rel = "noopener";
+        }
+        document.body.appendChild(a);
         a.click();
-        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       }, "image/png");
       onLog?.({ type: "download", name: text, font: selectedFont, uiLang });
     } finally {

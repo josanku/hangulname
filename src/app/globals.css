@@ -1,6 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&family=Black+Han+Sans&family=Gaegu:wght@700&family=Do+Hyeon&display=swap');
 @import "tailwindcss";
 
+@keyframes hg-fadeout {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 :root { --background: #ffffff; --foreground: #171717; }
 body { background: var(--background); color: var(--foreground); font-family: 'NanumGothic', Arial, sans-serif; }
 
