@@ -76,7 +76,7 @@ const DICT: Record<string, string> = {
   penelope:'페넬로페', vivian:'비비안', eleanor:'엘리너', claire:'클레어',
   blake:'블레이크', brianna:'브리애나', autumn:'오텀', savannah:'서배나',
   naomi:'나오미', isabelle:'이저벨', annabelle:'애너벨',
-  caroline:'캐롤라인', carolyn:'캐롤린', carol:'캐럴',
+  caroline:'캐롤라인',
   kathryn:'캐스린', kate:'케이트', katie:'케이티',
   beatrice:'베어트리스', beatrix:'비어트릭스', florence:'플로런스',
   virginia:'버지니아', georgia:'조지아', frances:'프랜시스',
