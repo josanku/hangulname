@@ -3,54 +3,27 @@
 import { useState, useEffect, useCallback } from "react";
 
 export const FONTS = [
-  {
-    id: "gungsuh",
-    labelKo: "궁서",
-    labelEn: "Gungsuh",
-    css: "JSongMyung, serif",
-  },
-  {
-    id: "myeongjo",
-    labelKo: "명조",
-    labelEn: "Myeongjo",
-    css: "NanumMyeongjo, serif",
-  },
-  {
-    id: "gothic",
-    labelKo: "고딕",
-    labelEn: "Gothic",
-    css: "NanumGothic, sans-serif",
-  },
-  {
-    id: "hunmin-hancom",
-    labelKo: "훈민정음\n(한컴)",
-    labelEn: "Hunminjeongeum\n(Hancom)",
-    css: "HancomHunminjeongeum, serif",
-  },
-  {
-    id: "hunmin-ebs",
-    labelKo: "훈민정음\n(EBS)",
-    labelEn: "Hunminjeongeum\n(EBS)",
-    css: "EBSHunminjeongeum, serif",
-  },
-  {
-    id: "pretendard",
-    labelKo: "Pretendard",
-    labelEn: "Pretendard",
-    css: "Pretendard, sans-serif",
-  },
+  { id: "gungsuh",      labelKo: "궁서",          labelEn: "Gungsuh",              css: "JSongMyung, serif" },
+  { id: "myeongjo",     labelKo: "명조",          labelEn: "Myeongjo",             css: "NanumMyeongjo, serif" },
+  { id: "gothic",       labelKo: "고딕",          labelEn: "Gothic",               css: "NanumGothic, sans-serif" },
+  { id: "hunmin-hancom",labelKo: "훈민정음(한컴)", labelEn: "Hunminjeongeum(Hancom)",css: "HancomHunminjeongeum, serif" },
+  { id: "hunmin-ebs",   labelKo: "훈민정음(EBS)", labelEn: "Hunminjeongeum(EBS)",  css: "EBSHunminjeongeum, serif" },
+  { id: "pretendard",   labelKo: "Pretendard",    labelEn: "Pretendard",           css: "Pretendard, sans-serif" },
 ] as const;
 
 interface Props {
   text: string;
   originalName: string;
   isKo: boolean;
+  uiLang: string;
   onClose: () => void;
+  onLog?: (data: Record<string, unknown>) => void;
 }
 
-export default function FontModal({ text, originalName, isKo, onClose }: Props) {
+export default function FontModal({ text, originalName, isKo, uiLang, onClose, onLog }: Props) {
   const [selectedFont, setSelectedFont] = useState<string>(FONTS[1].id);
   const [downloading, setDownloading] = useState(false);
+  const [shared, setShared] = useState(false);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -58,10 +31,13 @@ export default function FontModal({ text, originalName, isKo, onClose }: Props) 
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
+  const handleFontSelect = (fontId: string) => {
+    setSelectedFont(fontId);
+    onLog?.({ type: "font_select", name: text, font: fontId, uiLang });
+  };
+
   const font = FONTS.find((f) => f.id === selectedFont) ?? FONTS[1];
-  const fontLabel = isKo
-    ? font.labelKo.replace("\n", " ")
-    : font.labelEn.replace("\n", " ");
+  const fontLabel = isKo ? font.labelKo : font.labelEn;
 
   const downloadImage = useCallback(async () => {
     setDownloading(true);
@@ -76,7 +52,6 @@ export default function FontModal({ text, originalName, isKo, onClose }: Props) 
       const ctx = canvas.getContext("2d")!;
       ctx.scale(SCALE, SCALE);
 
-      // 배경
       const grad = ctx.createLinearGradient(0, 0, W, H);
       grad.addColorStop(0, "#f8fafc");
       grad.addColorStop(1, "#eff6ff");
@@ -85,7 +60,6 @@ export default function FontModal({ text, originalName, isKo, onClose }: Props) 
       ctx.roundRect(0, 0, W, H, 24);
       ctx.fill();
 
-      // 한글 이름: 공백 기준으로 두 줄 분리
       const parts = text.trim().split(/\s+/);
       const lines = parts.length >= 2
         ? [parts[0], parts.slice(1).join(" ")]
@@ -107,7 +81,6 @@ export default function FontModal({ text, originalName, isKo, onClose }: Props) 
         ctx.fillText(line, W / 2, startY + lineH * idx + lineH / 2);
       });
 
-      // 원어 이름 (작게, 아래)
       ctx.font = `400 18px NanumGothic, sans-serif`;
       ctx.fillStyle = "#94a3b8";
       ctx.fillText(originalName, W / 2, startY + totalH + 32);
@@ -121,10 +94,33 @@ export default function FontModal({ text, originalName, isKo, onClose }: Props) 
         a.click();
         URL.revokeObjectURL(url);
       }, "image/png");
+
+      onLog?.({ type: "download", name: text, font: selectedFont, uiLang });
     } finally {
       setDownloading(false);
     }
-  }, [font, text, originalName]);
+  }, [font, text, originalName, selectedFont, uiLang, onLog]);
+
+  const shareResult = useCallback(async () => {
+    const url = window.location.origin;
+    const title = isKo ? "내 이름을 한글로" : "My Name in Hangul";
+    const msg = isKo
+      ? `${originalName} → ${text} 🇰🇷\n내 이름도 한글로 확인해보세요!`
+      : `${originalName} → ${text} 🇰🇷\nFind out your name in Korean Hangul!`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text: msg, url });
+      } else {
+        await navigator.clipboard.writeText(`${msg}\n${url}`);
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+      }
+      onLog?.({ type: "share", name: text, uiLang });
+    } catch {
+      // user cancelled
+    }
+  }, [text, originalName, isKo, uiLang, onLog]);
 
   return (
     <div
@@ -134,7 +130,7 @@ export default function FontModal({ text, originalName, isKo, onClose }: Props) 
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
       <div
-        className="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg flex flex-col items-center gap-5 p-8"
+        className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl flex flex-col items-center gap-5 p-8"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 닫기 */}
@@ -147,7 +143,7 @@ export default function FontModal({ text, originalName, isKo, onClose }: Props) 
           </svg>
         </button>
 
-        {/* 이름 대형 표시 (볼드, 두 줄) */}
+        {/* 이름 대형 표시 */}
         <div
           className="w-full bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl flex items-center justify-center"
           style={{ minHeight: "220px", padding: "2rem" }}
@@ -173,44 +169,73 @@ export default function FontModal({ text, originalName, isKo, onClose }: Props) 
           </div>
         </div>
 
-        {/* 현재 폰트 이름 + 다운로드 버튼 */}
+        {/* 폰트 이름 + 버튼 */}
         <div className="flex items-center gap-3 w-full justify-between px-1">
           <span className="text-xs text-slate-400">{fontLabel}</span>
-          <button
-            onClick={downloadImage}
-            disabled={downloading}
-            className="flex items-center gap-1.5 text-xs bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white px-4 py-2 rounded-xl transition"
-          >
-            {downloading ? (
-              <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-            )}
-            PNG
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={shareResult}
+              className="flex items-center gap-1.5 text-xs bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl transition"
+            >
+              {shared ? (
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+              )}
+              {shared ? (isKo ? "복사됨!" : "Copied!") : (isKo ? "공유하기" : "Share")}
+            </button>
+            <button
+              onClick={downloadImage}
+              disabled={downloading}
+              className="flex items-center gap-1.5 text-xs bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white px-4 py-2 rounded-xl transition"
+            >
+              {downloading ? (
+                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+              )}
+              PNG
+            </button>
+          </div>
         </div>
 
-        {/* 폰트 선택 */}
+        {/* 폰트 선택 — 각 버튼에 서체 이름(작게) + 해당 서체로 이름 미리보기 */}
         <div className="grid grid-cols-3 gap-2 w-full">
           {FONTS.map((f) => (
             <button
               key={f.id}
-              onClick={() => setSelectedFont(f.id)}
-              style={{ fontFamily: f.css, fontWeight: 700 }}
-              className={`py-3 px-2 rounded-xl text-sm transition border leading-snug whitespace-pre-line
+              onClick={() => handleFontSelect(f.id)}
+              className={`py-3 px-3 rounded-xl transition border flex flex-col items-center gap-1
                 ${selectedFont === f.id
-                  ? "border-blue-400 bg-blue-50 text-blue-600"
-                  : "border-slate-100 bg-white text-slate-600 hover:border-blue-200"
+                  ? "border-blue-400 bg-blue-50"
+                  : "border-slate-100 bg-white hover:border-blue-200"
                 }`}
             >
-              {isKo ? f.labelKo : f.labelEn}
+              <span
+                className="text-[10px] text-slate-400 leading-none"
+                style={{ fontFamily: "system-ui, sans-serif", fontWeight: 400 }}
+              >
+                {isKo ? f.labelKo : f.labelEn}
+              </span>
+              <span
+                style={{ fontFamily: f.css, fontWeight: 700, fontSize: "1.05rem", lineHeight: 1.3 }}
+                className={selectedFont === f.id ? "text-blue-600" : "text-slate-700"}
+              >
+                {text}
+              </span>
             </button>
           ))}
         </div>

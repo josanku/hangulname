@@ -28,7 +28,6 @@ function SpeakerIcon({ active }: { active: boolean }) {
   );
 }
 
-// 여성 목소리 우선 선택
 function getVoice(lang: string): SpeechSynthesisVoice | undefined {
   const voices = window.speechSynthesis.getVoices();
   const prefix = lang.split("-")[0];
@@ -50,25 +49,36 @@ export default function Home() {
   const [lang, setLang] = useState<Lang>("en");
   const [input, setInput] = useState("");
   const [result, setResult] = useState<Result | null>(null);
-  const [currentInput, setCurrentInput] = useState(""); // 결과와 짝을 이루는 입력값
+  const [currentInput, setCurrentInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
   const [playing, setPlaying] = useState<string | null>(null);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [count, setCount] = useState(0);
-  const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
+  const [feedback, setFeedback] = useState<"up" | null>(null);
   const [modalText, setModalText] = useState<string | null>(null);
 
   useEffect(() => {
     setLang(detectLang());
     const stored = parseInt(localStorage.getItem("convertCount") ?? "0", 10);
     setCount(stored);
-    // voices는 비동기 로드되므로 한번 트리거
     window.speechSynthesis.getVoices();
   }, []);
 
   const t = translations[lang];
+
+  const logAction = useCallback(async (data: Record<string, unknown>) => {
+    try {
+      await fetch("/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const convert = async () => {
     if (!input.trim()) return;
@@ -91,6 +101,17 @@ export default function Home() {
       const next = count + 1;
       setCount(next);
       localStorage.setItem("convertCount", String(next));
+
+      logAction({
+        type: "conversion",
+        inputName: input.trim(),
+        uiLang: lang,
+        sourceLang: data.sourceLang,
+        results: data.variants?.map((v: Variant) => ({
+          country: v.country,
+          options: v.options,
+        })),
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : t.errorGeneral);
     } finally {
@@ -102,6 +123,12 @@ export default function Home() {
     navigator.clipboard.writeText(text);
     setCopied(text);
     setTimeout(() => setCopied(null), 1500);
+    logAction({ type: "copy", name: text, inputName: currentInput, uiLang: lang });
+  };
+
+  const openModal = (text: string) => {
+    setModalText(text);
+    logAction({ type: "font_modal_open", name: text, inputName: currentInput, uiLang: lang });
   };
 
   const speakText = useCallback((id: string, text: string, speakLang: string) => {
@@ -113,7 +140,6 @@ export default function Home() {
     utt.rate = 0.85;
     utt.pitch = 1.1;
 
-    // voices가 로드됐을 때만 선택
     const voice = getVoice(speakLang);
     if (voice) utt.voice = voice;
 
@@ -123,6 +149,14 @@ export default function Home() {
     window.speechSynthesis.speak(utt);
   }, [playing]);
 
+  const FontIcon = () => (
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <polyline points="4 7 4 4 20 4 20 7" />
+      <line x1="9" y1="20" x2="15" y2="20" />
+      <line x1="12" y1="4" x2="12" y2="20" />
+    </svg>
+  );
+
   return (
     <>
     <main
@@ -131,9 +165,8 @@ export default function Home() {
       onClick={() => setShowLangMenu(false)}
     >
       <div className="w-full max-w-lg">
-        {/* 상단 바: 언어 선택 + 변환 횟수 */}
-        <div className={`flex items-center justify-between mb-6`}>
-          {/* 변환 카운터 */}
+        {/* 상단 바 */}
+        <div className="flex items-center justify-between mb-6">
           <div className="text-xs text-slate-400 bg-white border border-slate-100 rounded-xl px-3 py-1.5">
             {count > 0 ? (
               <span dangerouslySetInnerHTML={{
@@ -144,7 +177,6 @@ export default function Home() {
             )}
           </div>
 
-          {/* 언어 선택 */}
           <div className="relative">
             <button
               onClick={(e) => { e.stopPropagation(); setShowLangMenu(!showLangMenu); }}
@@ -264,7 +296,6 @@ export default function Home() {
                   className={`w-full bg-white rounded-2xl border px-5 py-4
                     ${i === 0 ? "border-blue-200 shadow-sm" : "border-slate-100"}`}
                 >
-                  {/* 국가 헤더 */}
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-xl">{v.flag}</span>
                     <span className="text-sm font-medium text-slate-500">{v.country}</span>
@@ -273,7 +304,6 @@ export default function Home() {
                     )}
                   </div>
 
-                  {/* 한글 표기 옵션들 */}
                   <div className="grid gap-2 mb-1">
                     {options.map((opt, j) => (
                       <div key={j} className="flex items-center gap-3">
@@ -309,23 +339,17 @@ export default function Home() {
                         >
                           {copied === opt ? t.copied : t.copy}
                         </button>
-                        {/* 폰트 미리보기 버튼 */}
                         <button
-                          onClick={() => setModalText(opt)}
+                          onClick={() => openModal(opt)}
                           title="폰트로 보기"
                           className="flex-shrink-0 p-2 rounded-xl text-slate-300 hover:text-purple-400 hover:bg-purple-50 transition"
                         >
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="4 7 4 4 20 4 20 7" />
-                            <line x1="9" y1="20" x2="15" y2="20" />
-                            <line x1="12" y1="4" x2="12" y2="20" />
-                          </svg>
+                          <FontIcon />
                         </button>
                       </div>
                     ))}
                   </div>
 
-                  {/* 실제 발음 행 (있을 때만) */}
                   {hasPhonetic && (
                     <div className="flex items-center gap-3 pt-2 border-t border-slate-50">
                       <div className="flex-1">
@@ -354,15 +378,11 @@ export default function Home() {
                         {copied === v.phonetic ? t.copied : t.copy}
                       </button>
                       <button
-                        onClick={() => setModalText(v.phonetic)}
+                        onClick={() => openModal(v.phonetic)}
                         title="폰트로 보기"
                         className="flex-shrink-0 p-2 rounded-xl text-amber-200 hover:text-purple-400 hover:bg-purple-50 transition"
                       >
-                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <polyline points="4 7 4 4 20 4 20 7" />
-                          <line x1="9" y1="20" x2="15" y2="20" />
-                          <line x1="12" y1="4" x2="12" y2="20" />
-                        </svg>
+                        <FontIcon />
                       </button>
                     </div>
                   )}
@@ -370,11 +390,15 @@ export default function Home() {
               );
             })}
 
-            {/* 피드백 */}
+            {/* 피드백 — 좋아요만 */}
             <div className="flex items-center justify-center gap-3 pt-1">
               <span className="text-xs text-slate-300">{t.feedbackQ}</span>
               <button
-                onClick={() => setFeedback(feedback === "up" ? null : "up")}
+                onClick={() => {
+                  const next = feedback === "up" ? null : "up";
+                  setFeedback(next);
+                  if (next === "up") logAction({ type: "feedback", value: "up", inputName: currentInput, uiLang: lang });
+                }}
                 className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl transition
                   ${feedback === "up"
                     ? "bg-green-100 text-green-600 font-medium"
@@ -382,23 +406,38 @@ export default function Home() {
               >
                 {t.feedbackYes}
               </button>
-              <button
-                onClick={() => setFeedback(feedback === "down" ? null : "down")}
-                className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl transition
-                  ${feedback === "down"
-                    ? "bg-red-100 text-red-500 font-medium"
-                    : "bg-white border border-slate-100 text-slate-400 hover:border-red-200 hover:text-red-400"}`}
-              >
-                {t.feedbackNo}
-              </button>
-              {feedback && (
-                <span className="text-xs text-slate-400">
-                  {feedback === "up" ? t.feedbackThanks : t.feedbackBetter}
-                </span>
+              {feedback === "up" && (
+                <span className="text-xs text-slate-400">{t.feedbackThanks}</span>
               )}
             </div>
           </div>
         )}
+
+        {/* Wehome 푸터 */}
+        <footer className="mt-10 pb-2 text-center space-y-1">
+          <p className="text-xs text-slate-400">
+            <a
+              href="https://wehome.me"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-500 font-medium transition"
+            >
+              Wehome.me
+            </a>
+            {", 대한민국 공유숙박 위홈과 함께합니다"}
+          </p>
+          <p className="text-xs text-slate-400">
+            <a
+              href="https://wehome.me"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-500 font-medium transition"
+            >
+              Wehome.me
+            </a>
+            {", Your Home in Korea"}
+          </p>
+        </footer>
       </div>
     </main>
 
@@ -407,7 +446,9 @@ export default function Home() {
         text={modalText}
         originalName={currentInput}
         isKo={lang === "ko"}
+        uiLang={lang}
         onClose={() => setModalText(null)}
+        onLog={logAction}
       />
     )}
     </>
