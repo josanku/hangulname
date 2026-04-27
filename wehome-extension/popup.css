@@ -1,0 +1,130 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  width: 280px;
+  min-height: 160px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #fff;
+  color: #111;
+}
+
+#app {
+  padding: 20px 18px 18px;
+}
+
+.state { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.hidden { display: none !important; }
+
+.logo-box {
+  background: #FEE500;
+  color: #000;
+  font-weight: 900;
+  font-size: 15px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  letter-spacing: -0.5px;
+}
+
+/* 로딩 */
+.spinner {
+  width: 28px; height: 28px;
+  border: 3px solid #f0f0f0;
+  border-top-color: #FEE500;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 24px auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* idle */
+.idle-msg {
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* match */
+.match-badge {
+  background: #e6f4ea;
+  color: #1e7e34;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.match-title {
+  font-size: 13px;
+  color: #333;
+  text-align: center;
+  line-height: 1.5;
+  max-height: 52px;
+  overflow: hidden;
+}
+
+/* 가격 비교 */
+.price-compare {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8f8f8;
+  border-radius: 12px;
+  padding: 12px;
+  width: 100%;
+  justify-content: center;
+}
+.price-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.price-label {
+  font-size: 10px;
+  color: #999;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.price-airbnb {
+  font-size: 14px;
+  font-weight: 700;
+  color: #bbb;
+  text-decoration: line-through;
+}
+.price-wehome {
+  font-size: 18px;
+  font-weight: 800;
+  color: #e00;
+}
+.price-arrow { font-size: 16px; color: #ccc; }
+
+/* 버튼 */
+.btn-wehome {
+  display: block;
+  width: 100%;
+  background: #000;
+  color: #FEE500;
+  text-decoration: none;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 12px;
+  transition: transform 0.15s;
+}
+.btn-wehome:hover { transform: scale(1.02); }
+
+.note {
+  font-size: 11px;
+  color: #bbb;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.search-msg {
+  font-size: 13px;
+  color: #555;
+  text-align: center;
+  line-height: 1.6;
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wehome Extension</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- 로딩 -->
+    <div id="state-loading" class="state">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Airbnb 숙소 페이지가 아닐 때 -->
+    <div id="state-idle" class="state hidden">
+      <div class="logo-box">위홈</div>
+      <p class="idle-msg">에어비앤비 숙소 페이지를 방문하면<br>위홈에서 같은 숙소를 찾아드립니다.</p>
+      <a href="https://wehome.me" target="_blank" class="btn-wehome">위홈 바로가기</a>
+    </div>
+
+    <!-- 매칭 숙소 찾음 -->
+    <div id="state-match" class="state hidden">
+      <div class="logo-box">위홈</div>
+      <div class="match-badge">✓ 위홈에 있는 숙소!</div>
+      <p id="match-title" class="match-title"></p>
+
+      <div id="price-compare" class="price-compare hidden">
+        <div class="price-item">
+          <span class="price-label">Airbnb</span>
+          <span id="airbnb-price" class="price-airbnb"></span>
+        </div>
+        <div class="price-arrow">→</div>
+        <div class="price-item">
+          <span class="price-label">위홈</span>
+          <span id="wehome-price" class="price-wehome"></span>
+        </div>
+      </div>
+
+      <a id="btn-match" href="#" target="_blank" class="btn-wehome">위홈에서 예약하기</a>
+      <p class="note">에어비앤비 Reserve 버튼을 누르면<br>위홈 안내가 자동으로 표시됩니다.</p>
+    </div>
+
+    <!-- 매칭 없음 (검색만) -->
+    <div id="state-search" class="state hidden">
+      <div class="logo-box">위홈</div>
+      <p class="search-msg">이 지역의 위홈 숙소를<br>검색해보세요.</p>
+      <a id="btn-search" href="#" target="_blank" class="btn-wehome">위홈에서 검색</a>
+    </div>
+
+    <!-- 한국 외 지역 -->
+    <div id="state-foreign" class="state hidden">
+      <div class="logo-box">위홈</div>
+      <p class="idle-msg">위홈은 <strong>대한민국</strong> 숙소를 전문으로 합니다.<br>한국 숙소 페이지에서 이용해보세요.</p>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
