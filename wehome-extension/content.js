@@ -87,20 +87,68 @@ function getCheckoutPrice() {
 
 // ─── 다국어 콘텐츠 ───────────────────────────────────────────────────────────
 const T = {
-  // 숙소 페이지 — 위홈 매칭 있음
+  // 숙소 페이지 — 3가지 가치 (매칭 여부 관계없이 항상 표시)
   matched: {
-    ko: (save) => ({ title: "이 숙소, 위홈에 있어요!", sub: save ? `지금 바로 ${save} 절약 가능` : "에어비앤비보다 저렴하게", cta: "위홈에서 예약" }),
-    en: (save) => ({ title: "This listing is on Wehome!", sub: save ? `Save ${save} now` : "Better value than Airbnb", cta: "Book on Wehome" }),
-    ja: (save) => ({ title: "このお部屋、Wehomeにあります！", sub: save ? `今すぐ${save}お得` : "Airbnbより安く", cta: "Wehomeで予約" }),
-    zh: (save) => ({ title: "此房源在Wehome上！", sub: save ? `立即节省${save}` : "比Airbnb更划算", cta: "在Wehome预订" }),
-    fr: (save) => ({ title: "Ce logement est sur Wehome !", sub: save ? `Économisez ${save} maintenant` : "Meilleur prix qu'Airbnb", cta: "Réserver sur Wehome" }),
-    de: (save) => ({ title: "Dieses Angebot ist auf Wehome!", sub: save ? `Jetzt ${save} sparen` : "Besser als Airbnb", cta: "Auf Wehome buchen" }),
-    es: (save) => ({ title: "¡Este alojamiento está en Wehome!", sub: save ? `Ahorra ${save} ahora` : "Mejor precio que Airbnb", cta: "Reservar en Wehome" }),
-    ar: (save) => ({ title: "هذا المكان متاح على Wehome!", sub: save ? `وفر ${save} الآن` : "أفضل قيمة من Airbnb", cta: "احجز على Wehome" }),
-    ru: (save) => ({ title: "Это жильё есть на Wehome!", sub: save ? `Сэкономьте ${save}` : "Лучше чем Airbnb", cta: "Забронировать" }),
-    vi: (save) => ({ title: "Chỗ ở này có trên Wehome!", sub: save ? `Tiết kiệm ${save}` : "Giá tốt hơn Airbnb", cta: "Đặt trên Wehome" }),
-    th: (save) => ({ title: "ที่พักนี้อยู่บน Wehome!", sub: save ? `ประหยัด ${save}` : "ราคาดีกว่า Airbnb", cta: "จองบน Wehome" }),
-    id: (save) => ({ title: "Properti ini ada di Wehome!", sub: save ? `Hemat ${save}` : "Lebih hemat dari Airbnb", cta: "Pesan di Wehome" }),
+    ko: (save) => ({
+      title:   "wehome.me — Your Home in Korea",
+      cta:     "위홈에서 예약",
+      bullets: ["내국인 합법 공유숙박은 위홈", "숙박료 즉시 7% 할인", "현지 신속 고객지원"],
+    }),
+    en: (save) => ({
+      title:   "wehome.me — Your Home in Korea",
+      cta:     "Book on Wehome",
+      bullets: ["7% Instant Discount on Room Rate", "Fast Local Support 24/7", "Gov't Certified Legal Stays"],
+    }),
+    ja: (save) => ({
+      title:   "wehome.me — Your Home in Korea",
+      cta:     "Wehomeで予約",
+      bullets: ["宿泊料金から即時7%割引", "迅速な現地サポート24/7", "政府認定の合法民泊"],
+    }),
+    zh: (save) => ({
+      title:   "wehome.me — Your Home in Korea",
+      cta:     "在Wehome预订",
+      bullets: ["立即享受7%住宿折扣", "快速本地客户支持24/7", "政府认证合法民宿"],
+    }),
+    fr: (save) => ({
+      title:   "wehome.me — Your Home in Korea",
+      cta:     "Réserver sur Wehome",
+      bullets: ["7% de réduction immédiate", "Assistance locale 24/7", "Hébergements légaux certifiés"],
+    }),
+    de: (save) => ({
+      title:   "wehome.me — Your Home in Korea",
+      cta:     "Auf Wehome buchen",
+      bullets: ["7% Sofortrabatt auf den Preis", "Schneller lokaler Support 24/7", "Staatlich zertifizierte Unterkünfte"],
+    }),
+    es: (save) => ({
+      title:   "wehome.me — Your Home in Korea",
+      cta:     "Reservar en Wehome",
+      bullets: ["7% descuento instantáneo", "Soporte local rápido 24/7", "Alojamientos legales certificados"],
+    }),
+    ar: (save) => ({
+      title:   "wehome.me — Your Home in Korea",
+      cta:     "احجز على Wehome",
+      bullets: ["خصم فوري 7%", "دعم محلي سريع 24/7", "إقامات قانونية معتمدة"],
+    }),
+    ru: (save) => ({
+      title:   "wehome.me — Your Home in Korea",
+      cta:     "Забронировать",
+      bullets: ["Мгновенная скидка 7%", "Быстрая поддержка 24/7", "Официально сертифицированное жильё"],
+    }),
+    vi: (save) => ({
+      title:   "wehome.me — Your Home in Korea",
+      cta:     "Đặt trên Wehome",
+      bullets: ["Giảm ngay 7%", "Hỗ trợ địa phương nhanh 24/7", "Chỗ ở hợp pháp được chứng nhận"],
+    }),
+    th: (save) => ({
+      title:   "wehome.me — Your Home in Korea",
+      cta:     "จองบน Wehome",
+      bullets: ["ส่วนลดทันที 7%", "บริการลูกค้าท้องถิ่น 24/7", "ที่พักถูกกฎหมายรับรองโดยรัฐ"],
+    }),
+    id: (save) => ({
+      title:   "wehome.me — Your Home in Korea",
+      cta:     "Pesan di Wehome",
+      bullets: ["Diskon langsung 7%", "Dukungan lokal cepat 24/7", "Akomodasi legal bersertifikat"],
+    }),
   },
 
   // 숙소 페이지 — 위홈 미등록
@@ -213,50 +261,55 @@ function buildBanner({ lang, pageType, wehomeData, checkoutPrice }) {
   const banner = document.createElement("div");
   banner.id = "wh-banner";
 
-  if (pageType === "listing" && wehomeData?.found) {
-    // ── 매칭 숙소 있음 ──
-    const airbnbPrice = wehomeData.airbnb_price || null;
-    const wehomePrice = wehomeData.wehome_price || null;
-    const saveAmt = (airbnbPrice && wehomePrice)
-      ? `${wehomeData.currency ?? "₩"}${Math.round(airbnbPrice - wehomePrice).toLocaleString()}`
+  if (pageType === "listing") {
+    // ── 숙소 페이지: 매칭 여부와 관계없이 항상 3가지 가치 표시 ──
+    const bullets = getT(T.matched, lang)(null).bullets ?? getT(T.matched, "en")(null).bullets;
+    const isMatched = wehomeData?.found && wehomeData?.wehome_id;
+
+    // 매칭 숙소면 절약 금액 계산
+    const saveAmt = (wehomeData?.airbnb_price && wehomeData?.wehome_price)
+      ? `${wehomeData.currency ?? "₩"}${Math.round(wehomeData.airbnb_price - wehomeData.wehome_price).toLocaleString()}`
       : null;
-    const c = getT(T.matched, lang)(saveAmt);
-    const profileUrl = `${WEHOME.base}/profile/${wehomeData.wehome_id}`;
+
+    // 링크 목적지
+    const destUrl  = isMatched ? `${WEHOME.base}/profile/${wehomeData.wehome_id}` : WEHOME.base;
+    const destLabel = isMatched
+      ? (getT(T.matched, lang)(saveAmt).cta + " →")
+      : (getT(T.notMatched, lang).cta2 + " →");
+
+    // 헤드라인
+    const headline = isMatched
+      ? (saveAmt
+          ? (lang === "ko" ? `위홈에서 예약하면 ${saveAmt} 절약!` : getT(T.matched, lang)(saveAmt).title)
+          : getT(T.matched, lang)(null).title)
+      : (lang === "ko" ? "wehome.me — Your Home in Korea" : "wehome.me — Your Home in Korea");
+
+    const badgeHtml = isMatched
+      ? `<span class="wh-badge wh-badge-match">✓ 위홈 등록 숙소</span>`
+      : "";
 
     banner.innerHTML = `
       <div class="wh-inner">
         <div class="wh-logo">wehome</div>
         <div class="wh-body">
           <div class="wh-row">
-            <span class="wh-badge wh-badge-match">✓ 위홈 등록 숙소</span>
-            <strong class="wh-title">${c.title}</strong>
+            ${badgeHtml}
+            <strong class="wh-title">${headline}</strong>
           </div>
-          <div class="wh-sub">${c.sub}</div>
-        </div>
-        <a class="wh-cta" href="${profileUrl}" target="_blank" rel="noopener">${c.cta} →</a>
-        <button class="wh-close">✕</button>
-      </div>
-    `;
-
-  } else if (pageType === "listing") {
-    // ── 미등록 — 호스트 초대 ──
-    const c = getT(T.notMatched, lang);
-
-    banner.innerHTML = `
-      <div class="wh-inner">
-        <div class="wh-logo">wehome</div>
-        <div class="wh-body">
-          <strong class="wh-title">${c.title}</strong>
-          <div class="wh-sub">${c.sub}</div>
+          <div class="wh-bullets">
+            ${bullets.map((b, i) => `<span class="wh-bullet"><span class="wh-num">${i+1}</span>${b}</span>`).join("")}
+          </div>
         </div>
         <div class="wh-actions">
-          <button class="wh-cta wh-cta-host" id="wh-host-msg-btn">${c.cta}</button>
-          <a class="wh-cta wh-cta-ghost" href="${WEHOME.base}" target="_blank" rel="noopener">${c.cta2}</a>
+          <a class="wh-cta" href="${destUrl}" target="_blank" rel="noopener">${destLabel}</a>
+          ${!isMatched ? `<button class="wh-cta wh-cta-host" id="wh-host-msg-btn">${getT(T.notMatched, lang).cta}</button>` : ""}
         </div>
         <button class="wh-close">✕</button>
       </div>
     `;
-    banner.querySelector("#wh-host-msg-btn").onclick = () => showHostModal(lang);
+    if (!isMatched) {
+      banner.querySelector("#wh-host-msg-btn").onclick = () => showHostModal(lang);
+    }
 
   } else if (pageType === "checkout" && checkoutPrice) {
     // ── 결제 페이지 ──
