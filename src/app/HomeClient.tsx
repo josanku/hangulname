@@ -30,7 +30,27 @@ function SpeakerIcon({ active }: { active: boolean }) {
   );
 }
 
+// ─── Safe API helpers ─────────────────────────────────────────────────────────
+
+function hasSpeech(): boolean {
+  return typeof window !== "undefined" && "speechSynthesis" in window && !!window.speechSynthesis;
+}
+
+function safeStorageGet(key: string, fallback = ""): string {
+  try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; }
+}
+function safeStorageSet(key: string, value: string): void {
+  try { localStorage.setItem(key, value); } catch { /* blocked */ }
+}
+function safeSessionGet(key: string): string | null {
+  try { return sessionStorage.getItem(key); } catch { return null; }
+}
+function safeSessionSet(key: string, value: string): void {
+  try { sessionStorage.setItem(key, value); } catch { /* blocked */ }
+}
+
 function getVoice(lang: string): SpeechSynthesisVoice | undefined {
+  if (!hasSpeech()) return undefined;
   const voices = window.speechSynthesis.getVoices();
   const prefix = lang.split("-")[0];
   const langVoices = voices.filter((v) => v.lang.startsWith(prefix));
@@ -60,6 +80,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   const [count, setCount] = useState(0);
   const [feedback, setFeedback] = useState<"up" | null>(null);
   const [modalText, setModalText] = useState<string | null>(null);
+  const [kakaoIOS, setKakaoIOS] = useState(false);
 
   const logAction = useCallback(async (data: Record<string, unknown>) => {
     try {
@@ -74,15 +95,35 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   }, []);
 
   useEffect(() => {
+    const ua = navigator.userAgent;
+
+    // ── KakaoTalk 인앱 브라우저 처리 ───────────────────────────────────────
+    if (/KAKAOTALK/i.test(ua)) {
+      if (/Android/i.test(ua)) {
+        // Android: intent URL로 기본 브라우저(Chrome 등)에서 자동으로 열기
+        const intentUrl =
+          `intent://${window.location.host}${window.location.pathname}${window.location.search}` +
+          `#Intent;scheme=https;action=android.intent.action.VIEW;` +
+          `category=android.intent.category.BROWSABLE;end`;
+        window.location.replace(intentUrl);
+        return; // 이 후 코드는 실행하지 않음
+      } else {
+        // iOS: 자동 redirect 불가 → 배너로 안내
+        setKakaoIOS(true);
+      }
+    }
+
     const detectedLang = detectLang();
     setLang(detectedLang);
-    const stored = parseInt(localStorage.getItem("convertCount") ?? "0", 10);
+    const stored = parseInt(safeStorageGet("convertCount", "0"), 10);
     setCount(stored);
-    window.speechSynthesis.getVoices();
+
+    // speechSynthesis는 지원 여부 확인 후 호출
+    if (hasSpeech()) window.speechSynthesis.getVoices();
 
     // 방문자 로그 (세션당 1회)
-    if (!sessionStorage.getItem("hg_visited")) {
-      sessionStorage.setItem("hg_visited", "1");
+    if (!safeSessionGet("hg_visited")) {
+      safeSessionSet("hg_visited", "1");
       fetch("/api/log", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -107,7 +148,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             setCurrentInput(nameParam.trim());
             const next = stored + 1;
             setCount(next);
-            localStorage.setItem("convertCount", String(next));
+            safeStorageSet("convertCount", String(next));
           } else if (data.error) {
             setError(data.error);
           }
@@ -139,7 +180,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
       const next = count + 1;
       setCount(next);
-      localStorage.setItem("convertCount", String(next));
+      safeStorageSet("convertCount", String(next));
 
       logAction({
         type: "conversion",
@@ -168,6 +209,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   };
 
   const speakText = useCallback((id: string, text: string, speakLang: string) => {
+    if (!hasSpeech()) return; // speechSynthesis 미지원 환경(KakaoTalk WebView 등)
     window.speechSynthesis.cancel();
     if (playing === id) { setPlaying(null); return; }
 
@@ -196,6 +238,16 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   return (
     <>
     <KoreaBackground />
+
+    {/* iOS KakaoTalk: 자동 redirect 불가 — 배너로 안내 */}
+    {kakaoIOS && (
+      <div className="fixed top-0 inset-x-0 z-50 bg-[#FEE500] text-slate-900 py-3 px-4 text-center shadow-lg">
+        <p className="text-sm font-bold">카카오톡 브라우저에서는 일부 기능이 제한됩니다</p>
+        <p className="text-xs mt-0.5">
+          우측 하단 <strong>···</strong> 메뉴 → <strong>다른 브라우저로 열기</strong>를 탭하세요
+        </p>
+      </div>
+    )}
     <main
       dir={t.dir}
       className="min-h-screen flex items-center justify-center p-6 relative z-10"
