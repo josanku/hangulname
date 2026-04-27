@@ -2,12 +2,11 @@
   "manifest_version": 3,
   "name": "Wehome — Book Smarter in Korea",
   "version": "1.0.0",
-  "description": "에어비앤비보다 저렴하게! 같은 숙소를 위홈에서 직접 예약하세요.",
-  "permissions": ["storage", "tabs"],
+  "description": "에어비앤비 숙소 페이지에서 위홈(Wehome.me) 배너를 표시합니다. Same Home in Better Value than Airbnb.",
+  "permissions": [],
   "host_permissions": [
     "https://*.airbnb.com/*",
-    "https://*.airbnb.co.kr/*",
-    "https://wehome.me/*"
+    "https://*.airbnb.co.kr/*"
   ],
   "content_scripts": [
     {
@@ -20,9 +19,6 @@
       "run_at": "document_idle"
     }
   ],
-  "background": {
-    "service_worker": "background.js"
-  },
   "action": {
     "default_popup": "popup.html",
     "default_title": "Wehome — 같은 숙소 더 저렴하게",
@@ -38,11 +34,5 @@
     "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": ["icons/*.png"],
-      "matches": ["https://*.airbnb.com/*", "https://*.airbnb.co.kr/*"]
-    }
-  ]
+  }
 }
