@@ -1,32 +1,44 @@
-#wehome-ext-banner {
+/* ── Wehome Extension — 위홈 브랜드 컬러 ─────────────────────────────────── */
+/* Primary: #003580 (딥 네이비) / Accent: #FF6B00 (웜 오렌지) */
+
+/* ── 상단 배너 ── */
+#wh-banner {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   z-index: 2147483647;
-  background: linear-gradient(90deg, #FEE500 0%, #FFD000 100%);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-  display: flex;
-  align-items: center;
-  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Malgun Gothic", sans-serif;
+  background: linear-gradient(90deg, #002966 0%, #003F8C 60%, #004DB3 100%);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Malgun Gothic",
+               "Segoe UI", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-#wehome-ext-link {
+.wh-inner {
+  display: flex;
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 12px 0 0;
+}
+
+/* ── 클릭 가능 영역 ── */
+.wh-brand-area {
   display: flex;
   align-items: center;
   gap: 12px;
   flex: 1;
-  padding: 10px 16px;
-  text-decoration: none;
-  color: inherit;
   min-width: 0;
+  padding: 10px 14px;
+  text-decoration: none;
+  color: #fff;
+  cursor: pointer;
 }
+.wh-brand-area:hover { opacity: 0.92; }
 
-#wehome-ext-link:hover { opacity: 0.88; }
-
+/* ── 로고 ── */
 .wh-logo {
-  background: #000;
-  color: #FEE500;
+  background: #fff;
+  color: #003580;
   font-weight: 900;
   font-size: 13px;
   padding: 4px 9px;
@@ -36,60 +48,159 @@
   flex-shrink: 0;
 }
 
-.wh-msg {
+/* ── 콘텐츠 영역 ── */
+.wh-content {
   display: flex;
   flex-direction: column;
+  gap: 3px;
   min-width: 0;
 }
 
-.wh-msg strong {
+/* ── 숙소 페이지 ── */
+.wh-title {
   font-size: 13px;
   font-weight: 700;
-  color: #111;
+  color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.wh-bullets {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.wh-bullet {
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.88);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.wh-num {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
 
-.wh-msg span {
+/* ── 결제 페이지 ── */
+.wh-checkout-msg {
+  font-size: 14px;
+  color: rgba(255,255,255,0.9);
+}
+.wh-savings {
+  color: #FFD166;
+  font-size: 16px;
+  font-weight: 900;
+  margin-left: 2px;
+}
+.wh-checkout-sub {
   font-size: 11px;
-  color: #555;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: rgba(255,255,255,0.65);
+  margin-top: 1px;
 }
 
+/* ── 기타 페이지 ── */
+.wh-other-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.9);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── CTA 버튼 ── */
 .wh-cta {
+  background: #FF6B00;
+  color: #fff;
   font-size: 12px;
   font-weight: 700;
-  color: #000;
-  background: rgba(0,0,0,0.08);
-  padding: 5px 12px;
+  padding: 7px 14px;
   border-radius: 20px;
   white-space: nowrap;
   flex-shrink: 0;
+  transition: background 0.15s, transform 0.15s;
+}
+.wh-brand-area:hover .wh-cta {
+  background: #E55F00;
+  transform: scale(1.04);
+}
+.wh-cta-checkout {
+  background: #FFD166;
+  color: #003580;
+}
+.wh-brand-area:hover .wh-cta-checkout {
+  background: #FFC934;
 }
 
-#wehome-ext-close {
+/* ── 닫기 버튼 ── */
+.wh-close {
   background: none;
   border: none;
+  color: rgba(255,255,255,0.55);
   font-size: 15px;
   cursor: pointer;
-  color: #555;
-  padding: 6px 12px;
+  padding: 8px 10px;
   line-height: 1;
+  border-radius: 4px;
   flex-shrink: 0;
-  align-self: stretch;
+  transition: color 0.15s, background 0.15s;
+}
+.wh-close:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.12);
+}
+
+/* ── 플로팅 1:1 메시지 버튼 ── */
+#wh-chat-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  z-index: 2147483646;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: #003580;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 20px;
+  padding: 10px 14px 8px;
+  box-shadow: 0 4px 20px rgba(0,41,102,0.4);
+  transition: transform 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+}
+#wh-chat-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,41,102,0.5);
+}
+.wh-chat-icon {
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+.wh-chat-label {
+  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
 }
 
-#wehome-ext-close:hover {
-  background: rgba(0,0,0,0.08);
-  color: #000;
+/* ── 반응형 ── */
+@media (max-width: 640px) {
+  .wh-bullets   { display: none; }
+  .wh-title     { font-size: 12px; }
+  .wh-other-text{ max-width: 160px; }
+  .wh-cta       { font-size: 11px; padding: 6px 10px; }
+  #wh-chat-btn  { bottom: 16px; right: 14px; }
 }
-
-@media (max-width: 480px) {
-  .wh-msg span { display: none; }
-  .wh-cta { display: none; }
+@media (max-width: 400px) {
+  .wh-other-text{ display: none; }
 }
