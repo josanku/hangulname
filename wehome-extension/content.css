@@ -1,12 +1,13 @@
-/* ── Wehome Extension — 공식 브랜드 컬러 #6800cd ── */
+/* ── Wehome Extension — #6800cd 퍼플 포인트 / 화이트 베이스 ── */
 
 /* ─── 상단 배너 ──────────────────────────────────────────────────────────── */
 #wh-banner {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 2147483647;
-  background: linear-gradient(90deg, #4a0093 0%, #6800cd 55%, #8200ff 100%);
-  box-shadow: 0 3px 16px rgba(104,0,205,0.35);
+  background: #ffffff;
+  border-bottom: 3px solid #6800cd;
+  box-shadow: 0 2px 12px rgba(104,0,205,0.12);
   font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Malgun Gothic",
                "Segoe UI", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -18,29 +19,29 @@
   gap: 12px;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 9px 12px 9px 16px;
+  padding: 8px 12px 8px 16px;
 }
 
 /* 로고 */
 .wh-logo {
-  background: #fff;
-  color: #6800cd;
+  background: #6800cd;
+  color: #fff;
   font-weight: 900;
   font-size: 13px;
-  padding: 4px 9px;
+  padding: 4px 10px;
   border-radius: 6px;
   white-space: nowrap;
   letter-spacing: -0.3px;
   flex-shrink: 0;
 }
 
-/* 본문 영역 */
+/* 본문 */
 .wh-body {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 .wh-row {
   display: flex;
@@ -48,6 +49,8 @@
   gap: 8px;
   flex-wrap: wrap;
 }
+
+/* 배지 */
 .wh-badge {
   font-size: 10px;
   font-weight: 700;
@@ -56,43 +59,79 @@
   white-space: nowrap;
 }
 .wh-badge-match {
-  background: rgba(255,255,255,0.2);
-  color: #fff;
+  background: #f0e6ff;
+  color: #6800cd;
 }
+
+/* 타이틀 */
 .wh-title {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.wh-sub {
-  font-size: 11px;
-  color: rgba(255,255,255,0.75);
-}
-.wh-checkout-msg {
-  font-size: 14px;
-  font-weight: 800;
-  color: #fff;
-}
-.wh-other-text {
   font-size: 13px;
-  color: rgba(255,255,255,0.9);
+  font-weight: 700;
+  color: #1a1a2e;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* CTA 버튼들 */
+/* 불릿 리스트 */
+.wh-bullets {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.wh-bullet {
+  font-size: 11.5px;
+  color: #444;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.wh-num {
+  background: #6800cd;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* 결제 페이지 */
+.wh-checkout-msg {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #1a1a2e;
+}
+.wh-sub {
+  font-size: 11px;
+  color: #888;
+}
+
+/* 기타 페이지 */
+.wh-other-text {
+  font-size: 13px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── 버튼 ───────────────────────────────────────────────────────────────── */
 .wh-actions {
   display: flex;
   gap: 6px;
   flex-shrink: 0;
 }
+
+/* 기본 CTA — 퍼플 솔리드 */
 .wh-cta {
-  background: #fff;
-  color: #6800cd;
+  background: #6800cd;
+  color: #fff;
   font-size: 12px;
   font-weight: 700;
   padding: 7px 14px;
@@ -102,28 +141,43 @@
   flex-shrink: 0;
   border: none;
   cursor: pointer;
-  transition: transform 0.15s, opacity 0.15s;
+  transition: background 0.15s, transform 0.12s;
   display: inline-flex;
   align-items: center;
+  line-height: 1;
 }
-.wh-cta:hover { transform: scale(1.04); opacity: 0.92; }
+.wh-cta:hover {
+  background: #5200a3;
+  transform: scale(1.03);
+}
 
+/* 호스트 메시지 버튼 — 아웃라인 */
 .wh-cta-host {
-  background: #FFD700;
-  color: #4a0093;
+  background: transparent;
+  color: #6800cd;
+  border: 1.5px solid #6800cd;
 }
+.wh-cta-host:hover {
+  background: #f5f0ff;
+  transform: scale(1.03);
+}
+
+/* 서브 CTA — 연한 퍼플 */
 .wh-cta-ghost {
-  background: rgba(255,255,255,0.18);
-  color: #fff;
-  border: 1.5px solid rgba(255,255,255,0.4);
+  background: #f5f0ff;
+  color: #6800cd;
+  border: none;
 }
-.wh-cta-ghost:hover { background: rgba(255,255,255,0.28); }
+.wh-cta-ghost:hover {
+  background: #ede0ff;
+  transform: scale(1.03);
+}
 
 /* 닫기 */
 .wh-close {
   background: none;
   border: none;
-  color: rgba(255,255,255,0.5);
+  color: #bbb;
   font-size: 15px;
   cursor: pointer;
   padding: 6px 8px;
@@ -132,7 +186,10 @@
   flex-shrink: 0;
   transition: color 0.15s, background 0.15s;
 }
-.wh-close:hover { color: #fff; background: rgba(255,255,255,0.12); }
+.wh-close:hover {
+  color: #6800cd;
+  background: #f5f0ff;
+}
 
 /* ─── 플로팅 1:1 버튼 ─────────────────────────────────────────────────────── */
 #wh-chat-btn {
@@ -149,20 +206,19 @@
   text-decoration: none;
   border-radius: 22px;
   padding: 11px 14px 9px;
-  box-shadow: 0 4px 20px rgba(104,0,205,0.45);
+  box-shadow: 0 4px 18px rgba(104,0,205,0.35);
   transition: transform 0.15s, box-shadow 0.15s;
-  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", Arial, sans-serif;
+  font-family: inherit;
 }
 #wh-chat-btn svg { display: block; }
 #wh-chat-btn span {
   font-size: 10px;
   font-weight: 700;
   white-space: nowrap;
-  letter-spacing: 0.2px;
 }
 #wh-chat-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 28px rgba(104,0,205,0.55);
+  box-shadow: 0 8px 24px rgba(104,0,205,0.45);
 }
 
 /* ─── 호스트 메시지 모달 ──────────────────────────────────────────────────── */
@@ -173,12 +229,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", Arial, sans-serif;
+  font-family: inherit;
 }
 .wh-modal-bg {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.4);
   backdrop-filter: blur(4px);
 }
 .wh-modal-box {
@@ -188,23 +244,24 @@
   padding: 32px 28px 24px;
   max-width: 400px;
   width: calc(100% - 32px);
-  box-shadow: 0 20px 60px rgba(104,0,205,0.2);
+  box-shadow: 0 20px 60px rgba(104,0,205,0.18);
+  border-top: 4px solid #6800cd;
 }
 .wh-modal-x {
   position: absolute;
   top: 14px; right: 14px;
   background: none; border: none;
   font-size: 17px; cursor: pointer;
-  color: #aaa; border-radius: 4px;
+  color: #bbb; border-radius: 4px;
   padding: 4px 8px;
 }
-.wh-modal-x:hover { background: #f0f0f0; color: #444; }
+.wh-modal-x:hover { background: #f5f0ff; color: #6800cd; }
 .wh-modal-logo {
   display: inline-block;
   background: #6800cd;
   color: #fff;
   font-weight: 900;
-  font-size: 14px;
+  font-size: 13px;
   padding: 4px 10px;
   border-radius: 6px;
   margin-bottom: 12px;
@@ -212,9 +269,8 @@
 .wh-modal-h {
   font-size: 17px;
   font-weight: 800;
-  color: #111;
+  color: #1a1a2e;
   margin-bottom: 6px;
-  line-height: 1.3;
 }
 .wh-modal-desc {
   font-size: 12.5px;
@@ -261,13 +317,13 @@
 .wh-modal-host-link:hover { text-decoration: underline; }
 
 /* ─── 반응형 ─────────────────────────────────────────────────────────────── */
-@media (max-width: 680px) {
-  .wh-badge, .wh-sub { display: none; }
-  .wh-title { font-size: 12px; }
-  .wh-cta-ghost { display: none; }
-  #wh-chat-btn { bottom: 16px; right: 14px; }
+@media (max-width: 720px) {
+  .wh-bullets { display: none; }
+  .wh-title   { font-size: 12px; }
 }
-@media (max-width: 420px) {
-  .wh-other-text { display: none; }
-  .wh-cta { font-size: 11px; padding: 6px 10px; }
+@media (max-width: 480px) {
+  .wh-badge      { display: none; }
+  .wh-cta-ghost  { display: none; }
+  .wh-other-text { max-width: 140px; }
+  #wh-chat-btn   { bottom: 16px; right: 14px; }
 }
