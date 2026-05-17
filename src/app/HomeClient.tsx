@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { translations, LANG_LABELS, detectLang, type Lang } from "@/lib/i18n";
 import FontModal from "@/components/FontModal";
 import KoreaBackground from "@/components/KoreaBackground";
@@ -299,6 +300,22 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
         {/* Header */}
         <div className="mb-8 text-center">
+          <a
+            href="https://wehome.me"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block mb-3 transition hover:opacity-85"
+            onClick={() => logAction({ type: "wehome_logo_click", uiLang: lang })}
+          >
+            <Image
+              src="/wehome-logo.png"
+              alt="Wehome"
+              width={1982}
+              height={1021}
+              priority
+              className="h-12 w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+            />
+          </a>
           <h1 className="text-3xl font-bold text-white mb-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{t.title}</h1>
           <p className="text-sm text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">{t.subtitle}</p>
         </div>
