@@ -9,7 +9,7 @@ import FontGallery from "@/components/FontGallery";
 import KoreaBackground from "@/components/KoreaBackground";
 import FeedbackButton from "@/components/FeedbackButton";
 
-type AboutKey = "hangulname" | "wehome";
+type AboutKey = "hangulname" | "wehome" | "faq";
 
 const SPEECH_LANG: Record<Lang, string> = {
   ko: "ko-KR", en: "en-US", zh: "zh-CN", ja: "ja-JP", es: "es-ES",
@@ -472,6 +472,16 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                   </button>
                   <button
                     onClick={() => {
+                      setAboutOpen("faq");
+                      setShowInfoMenu(false);
+                      logAction({ type: "about_open", target: "faq", uiLang: lang });
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition"
+                  >
+                    {ABOUT_CONTENT[lang].faqTitle}
+                  </button>
+                  <button
+                    onClick={() => {
                       setAboutOpen("wehome");
                       setShowInfoMenu(false);
                       logAction({ type: "about_open", target: "wehome", uiLang: lang });
@@ -713,15 +723,16 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         aria-modal="true"
       >
         <div
-          className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[85vh] overflow-y-auto"
+          className={`bg-white rounded-2xl shadow-xl w-full max-h-[85vh] overflow-y-auto
+            ${aboutOpen === "faq" ? "max-w-2xl" : "max-w-md"}`}
           onClick={(e) => e.stopPropagation()}
           dir={t.dir}
         >
           <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-slate-100">
             <h2 className="text-lg font-bold text-slate-800">
-              {aboutOpen === "hangulname"
-                ? ABOUT_CONTENT[lang].hangulnameTitle
-                : ABOUT_CONTENT[lang].wehomeTitle}
+              {aboutOpen === "hangulname" && ABOUT_CONTENT[lang].hangulnameTitle}
+              {aboutOpen === "wehome" && ABOUT_CONTENT[lang].wehomeTitle}
+              {aboutOpen === "faq" && ABOUT_CONTENT[lang].faqTitle}
             </h2>
             <button
               onClick={() => setAboutOpen(null)}
@@ -734,6 +745,26 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               </svg>
             </button>
           </div>
+          {aboutOpen === "faq" ? (
+            <div className="px-6 py-4 space-y-2">
+              {ABOUT_CONTENT[lang].faqEntries.map((entry, i) => (
+                <details
+                  key={i}
+                  className="group border border-slate-100 rounded-xl bg-slate-50/50 open:bg-white open:border-blue-100 transition"
+                >
+                  <summary className="cursor-pointer list-none px-4 py-3 flex items-center justify-between gap-3 text-sm font-medium text-slate-700">
+                    <span className="flex-1">{entry.q}</span>
+                    <svg className="w-4 h-4 text-slate-400 transition group-open:rotate-180 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </summary>
+                  <p className="px-4 pb-4 text-sm leading-relaxed text-slate-600">
+                    {entry.a}
+                  </p>
+                </details>
+              ))}
+            </div>
+          ) : (
           <div className="px-6 py-5 space-y-4">
             <p className="text-sm leading-relaxed text-slate-600 whitespace-pre-line">
               {aboutOpen === "hangulname"
@@ -752,6 +783,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               </a>
             )}
           </div>
+          )}
         </div>
       </div>
     )}
