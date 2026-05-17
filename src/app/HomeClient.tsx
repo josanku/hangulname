@@ -1,14 +1,35 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { translations, LANG_LABELS, detectLang, type Lang } from "@/lib/i18n";
 import { ABOUT_CONTENT } from "@/lib/about";
 import FontModal from "@/components/FontModal";
+import FontGallery from "@/components/FontGallery";
 import KoreaBackground from "@/components/KoreaBackground";
 import FeedbackButton from "@/components/FeedbackButton";
 
 type AboutKey = "hangulname" | "wehome";
+
+const SPEECH_LANG: Record<Lang, string> = {
+  ko: "ko-KR", en: "en-US", zh: "zh-CN", ja: "ja-JP", es: "es-ES",
+  fr: "fr-FR", de: "de-DE", ar: "ar-SA", ru: "ru-RU", pt: "pt-BR",
+  vi: "vi-VN", id: "id-ID", th: "th-TH", ms: "ms-MY", hi: "hi-IN",
+  bn: "bn-BD", tl: "fil-PH", my: "my-MM", mn: "mn-MN",
+};
+
+interface MinimalSpeechRecognition extends EventTarget {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  start(): void;
+  stop(): void;
+  abort(): void;
+  onresult: ((ev: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+  onerror: ((ev: unknown) => void) | null;
+  onend: (() => void) | null;
+}
+type SRConstructor = new () => MinimalSpeechRecognition;
 
 interface Variant {
   country: string;
@@ -86,6 +107,11 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   const [count, setCount] = useState(0);
   const [feedback, setFeedback] = useState<"up" | null>(null);
   const [modalText, setModalText] = useState<string | null>(null);
+  const [modalInitialFont, setModalInitialFont] = useState<string | undefined>(undefined);
+  const [galleryText, setGalleryText] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [micSupported, setMicSupported] = useState(false);
+  const recognitionRef = useRef<MinimalSpeechRecognition | null>(null);
   const [kakaoIOS, setKakaoIOS] = useState(false);
 
   const logAction = useCallback(async (data: Record<string, unknown>) => {
@@ -164,6 +190,56 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── Speech Recognition (STT) setup ──────────────────────────────────────────
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const w = window as unknown as { SpeechRecognition?: SRConstructor; webkitSpeechRecognition?: SRConstructor };
+    const SR = w.SpeechRecognition ?? w.webkitSpeechRecognition;
+    if (!SR) { setMicSupported(false); return; }
+    setMicSupported(true);
+    const rec = new SR();
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.onresult = (event) => {
+      const transcript = event.results[0]?.[0]?.transcript ?? "";
+      const cleaned = transcript.replace(/[.,]/g, "").trim();
+      if (cleaned) setInput(cleaned);
+      setIsListening(false);
+    };
+    rec.onerror = () => setIsListening(false);
+    rec.onend = () => setIsListening(false);
+    recognitionRef.current = rec;
+    return () => { try { rec.abort(); } catch { /* noop */ } };
+  }, []);
+
+  const toggleMic = () => {
+    const rec = recognitionRef.current;
+    if (!rec) return;
+    if (isListening) {
+      try { rec.stop(); } catch { /* noop */ }
+      setIsListening(false);
+      return;
+    }
+    rec.lang = SPEECH_LANG[lang] ?? "en-US";
+    try {
+      rec.start();
+      setIsListening(true);
+      logAction({ type: "mic_start", uiLang: lang, speechLang: rec.lang });
+    } catch {
+      setIsListening(false);
+    }
+  };
+
+  const openGallery = (text: string) => {
+    setGalleryText(text);
+    logAction({ type: "gallery_open", name: text, inputName: currentInput, uiLang: lang });
+  };
+
+  const openModalForFont = (text: string, fontId: string) => {
+    setModalInitialFont(fontId);
+    setModalText(text);
+  };
+
   const t = translations[lang];
 
   const convert = async () => {
@@ -209,10 +285,6 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     logAction({ type: "copy", name: text, inputName: currentInput, uiLang: lang });
   };
 
-  const openModal = (text: string) => {
-    setModalText(text);
-    logAction({ type: "font_modal_open", name: text, inputName: currentInput, uiLang: lang });
-  };
 
   const speakText = useCallback((id: string, text: string, speakLang: string) => {
     if (!hasSpeech()) return; // speechSynthesis 미지원 환경(KakaoTalk WebView 등)
@@ -233,14 +305,6 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     window.speechSynthesis.speak(utt);
   }, [playing]);
 
-  const FontIcon = () => (
-    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <polyline points="4 7 4 4 20 4 20 7" />
-      <line x1="9" y1="20" x2="15" y2="20" />
-      <line x1="12" y1="4" x2="12" y2="20" />
-    </svg>
-  );
-
   return (
     <>
     <KoreaBackground />
@@ -260,8 +324,82 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
       onClick={() => { setShowLangMenu(false); setShowInfoMenu(false); }}
     >
       <div className="w-full max-w-lg">
-        {/* 상단 바 */}
-        <div className="flex items-center justify-between mb-6">
+        {/* Header */}
+        <div className="mb-6 text-center">
+          <a
+            href="https://wehome.me"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block mb-3 transition hover:opacity-85"
+            onClick={() => logAction({ type: "wehome_logo_click", uiLang: lang })}
+          >
+            <Image
+              src="/wehome-logo.png"
+              alt="Wehome"
+              width={1982}
+              height={1021}
+              priority
+              className="h-12 w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+            />
+          </a>
+          <h1 className="text-3xl font-bold text-white mb-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{t.title}</h1>
+          <p className="text-sm text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">{t.subtitle}</p>
+        </div>
+
+        {/* Input */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-3">
+          <div className="flex gap-2 items-center">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && convert()}
+              placeholder={t.placeholder}
+              dir="auto"
+              className="flex-1 min-w-0 text-slate-700 placeholder:text-slate-300 focus:outline-none text-base"
+              autoFocus
+            />
+            {micSupported && (
+              <button
+                onClick={toggleMic}
+                aria-label={isListening ? (lang === "ko" ? "녹음 중지" : "Stop recording") : (lang === "ko" ? "음성으로 입력" : "Speak to input")}
+                title={isListening ? (lang === "ko" ? "녹음 중지" : "Stop recording") : (lang === "ko" ? "음성으로 입력" : "Speak to input")}
+                className={`shrink-0 rounded-xl p-2.5 transition border
+                  ${isListening
+                    ? "bg-red-50 border-red-200 text-red-500 animate-pulse"
+                    : "bg-slate-50 border-slate-200 text-slate-500 hover:bg-blue-50 hover:text-blue-500 hover:border-blue-200"}`}
+              >
+                {isListening ? (
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="6" width="12" height="12" rx="2" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    <line x1="12" y1="19" x2="12" y2="23" />
+                    <line x1="8" y1="23" x2="16" y2="23" />
+                  </svg>
+                )}
+              </button>
+            )}
+            <button
+              onClick={convert}
+              disabled={loading || !input.trim()}
+              className="shrink-0 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-blue-200 text-white px-4 py-2.5 rounded-xl font-medium transition text-sm"
+            >
+              {loading ? (
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                </svg>
+              ) : t.convert}
+            </button>
+          </div>
+        </div>
+
+        {/* Meta bar — moved below input */}
+        <div className="flex items-center justify-between mb-4">
           <div className="text-xs text-slate-400 bg-white border border-slate-100 rounded-xl px-3 py-1.5">
             {count > 0 ? (
               <span dangerouslySetInnerHTML={{
@@ -286,7 +424,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
               {showLangMenu && (
                 <div
-                  className="absolute top-full mt-1 right-0 bg-white border border-slate-100 rounded-2xl shadow-lg py-1 z-10 min-w-40 max-h-80 overflow-y-auto"
+                  className="absolute bottom-full mb-1 right-0 bg-white border border-slate-100 rounded-2xl shadow-lg py-1 z-10 min-w-40 max-h-80 overflow-y-auto"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {(Object.keys(LANG_LABELS) as Lang[]).map((l) => (
@@ -319,7 +457,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
               {showInfoMenu && (
                 <div
-                  className="absolute top-full mt-1 right-0 bg-white border border-slate-100 rounded-2xl shadow-lg py-1 z-10 min-w-52"
+                  className="absolute bottom-full mb-1 right-0 bg-white border border-slate-100 rounded-2xl shadow-lg py-1 z-10 min-w-52"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
@@ -345,56 +483,6 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                 </div>
               )}
             </div>
-          </div>
-        </div>
-
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <a
-            href="https://wehome.me"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block mb-3 transition hover:opacity-85"
-            onClick={() => logAction({ type: "wehome_logo_click", uiLang: lang })}
-          >
-            <Image
-              src="/wehome-logo.png"
-              alt="Wehome"
-              width={1982}
-              height={1021}
-              priority
-              className="h-12 w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
-            />
-          </a>
-          <h1 className="text-3xl font-bold text-white mb-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{t.title}</h1>
-          <p className="text-sm text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">{t.subtitle}</p>
-        </div>
-
-        {/* Input */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-4">
-          <div className="flex gap-2 items-center">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && convert()}
-              placeholder={t.placeholder}
-              dir="auto"
-              className="flex-1 min-w-0 text-slate-700 placeholder:text-slate-300 focus:outline-none text-base"
-              autoFocus
-            />
-            <button
-              onClick={convert}
-              disabled={loading || !input.trim()}
-              className="shrink-0 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-blue-200 text-white px-4 py-2.5 rounded-xl font-medium transition text-sm"
-            >
-              {loading ? (
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                </svg>
-              ) : t.convert}
-            </button>
           </div>
         </div>
 
@@ -492,13 +580,6 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                         >
                           {copied === opt ? t.copied : t.copy}
                         </button>
-                        <button
-                          onClick={() => openModal(opt)}
-                          title="폰트로 보기"
-                          className="flex-shrink-0 p-2 rounded-xl text-slate-300 hover:text-purple-400 hover:bg-purple-50 transition"
-                        >
-                          <FontIcon />
-                        </button>
                       </div>
                     ))}
                   </div>
@@ -530,15 +611,21 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       >
                         {copied === v.phonetic ? t.copied : t.copy}
                       </button>
-                      <button
-                        onClick={() => openModal(v.phonetic)}
-                        title="폰트로 보기"
-                        className="flex-shrink-0 p-2 rounded-xl text-amber-200 hover:text-purple-400 hover:bg-purple-50 transition"
-                      >
-                        <FontIcon />
-                      </button>
                     </div>
                   )}
+
+                  <button
+                    onClick={() => openGallery(options[0] ?? v.phonetic)}
+                    className="mt-3 w-full flex items-center justify-center gap-2 text-xs bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-100 px-3 py-2.5 rounded-xl transition font-medium"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <rect x="3" y="3" width="7" height="7" rx="1" />
+                      <rect x="14" y="3" width="7" height="7" rx="1" />
+                      <rect x="3" y="14" width="7" height="7" rx="1" />
+                      <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                    {lang === "ko" ? "여러 폰트 이미지 내려받기" : "Download all font images"}
+                  </button>
                 </div>
               );
             })}
@@ -597,7 +684,23 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         originalName={currentInput}
         isKo={lang === "ko"}
         uiLang={lang}
-        onClose={() => setModalText(null)}
+        initialFontId={modalInitialFont}
+        onClose={() => { setModalText(null); setModalInitialFont(undefined); }}
+        onLog={logAction}
+      />
+    )}
+
+    {galleryText !== null && (
+      <FontGallery
+        text={galleryText}
+        originalName={currentInput}
+        isKo={lang === "ko"}
+        uiLang={lang}
+        onClose={() => setGalleryText(null)}
+        onPickFont={(fontId) => {
+          openModalForFont(galleryText, fontId);
+          setGalleryText(null);
+        }}
         onLog={logAction}
       />
     )}
