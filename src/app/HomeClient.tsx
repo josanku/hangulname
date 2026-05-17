@@ -3,9 +3,12 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { translations, LANG_LABELS, detectLang, type Lang } from "@/lib/i18n";
+import { ABOUT_CONTENT } from "@/lib/about";
 import FontModal from "@/components/FontModal";
 import KoreaBackground from "@/components/KoreaBackground";
 import FeedbackButton from "@/components/FeedbackButton";
+
+type AboutKey = "hangulname" | "wehome";
 
 interface Variant {
   country: string;
@@ -78,6 +81,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   const [copied, setCopied] = useState<string | null>(null);
   const [playing, setPlaying] = useState<string | null>(null);
   const [showLangMenu, setShowLangMenu] = useState(false);
+  const [showInfoMenu, setShowInfoMenu] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState<AboutKey | null>(null);
   const [count, setCount] = useState(0);
   const [feedback, setFeedback] = useState<"up" | null>(null);
   const [modalText, setModalText] = useState<string | null>(null);
@@ -252,7 +257,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     <main
       dir={t.dir}
       className="min-h-screen flex items-center justify-center p-6 relative z-10"
-      onClick={() => setShowLangMenu(false)}
+      onClick={() => { setShowLangMenu(false); setShowInfoMenu(false); }}
     >
       <div className="w-full max-w-lg">
         {/* 상단 바 */}
@@ -267,34 +272,79 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             )}
           </div>
 
-          <div className="relative">
-            <button
-              onClick={(e) => { e.stopPropagation(); setShowLangMenu(!showLangMenu); }}
-              className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-1.5 transition"
-            >
-              <span>{LANG_LABELS[lang]}</span>
-              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </button>
-
-            {showLangMenu && (
-              <div
-                className="absolute top-full mt-1 right-0 bg-white border border-slate-100 rounded-2xl shadow-lg py-1 z-10 min-w-40 max-h-80 overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowLangMenu(!showLangMenu); setShowInfoMenu(false); }}
+                className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-1.5 transition"
               >
-                {(Object.keys(LANG_LABELS) as Lang[]).map((l) => (
+                <span>{LANG_LABELS[lang]}</span>
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+
+              {showLangMenu && (
+                <div
+                  className="absolute top-full mt-1 right-0 bg-white border border-slate-100 rounded-2xl shadow-lg py-1 z-10 min-w-40 max-h-80 overflow-y-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {(Object.keys(LANG_LABELS) as Lang[]).map((l) => (
+                    <button
+                      key={l}
+                      onClick={() => { setLang(l); setShowLangMenu(false); }}
+                      className={`w-full text-left px-4 py-2 text-sm transition
+                        ${l === lang ? "text-blue-600 bg-blue-50 font-medium" : "text-slate-600 hover:bg-slate-50"}`}
+                    >
+                      {LANG_LABELS[l]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="relative">
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowInfoMenu(!showInfoMenu); setShowLangMenu(false); }}
+                aria-label={ABOUT_CONTENT[lang].menuLabel}
+                title={ABOUT_CONTENT[lang].menuLabel}
+                className="flex items-center text-slate-500 hover:text-slate-700 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 transition"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="4" y1="7"  x2="20" y2="7"  />
+                  <line x1="4" y1="12" x2="20" y2="12" />
+                  <line x1="4" y1="17" x2="20" y2="17" />
+                </svg>
+              </button>
+
+              {showInfoMenu && (
+                <div
+                  className="absolute top-full mt-1 right-0 bg-white border border-slate-100 rounded-2xl shadow-lg py-1 z-10 min-w-52"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <button
-                    key={l}
-                    onClick={() => { setLang(l); setShowLangMenu(false); }}
-                    className={`w-full text-left px-4 py-2 text-sm transition
-                      ${l === lang ? "text-blue-600 bg-blue-50 font-medium" : "text-slate-600 hover:bg-slate-50"}`}
+                    onClick={() => {
+                      setAboutOpen("hangulname");
+                      setShowInfoMenu(false);
+                      logAction({ type: "about_open", target: "hangulname", uiLang: lang });
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition"
                   >
-                    {LANG_LABELS[l]}
+                    {ABOUT_CONTENT[lang].hangulnameTitle}
                   </button>
-                ))}
-              </div>
-            )}
+                  <button
+                    onClick={() => {
+                      setAboutOpen("wehome");
+                      setShowInfoMenu(false);
+                      logAction({ type: "about_open", target: "wehome", uiLang: lang });
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition"
+                  >
+                    {ABOUT_CONTENT[lang].wehomeTitle}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -551,6 +601,58 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         onLog={logAction}
       />
     )}
+
+    {aboutOpen !== null && (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+        onClick={() => setAboutOpen(null)}
+        role="dialog"
+        aria-modal="true"
+      >
+        <div
+          className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[85vh] overflow-y-auto"
+          onClick={(e) => e.stopPropagation()}
+          dir={t.dir}
+        >
+          <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-slate-100">
+            <h2 className="text-lg font-bold text-slate-800">
+              {aboutOpen === "hangulname"
+                ? ABOUT_CONTENT[lang].hangulnameTitle
+                : ABOUT_CONTENT[lang].wehomeTitle}
+            </h2>
+            <button
+              onClick={() => setAboutOpen(null)}
+              aria-label={ABOUT_CONTENT[lang].close}
+              className="text-slate-400 hover:text-slate-700 transition p-1"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+          <div className="px-6 py-5 space-y-4">
+            <p className="text-sm leading-relaxed text-slate-600 whitespace-pre-line">
+              {aboutOpen === "hangulname"
+                ? ABOUT_CONTENT[lang].hangulnameBody
+                : ABOUT_CONTENT[lang].wehomeBody}
+            </p>
+            {aboutOpen === "wehome" && (
+              <a
+                href="https://wehome.me"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => logAction({ type: "wehome_modal_cta_click", uiLang: lang })}
+                className="block w-full text-center bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-medium transition text-sm"
+              >
+                {ABOUT_CONTENT[lang].wehomeCta}
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+
     <FeedbackButton lang={lang} />
     </>
   );
