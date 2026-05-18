@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FONTS, buildFontCanvas, downloadCanvasPng, type Font } from "@/lib/fontCanvas";
+import ShareLinkModal from "@/components/ShareLinkModal";
 
 interface Props {
   text: string;
@@ -11,6 +12,54 @@ interface Props {
   onClose: () => void;
   onPickFont?: (fontId: string) => void;
   onLog?: (data: Record<string, unknown>) => void;
+}
+
+// "Various Korean fonts" — translated per UI language (falls back to en)
+const VARIOUS_FONTS_LABEL: Record<string, string> = {
+  ko: "다양한 한글 폰트",
+  en: "Various Korean fonts",
+  zh: "多种韩文字体",
+  ja: "様々なハングルフォント",
+  es: "Diversas fuentes coreanas",
+  fr: "Différentes polices coréennes",
+  de: "Verschiedene koreanische Schriftarten",
+  ar: "خطوط كورية متنوعة",
+  ru: "Разные корейские шрифты",
+  pt: "Várias fontes coreanas",
+  vi: "Các kiểu chữ tiếng Hàn khác nhau",
+  id: "Berbagai font Korea",
+  th: "ฟอนต์เกาหลีหลากหลายแบบ",
+  ms: "Pelbagai jenis fon Korea",
+  hi: "विभिन्न कोरियाई फ़ॉन्ट",
+  bn: "বিভিন্ন কোরিয়ান ফন্ট",
+  tl: "Iba't ibang Korean fonts",
+  my: "ကိုရီးယားဖောင့်အမျိုးမျိုး",
+  mn: "Янз бүрийн солонгос фонт",
+};
+
+const SHARE_BUTTON_LABEL: Record<string, string> = {
+  ko: "공유", en: "Share", zh: "分享", ja: "シェア", es: "Compartir",
+  fr: "Partager", de: "Teilen", ar: "مشاركة", ru: "Поделиться",
+  pt: "Compartilhar", vi: "Chia sẻ", id: "Bagikan", th: "แชร์",
+  ms: "Kongsi", hi: "शेयर", bn: "শেয়ার", tl: "Ibahagi",
+  my: "မျှဝေပါ", mn: "Хуваалцах",
+};
+
+const SHARE_MODAL_TITLE: Record<string, string> = {
+  ko: "한글 폰트 모음 공유", en: "Share Korean font gallery",
+  zh: "分享韩文字体集", ja: "ハングルフォント集を共有",
+  es: "Compartir galería de fuentes", fr: "Partager la galerie de polices",
+  de: "Schriftarten-Galerie teilen", ar: "مشاركة معرض الخطوط",
+  ru: "Поделиться галереей шрифтов", pt: "Compartilhar galeria de fontes",
+  vi: "Chia sẻ thư viện phông chữ", id: "Bagikan galeri font",
+  th: "แชร์แกลเลอรีฟอนต์", ms: "Kongsi galeri fon",
+  hi: "फ़ॉन्ट गैलरी शेयर करें", bn: "ফন্ট গ্যালারি শেয়ার করুন",
+  tl: "Ibahagi ang font gallery", my: "ဖောင့်ပြခန်းကို မျှဝေပါ",
+  mn: "Фонтын галерейг хуваалцах",
+};
+
+function tr(map: Record<string, string>, lang: string): string {
+  return map[lang] ?? map.en;
 }
 
 interface RenderedFont {
@@ -25,6 +74,15 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
   );
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [bulkDownloading, setBulkDownloading] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+
+  const subtitleLabel = tr(VARIOUS_FONTS_LABEL, uiLang);
+  const shareLabel = tr(SHARE_BUTTON_LABEL, uiLang);
+  const shareTitle = tr(SHARE_MODAL_TITLE, uiLang);
+  const shareUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/?name=${encodeURIComponent(originalName)}`
+    : `https://name.hangulmaru.com/?name=${encodeURIComponent(originalName)}`;
+  const shareText = `${originalName} → ${text} 🇰🇷 — ${subtitleLabel}`;
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -88,16 +146,30 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
         className="relative bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-slate-100">
-          <div>
-            <h2 className="text-lg font-bold text-slate-800">
-              {isKo ? "여러 폰트 이미지" : "All font images"}
-            </h2>
-            <p className="text-xs text-slate-400 mt-0.5" dir="auto">
+        <div className="flex items-start justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-100">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-2xl font-bold text-slate-800 truncate" dir="auto" title={text}>
               {text}
+            </h2>
+            <p className="text-xs text-slate-400 mt-1">
+              {subtitleLabel}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => {
+                setShareOpen(true);
+                onLog?.({ type: "gallery_share_open", name: text, uiLang });
+              }}
+              className="flex items-center gap-1.5 text-xs bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded-xl transition"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+              {shareLabel}
+            </button>
             <button
               onClick={downloadAll}
               disabled={bulkDownloading}
@@ -129,6 +201,19 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
             </button>
           </div>
         </div>
+
+        {shareOpen && (
+          <ShareLinkModal
+            url={shareUrl}
+            shareText={shareText}
+            hashtags="#Hangul #한글이름 #HangulName"
+            title={shareTitle}
+            isKo={isKo}
+            uiLang={uiLang}
+            onClose={() => setShareOpen(false)}
+            onLog={onLog}
+          />
+        )}
 
         <div className="overflow-y-auto px-6 py-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
