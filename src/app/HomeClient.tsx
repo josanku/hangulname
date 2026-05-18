@@ -6,10 +6,12 @@ import { translations, LANG_LABELS, detectLang, type Lang } from "@/lib/i18n";
 import { ABOUT_CONTENT } from "@/lib/about";
 import FontModal from "@/components/FontModal";
 import FontGallery from "@/components/FontGallery";
+import ShareLinkModal from "@/components/ShareLinkModal";
 import KoreaBackground from "@/components/KoreaBackground";
 import FeedbackButton from "@/components/FeedbackButton";
 
 type AboutKey = "hangulname" | "wehome" | "faq";
+type ShareKind = "site" | "result";
 
 const SPEECH_LANG: Record<Lang, string> = {
   ko: "ko-KR", en: "en-US", zh: "zh-CN", ja: "ja-JP", es: "es-ES",
@@ -104,6 +106,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [showInfoMenu, setShowInfoMenu] = useState(false);
   const [aboutOpen, setAboutOpen] = useState<AboutKey | null>(null);
+  const [shareOpen, setShareOpen] = useState<ShareKind | null>(null);
   const [count, setCount] = useState(0);
   const [feedback, setFeedback] = useState<"up" | null>(null);
   const [modalText, setModalText] = useState<string | null>(null);
@@ -482,6 +485,21 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                   </button>
                   <button
                     onClick={() => {
+                      setShareOpen("site");
+                      setShowInfoMenu(false);
+                      logAction({ type: "page_share_open", source: "menu", uiLang: lang });
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                    {lang === "ko" ? "사이트 공유" : "Share this site"}
+                  </button>
+                  <button
+                    onClick={() => {
                       setAboutOpen("wehome");
                       setShowInfoMenu(false);
                       logAction({ type: "about_open", target: "wehome", uiLang: lang });
@@ -640,6 +658,22 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               );
             })}
 
+            {/* 결과 공유 */}
+            <button
+              onClick={() => {
+                setShareOpen("result");
+                logAction({ type: "page_share_open", source: "result", inputName: currentInput, uiLang: lang });
+              }}
+              className="mt-1 w-full flex items-center justify-center gap-2 text-sm bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white px-4 py-3 rounded-xl transition font-medium shadow-sm"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+              {lang === "ko" ? "결과 공유하기" : "Share this result"}
+            </button>
+
             {/* 피드백 — 좋아요만 */}
             <div className="flex items-center justify-center gap-3 pt-1">
               <span className="text-xs text-white/60">{t.feedbackQ}</span>
@@ -714,6 +748,37 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         onLog={logAction}
       />
     )}
+
+    {shareOpen !== null && (() => {
+      const origin = typeof window !== "undefined" ? window.location.origin : "https://name.hangulmaru.com";
+      const isResult = shareOpen === "result" && currentInput && result;
+      const primaryHangul = isResult ? (result.variants[0]?.options[0] ?? result.variants[0]?.phonetic ?? "") : "";
+      const shareUrl = isResult
+        ? `${origin}/?name=${encodeURIComponent(currentInput)}`
+        : `${origin}/`;
+      const shareText = isResult
+        ? (lang === "ko"
+            ? `${currentInput} → ${primaryHangul} 🇰🇷 내 이름도 한글로 확인해보세요!`
+            : `${currentInput} → ${primaryHangul} 🇰🇷 Find your name in Korean Hangul!`)
+        : (lang === "ko"
+            ? "한글이름 — 외국 이름을 한글 발음으로 변환! 19개 언어 지원, 폰트 이미지 다운로드까지 무료."
+            : "hangulname — convert any foreign name to Korean Hangul pronunciation. 19 languages, free font image downloads.");
+      const title = isResult
+        ? (lang === "ko" ? "결과 공유하기" : "Share this result")
+        : (lang === "ko" ? "사이트 공유하기" : "Share this site");
+      return (
+        <ShareLinkModal
+          url={shareUrl}
+          shareText={shareText}
+          hashtags="#Hangul #한글이름 #HangulName"
+          title={title}
+          isKo={lang === "ko"}
+          uiLang={lang}
+          onClose={() => setShareOpen(null)}
+          onLog={logAction}
+        />
+      );
+    })()}
 
     {aboutOpen !== null && (
       <div
