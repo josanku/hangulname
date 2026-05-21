@@ -6,6 +6,7 @@ import { translations, LANG_LABELS, detectLang, type Lang } from "@/lib/i18n";
 import { ABOUT_CONTENT } from "@/lib/about";
 import FontModal from "@/components/FontModal";
 import FontGallery from "@/components/FontGallery";
+import HangulArtModal from "@/components/HangulArtModal";
 import ShareLinkModal from "@/components/ShareLinkModal";
 import KoreaBackground from "@/components/KoreaBackground";
 import FeedbackButton from "@/components/FeedbackButton";
@@ -112,6 +113,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   const [modalText, setModalText] = useState<string | null>(null);
   const [modalInitialFont, setModalInitialFont] = useState<string | undefined>(undefined);
   const [galleryText, setGalleryText] = useState<string | null>(null);
+  const [artText, setArtText] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [micSupported, setMicSupported] = useState(false);
   const recognitionRef = useRef<MinimalSpeechRecognition | null>(null);
@@ -236,6 +238,11 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   const openGallery = (text: string) => {
     setGalleryText(text);
     logAction({ type: "gallery_open", name: text, inputName: currentInput, uiLang: lang });
+  };
+
+  const openArt = (text: string) => {
+    setArtText(text);
+    logAction({ type: "hangulart_button_click", name: text, inputName: currentInput, uiLang: lang });
   };
 
   const openModalForFont = (text: string, fontId: string) => {
@@ -654,6 +661,20 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                     </svg>
                     {lang === "ko" ? "여러 폰트 이미지 내려받기" : "Download all font images"}
                   </button>
+
+                  <button
+                    onClick={() => openArt(options[0] ?? v.phonetic)}
+                    className="mt-2 w-full flex items-center justify-center gap-2 text-xs bg-gradient-to-r from-pink-50 to-orange-50 hover:from-pink-100 hover:to-orange-100 text-pink-600 border border-pink-100 px-3 py-2.5 rounded-xl transition font-medium"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="13.5" cy="6.5" r="1.5" />
+                      <circle cx="17.5" cy="10.5" r="1.5" />
+                      <circle cx="8.5" cy="7.5" r="1.5" />
+                      <circle cx="6.5" cy="12.5" r="1.5" />
+                      <path d="M12 2a10 10 0 0 0 0 20c1.5 0 2.5-1 2.5-2.5 0-1-.5-1.5-.5-2.5 0-1 1-2 2-2H18a4 4 0 0 0 4-4 10 10 0 0 0-10-10z" />
+                    </svg>
+                    {lang === "ko" ? "한글아트로 보기" : "View as Hangul Art"}
+                  </button>
                 </div>
               );
             })}
@@ -745,6 +766,17 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           openModalForFont(galleryText, fontId);
           setGalleryText(null);
         }}
+        onLog={logAction}
+      />
+    )}
+
+    {artText !== null && (
+      <HangulArtModal
+        text={artText}
+        originalName={currentInput}
+        isKo={lang === "ko"}
+        uiLang={lang}
+        onClose={() => setArtText(null)}
         onLog={logAction}
       />
     )}
