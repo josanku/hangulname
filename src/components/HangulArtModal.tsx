@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import ShareLinkModal from "@/components/ShareLinkModal";
 
 interface Props {
   text: string;
@@ -15,10 +16,16 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [loaded, setLoaded] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  // Bump `nonce` to force iframe to reload (regenerate art)
+  // text rendered in iframe — starts as the converted name, can be changed via input
+  const [currentText, setCurrentText] = useState(text);
+  // value in the input box
+  const [draft, setDraft] = useState(text);
+  // bump to force iframe reload (regenerate art for same text)
   const [nonce, setNonce] = useState(0);
+  const [shareOpen, setShareOpen] = useState(false);
 
-  const src = `/hangulart/index.html?text=${encodeURIComponent(text)}&n=${nonce}`;
+  const src = `/hangulart/index.html?text=${encodeURIComponent(currentText)}&n=${nonce}`;
+  const isCustom = currentText !== text;
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -26,10 +33,27 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
+  const apply = () => {
+    const t = draft.trim();
+    if (!t || t === currentText) return;
+    setLoaded(false);
+    setCurrentText(t);
+    setNonce((n) => n + 1);
+    onLog?.({ type: "hangulart_apply_custom", text: t, originalName, uiLang });
+  };
+
   const regenerate = () => {
     setLoaded(false);
     setNonce((n) => n + 1);
-    onLog?.({ type: "hangulart_regenerate", name: text, uiLang });
+    onLog?.({ type: "hangulart_regenerate", text: currentText, originalName, uiLang });
+  };
+
+  const resetToOriginal = () => {
+    setLoaded(false);
+    setDraft(text);
+    setCurrentText(text);
+    setNonce((n) => n + 1);
+    onLog?.({ type: "hangulart_reset_original", text, originalName, uiLang });
   };
 
   const download = async () => {
@@ -44,7 +68,7 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${text}_hangulart.png`;
+          a.download = `${currentText}_hangulart.png`;
           if (/iP(hone|ad|od)/i.test(navigator.userAgent)) {
             a.target = "_blank";
             a.rel = "noopener";
@@ -55,13 +79,21 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
           setTimeout(() => { URL.revokeObjectURL(url); resolve(); }, 1000);
         }, "image/png");
       });
-      onLog?.({ type: "hangulart_download", name: text, uiLang });
+      onLog?.({ type: "hangulart_download", text: currentText, uiLang });
     } finally {
       setDownloading(false);
     }
   };
 
+  const shareUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/?name=${encodeURIComponent(originalName || currentText)}`
+    : `https://name.hangulmaru.com/?name=${encodeURIComponent(originalName || currentText)}`;
+  const shareText = isKo
+    ? `${originalName ? originalName + " → " : ""}${currentText} 🎨 한글아트로 만들어 보세요!`
+    : `${originalName ? originalName + " → " : ""}${currentText} 🎨 Make it as Hangul Art!`;
+
   return (
+    <>
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={onClose}
@@ -74,14 +106,15 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
         className="relative bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Header */}
         <div className="flex items-start justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-100">
           <div className="min-w-0 flex-1">
-            <h2 className="text-2xl font-bold text-slate-800 truncate" dir="auto" title={text}>
-              {text}
+            <h2 className="text-2xl font-bold text-slate-800 truncate" dir="auto" title={currentText}>
+              {currentText}
             </h2>
             <p className="text-xs text-slate-400 mt-1">
               {isKo
-                ? "한글아트 — 탭하거나 새로 만들기를 누르면 다른 작품이 나옵니다"
+                ? "한글아트 — 캔버스를 탭하거나 새로 만들기를 눌러 다른 작품을 만들어 보세요"
                 : "Hangul Art — tap the canvas or press Regenerate for a new variation"}
             </p>
           </div>
@@ -97,6 +130,43 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
           </button>
         </div>
 
+        {/* Input row */}
+        <div className="px-6 py-3 border-b border-slate-100 bg-slate-50/50">
+          <div className="flex gap-2 items-center">
+            <input
+              type="text"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") apply(); }}
+              placeholder={isKo ? "한글 입력 후 만들기" : "Type Hangul and press Apply"}
+              dir="auto"
+              maxLength={20}
+              className="flex-1 min-w-0 bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none focus:border-pink-300"
+            />
+            <button
+              onClick={apply}
+              disabled={!draft.trim() || draft.trim() === currentText}
+              className="shrink-0 bg-pink-500 hover:bg-pink-600 disabled:bg-pink-200 text-white text-xs px-4 py-2 rounded-xl transition font-medium"
+            >
+              {isKo ? "만들기" : "Apply"}
+            </button>
+            {isCustom && (
+              <button
+                onClick={resetToOriginal}
+                title={isKo ? `${text}으로 돌아가기` : `Back to ${text}`}
+                className="shrink-0 flex items-center gap-1 bg-white border border-slate-200 hover:border-pink-300 text-slate-500 hover:text-pink-600 text-xs px-3 py-2 rounded-xl transition"
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="9 14 4 9 9 4" />
+                  <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
+                </svg>
+                <span className="truncate max-w-[6rem]">{isKo ? `${text} 다시` : text}</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Canvas iframe */}
         <div className="relative bg-slate-50" style={{ aspectRatio: "1 / 1" }}>
           {!loaded && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -107,19 +177,34 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
             </div>
           )}
           <iframe
-            key={nonce}
+            key={nonce + "-" + currentText}
             ref={iframeRef}
             src={src}
-            title={`Hangul Art for ${text}`}
+            title={`Hangul Art for ${currentText}`}
             className="block w-full h-full border-0"
             onLoad={() => {
               setLoaded(true);
-              onLog?.({ type: "hangulart_open", name: text, originalName, uiLang });
+              onLog?.({ type: "hangulart_open", text: currentText, originalName, uiLang });
             }}
           />
         </div>
 
+        {/* Action bar */}
         <div className="flex items-center justify-end gap-2 px-6 py-3 border-t border-slate-100 bg-white">
+          <button
+            onClick={() => {
+              setShareOpen(true);
+              onLog?.({ type: "hangulart_share_open", text: currentText, uiLang });
+            }}
+            className="flex items-center gap-1.5 text-xs bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl transition"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            {isKo ? "공유" : "Share"}
+          </button>
           <button
             onClick={regenerate}
             className="flex items-center gap-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-xl transition"
@@ -153,5 +238,19 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
         </div>
       </div>
     </div>
+
+    {shareOpen && (
+      <ShareLinkModal
+        url={shareUrl}
+        shareText={shareText}
+        hashtags="#Hangul #한글아트 #HangulArt #HangulName"
+        title={isKo ? "한글아트 공유" : "Share Hangul Art"}
+        isKo={isKo}
+        uiLang={uiLang}
+        onClose={() => setShareOpen(false)}
+        onLog={onLog}
+      />
+    )}
+    </>
   );
 }

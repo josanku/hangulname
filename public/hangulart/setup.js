@@ -125,6 +125,14 @@ function setup() {
 	mal= mal.replace(/\./g, '');  //blank 없앰
 	mal= mal.replace(/\,/g, '');  //blank 없앰
 
+	// Dynamic grid: render every character of `mal` (no more "only the first char")
+	{
+		const len = Math.max(mal.length, 1);
+		if (len <= 3)      { xnum = len;                  ynum = 1; }
+		else if (len <= 6) { xnum = 3;                    ynum = Math.ceil(len / 3); }
+		else               { xnum = Math.ceil(Math.sqrt(len)); ynum = Math.ceil(len / xnum); }
+	}
+
 	xw = int((w - (xoffset * 2 + xmargin * (xnum - 1))) / xnum);
 	// 	xw=((w-(xoffset*2+xmargin*(xnum-1)))/xnum); //양쪽 offset이 정확하지만... 글자에 미세 라인 존재함
 
@@ -593,7 +601,11 @@ function mousePressed() {
 
 function windowResized() {
 	resizeCanvas(window.innerWidth, window.innerHeight);
-	xw = int((width - (xoffset * 2 + xmargin * (xnum - 1))) / xnum);
+	const len = Math.max(mal.length, 1);
+	if (len <= 3)      { xnum = len;                  ynum = 1; }
+	else if (len <= 6) { xnum = 3;                    ynum = Math.ceil(len / 3); }
+	else               { xnum = Math.ceil(Math.sqrt(len)); ynum = Math.ceil(len / xnum); }
+	xw = int((width  - (xoffset * 2 + xmargin * (xnum - 1))) / xnum);
 	yw = int((height - (yoffset * 2 + ymargin * (ynum - 1))) / ynum);
 	cellsz = xw;
 	stsz = min(xw, yw) / 60;
