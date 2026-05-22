@@ -244,6 +244,9 @@ if(frameCount==1||frameCount%200==0)
 
 	} else {
 
+		// IMPORTANT: reset `ord` each draw — redraw() (windowResized, tap) runs
+		// draw() again and a stale `ord` would skew the syllable order.
+		ord = 0;
 		for (let i = 0; i < ynum; i++) {
 			let y = yoffset + (yw + ymargin) * i;
 			for (let j = 0; j < xnum; j++) {
@@ -304,14 +307,14 @@ if(frameCount==1||frameCount%200==0)
 
 					}
 						
-					let yetyet=1;
+					let yetyet=0; // disable archaic-Hangul random debug path — render the actual input
 					
 					if(yetyet!=1)
 					{	
 						
 						if (jungtype == 0) //미 밈
 						{
-							dns_line(x, y);
+							dns0_line(x, y);
 						} 
 						else if (jungtype == 1) //므믐 
 							dns1_line(x, y);
@@ -544,7 +547,7 @@ function split2(x,y,w,h,n){
 			jungtype=hanalysis(mychar);
 			if(jungtype==0) //미 밈
 			{
-					dns_line(x,y);
+					dns0_line(x,y);
 			}
 			else if(jungtype==1) //므믐 
 					dns1_line(x,y);
