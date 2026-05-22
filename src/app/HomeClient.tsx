@@ -7,6 +7,7 @@ import { ABOUT_CONTENT } from "@/lib/about";
 import FontModal from "@/components/FontModal";
 import FontGallery from "@/components/FontGallery";
 import HangulArtModal from "@/components/HangulArtModal";
+import HangulArtGallery from "@/components/HangulArtGallery";
 import ShareLinkModal from "@/components/ShareLinkModal";
 import KoreaBackground from "@/components/KoreaBackground";
 import FeedbackButton from "@/components/FeedbackButton";
@@ -717,6 +718,29 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             </div>
           </div>
         )}
+
+        {/* Hangul Art Gallery preview */}
+        <section className="mt-10 mb-2 bg-white/95 backdrop-blur rounded-3xl shadow-sm border border-slate-100 p-5">
+          <HangulArtGallery
+            isKo={lang === "ko"}
+            uiLang={lang}
+            itemsPerCategory={4}
+            compact
+            onLog={logAction}
+          />
+          <div className="mt-3 text-right">
+            <a
+              href="/gallery"
+              onClick={() => logAction({ type: "gallery_full_link_click", uiLang: lang })}
+              className="inline-flex items-center gap-1 text-xs text-pink-600 hover:text-pink-700 transition"
+            >
+              {lang === "ko" ? "전체 갤러리 보기" : "View full gallery"}
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </a>
+          </div>
+        </section>
 
         {/* Wehome 바이라인 */}
         <footer className="mt-10 pb-2 text-center space-y-0.5" dir="ltr">
