@@ -8,6 +8,7 @@ import FontModal from "@/components/FontModal";
 import FontGallery from "@/components/FontGallery";
 import HangulArtModal from "@/components/HangulArtModal";
 import HangulArtGallery from "@/components/HangulArtGallery";
+import HangulQRModal from "@/components/HangulQRModal";
 import ShareLinkModal from "@/components/ShareLinkModal";
 import KoreaBackground from "@/components/KoreaBackground";
 import FeedbackButton from "@/components/FeedbackButton";
@@ -115,6 +116,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   const [modalInitialFont, setModalInitialFont] = useState<string | undefined>(undefined);
   const [galleryText, setGalleryText] = useState<string | null>(null);
   const [artText, setArtText] = useState<string | null>(null);
+  const [qrText, setQrText] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [micSupported, setMicSupported] = useState(false);
   const recognitionRef = useRef<MinimalSpeechRecognition | null>(null);
@@ -244,6 +246,11 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   const openArt = (text: string) => {
     setArtText(text);
     logAction({ type: "hangulart_button_click", name: text, inputName: currentInput, uiLang: lang });
+  };
+
+  const openQR = (text: string) => {
+    setQrText(text);
+    logAction({ type: "qr_button_click", name: text, inputName: currentInput, uiLang: lang });
   };
 
   const openModalForFont = (text: string, fontId: string) => {
@@ -650,19 +657,36 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                     </div>
                   )}
 
-                  <button
-                    onClick={() => openArt(options[0] ?? v.phonetic)}
-                    className="mt-4 w-full flex items-center justify-center gap-2 text-sm bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-2 border-pink-300 px-4 py-3.5 rounded-xl transition font-bold shadow-lg hover:shadow-xl"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="13.5" cy="6.5" r="1.5" />
-                      <circle cx="17.5" cy="10.5" r="1.5" />
-                      <circle cx="8.5" cy="7.5" r="1.5" />
-                      <circle cx="6.5" cy="12.5" r="1.5" />
-                      <path d="M12 2a10 10 0 0 0 0 20c1.5 0 2.5-1 2.5-2.5 0-1-.5-1.5-.5-2.5 0-1 1-2 2-2H18a4 4 0 0 0 4-4 10 10 0 0 0-10-10z" />
-                    </svg>
-                    {lang === "ko" ? "🎨 한글아트로 보기" : "🎨 View as Hangul Art"}
-                  </button>
+                  <div className="grid grid-cols-2 gap-2 mt-4">
+                    <button
+                      onClick={() => openArt(options[0] ?? v.phonetic)}
+                      className="flex items-center justify-center gap-2 text-sm bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-2 border-pink-300 px-4 py-3.5 rounded-xl transition font-bold shadow-lg hover:shadow-xl"
+                    >
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="13.5" cy="6.5" r="1.5" />
+                        <circle cx="17.5" cy="10.5" r="1.5" />
+                        <circle cx="8.5" cy="7.5" r="1.5" />
+                        <circle cx="6.5" cy="12.5" r="1.5" />
+                        <path d="M12 2a10 10 0 0 0 0 20c1.5 0 2.5-1 2.5-2.5 0-1-.5-1.5-.5-2.5 0-1 1-2 2-2H18a4 4 0 0 0 4-4 10 10 0 0 0-10-10z" />
+                      </svg>
+                      <span className="hidden sm:inline">{lang === "ko" ? "한글아트" : "Art"}</span>
+                    </button>
+
+                    <button
+                      onClick={() => openQR(options[0] ?? v.phonetic)}
+                      className="flex items-center justify-center gap-2 text-sm bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white border-2 border-indigo-300 px-4 py-3.5 rounded-xl transition font-bold shadow-lg hover:shadow-xl"
+                    >
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <rect x="3" y="3" width="5" height="5" rx="1" />
+                        <rect x="16" y="3" width="5" height="5" rx="1" />
+                        <rect x="3" y="16" width="5" height="5" rx="1" />
+                        <rect x="13" y="13" width="3" height="3" />
+                        <rect x="13" y="17" width="3" height="3" />
+                        <rect x="17" y="13" width="3" height="3" />
+                      </svg>
+                      <span className="hidden sm:inline">{lang === "ko" ? "QR아트" : "QR Art"}</span>
+                    </button>
+                  </div>
 
                   <button
                     onClick={() => openGallery(options[0] ?? v.phonetic)}
@@ -801,6 +825,17 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         isKo={lang === "ko"}
         uiLang={lang}
         onClose={() => setArtText(null)}
+        onLog={logAction}
+      />
+    )}
+
+    {qrText !== null && (
+      <HangulQRModal
+        text={qrText}
+        originalName={currentInput}
+        isKo={lang === "ko"}
+        uiLang={lang}
+        onClose={() => setQrText(null)}
         onLog={logAction}
       />
     )}
