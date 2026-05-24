@@ -336,12 +336,12 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     >
       <div className="w-full max-w-lg">
         {/* Header */}
-        <div className="mb-6 text-center">
+        <div className="mb-8 text-center">
           <a
             href="https://wehome.me"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block mb-3 transition hover:opacity-85"
+            className="inline-block mb-4 transition hover:opacity-85"
             onClick={() => logAction({ type: "wehome_logo_click", uiLang: lang })}
           >
             <Image
@@ -350,16 +350,16 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               width={1982}
               height={1021}
               priority
-              className="h-12 w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+              className="h-14 w-auto drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
             />
           </a>
-          <h1 className="text-3xl font-bold text-white mb-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{t.title}</h1>
-          <p className="text-sm text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">{t.subtitle}</p>
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2 drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]">{t.title}</h1>
+          <p className="text-base text-white/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]">{t.subtitle}</p>
         </div>
 
-        {/* Input */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-3">
-          <div className="flex gap-2 items-center">
+        {/* Input - 더 크고 눈에 띄게 */}
+        <div className="bg-white rounded-3xl shadow-2xl border-2 border-blue-100 p-6 mb-4">
+          <div className="flex gap-3 items-center">
             <input
               type="text"
               value={input}
@@ -367,7 +367,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               onKeyDown={(e) => e.key === "Enter" && convert()}
               placeholder={t.placeholder}
               dir="auto"
-              className="flex-1 min-w-0 text-slate-700 placeholder:text-slate-300 focus:outline-none text-base"
+              className="flex-1 min-w-0 text-slate-800 placeholder:text-slate-400 focus:outline-none text-lg sm:text-xl font-medium"
               autoFocus
             />
             {micSupported && (
@@ -375,17 +375,17 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                 onClick={toggleMic}
                 aria-label={isListening ? (lang === "ko" ? "녹음 중지" : "Stop recording") : (lang === "ko" ? "음성으로 입력" : "Speak to input")}
                 title={isListening ? (lang === "ko" ? "녹음 중지" : "Stop recording") : (lang === "ko" ? "음성으로 입력" : "Speak to input")}
-                className={`shrink-0 rounded-xl p-2.5 transition border
+                className={`shrink-0 rounded-2xl p-3 transition border-2
                   ${isListening
-                    ? "bg-red-50 border-red-200 text-red-500 animate-pulse"
-                    : "bg-slate-50 border-slate-200 text-slate-500 hover:bg-blue-50 hover:text-blue-500 hover:border-blue-200"}`}
+                    ? "bg-red-50 border-red-300 text-red-500 animate-pulse"
+                    : "bg-slate-50 border-slate-200 text-slate-500 hover:bg-blue-50 hover:text-blue-500 hover:border-blue-300"}`}
               >
                 {isListening ? (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
                     <rect x="6" y="6" width="12" height="12" rx="2" />
                   </svg>
                 ) : (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
                     <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
                     <line x1="12" y1="19" x2="12" y2="23" />
@@ -397,10 +397,10 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             <button
               onClick={convert}
               disabled={loading || !input.trim()}
-              className="shrink-0 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-blue-200 text-white px-4 py-2.5 rounded-xl font-medium transition text-sm"
+              className="shrink-0 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 active:from-blue-700 active:to-indigo-800 disabled:from-slate-300 disabled:to-slate-400 text-white px-6 py-3 rounded-2xl font-bold transition text-base shadow-lg disabled:shadow-none"
             >
               {loading ? (
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
                 </svg>
@@ -410,11 +410,11 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         </div>
 
         {/* Meta bar — moved below input */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="text-xs text-slate-400 bg-white border border-slate-100 rounded-xl px-3 py-1.5">
+        <div className="flex items-center justify-between mb-5">
+          <div className="text-xs text-white/70 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-3 py-2">
             {count > 0 ? (
               <span dangerouslySetInnerHTML={{
-                __html: t.counter.replace("{n}", `<span class="font-semibold text-blue-500">${count.toLocaleString()}</span>`)
+                __html: t.counter.replace("{n}", `<span class="font-bold text-yellow-300">${count.toLocaleString()}</span>`)
               }} />
             ) : (
               <span>{t.counterFirst}</span>
@@ -425,7 +425,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             <div className="relative">
               <button
                 onClick={(e) => { e.stopPropagation(); setShowLangMenu(!showLangMenu); setShowInfoMenu(false); }}
-                className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-1.5 transition"
+                className="flex items-center gap-1.5 text-sm text-white hover:text-white bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 rounded-xl px-3 py-2 transition"
               >
                 <span>{LANG_LABELS[lang]}</span>
                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -457,7 +457,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                 onClick={(e) => { e.stopPropagation(); setShowInfoMenu(!showInfoMenu); setShowLangMenu(false); }}
                 aria-label={ABOUT_CONTENT[lang].menuLabel}
                 title={ABOUT_CONTENT[lang].menuLabel}
-                className="flex items-center text-slate-500 hover:text-slate-700 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 transition"
+                className="flex items-center text-white hover:text-white bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 rounded-xl px-2.5 py-2 transition"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   <line x1="4" y1="7"  x2="20" y2="7"  />
@@ -537,27 +537,27 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             )}
 
             {/* 원어 발음 카드 */}
-            <div className="bg-amber-50 border border-amber-100 rounded-2xl px-5 py-4 flex items-center gap-4">
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl px-5 py-4 flex items-center gap-4 shadow-md">
               <div className="flex-shrink-0 text-center w-14">
-                <div className="text-lg mb-0.5">🗣️</div>
-                <div className="text-xs text-amber-500">{t.listenOriginal}</div>
+                <div className="text-2xl mb-0.5">🗣️</div>
+                <div className="text-xs text-amber-600 font-medium">{t.listenOriginal}</div>
               </div>
-              <div className="w-px h-10 bg-amber-100 flex-shrink-0" />
+              <div className="w-px h-12 bg-amber-200 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <div className="text-xl font-semibold text-amber-800 truncate" dir="auto">
+                <div className="text-2xl font-bold text-amber-900 truncate" dir="auto">
                   {currentInput}
                 </div>
                 {result.sourceLang && (
-                  <div className="text-xs text-amber-400 mt-0.5">{result.sourceLang}</div>
+                  <div className="text-xs text-amber-500 mt-1 font-medium">{result.sourceLang}</div>
                 )}
               </div>
               <button
                 onClick={() => speakText("original", currentInput, result.sourceLang ?? "en-US")}
                 title={t.listenOriginal}
-                className={`flex-shrink-0 p-2 rounded-xl transition
+                className={`flex-shrink-0 p-3 rounded-xl transition
                   ${playing === "original"
-                    ? "text-amber-600 bg-amber-100"
-                    : "text-amber-300 hover:text-amber-500 hover:bg-amber-100"}`}
+                    ? "text-amber-600 bg-amber-200"
+                    : "text-amber-400 hover:text-amber-600 hover:bg-amber-100"}`}
               >
                 <SpeakerIcon active={playing === "original"} />
               </button>
@@ -570,8 +570,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               return (
                 <div
                   key={i}
-                  className={`w-full bg-white rounded-2xl border px-5 py-4
-                    ${i === 0 ? "border-blue-200 shadow-sm" : "border-slate-100"}`}
+                  className={`w-full bg-white rounded-2xl px-5 py-5
+                    ${i === 0 ? "border-2 border-blue-300 shadow-lg" : "border border-slate-200 shadow-md"}`}
                 >
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-xl">{v.flag}</span>
@@ -651,30 +651,30 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                   )}
 
                   <button
-                    onClick={() => openGallery(options[0] ?? v.phonetic)}
-                    className="mt-3 w-full flex items-center justify-center gap-2 text-xs bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-100 px-3 py-2.5 rounded-xl transition font-medium"
-                  >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <rect x="3" y="3" width="7" height="7" rx="1" />
-                      <rect x="14" y="3" width="7" height="7" rx="1" />
-                      <rect x="3" y="14" width="7" height="7" rx="1" />
-                      <rect x="14" y="14" width="7" height="7" rx="1" />
-                    </svg>
-                    {lang === "ko" ? "여러 폰트 이미지 내려받기" : "Download all font images"}
-                  </button>
-
-                  <button
                     onClick={() => openArt(options[0] ?? v.phonetic)}
-                    className="mt-2 w-full flex items-center justify-center gap-2 text-xs bg-gradient-to-r from-pink-50 to-orange-50 hover:from-pink-100 hover:to-orange-100 text-pink-600 border border-pink-100 px-3 py-2.5 rounded-xl transition font-medium"
+                    className="mt-4 w-full flex items-center justify-center gap-2 text-sm bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-2 border-pink-300 px-4 py-3.5 rounded-xl transition font-bold shadow-lg hover:shadow-xl"
                   >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="13.5" cy="6.5" r="1.5" />
                       <circle cx="17.5" cy="10.5" r="1.5" />
                       <circle cx="8.5" cy="7.5" r="1.5" />
                       <circle cx="6.5" cy="12.5" r="1.5" />
                       <path d="M12 2a10 10 0 0 0 0 20c1.5 0 2.5-1 2.5-2.5 0-1-.5-1.5-.5-2.5 0-1 1-2 2-2H18a4 4 0 0 0 4-4 10 10 0 0 0-10-10z" />
                     </svg>
-                    {lang === "ko" ? "한글아트로 보기" : "View as Hangul Art"}
+                    {lang === "ko" ? "🎨 한글아트로 보기" : "🎨 View as Hangul Art"}
+                  </button>
+
+                  <button
+                    onClick={() => openGallery(options[0] ?? v.phonetic)}
+                    className="mt-2 w-full flex items-center justify-center gap-2 text-sm bg-purple-500 hover:bg-purple-600 text-white border-2 border-purple-300 px-4 py-3 rounded-xl transition font-bold shadow-md hover:shadow-lg"
+                  >
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                      <rect x="3" y="3" width="7" height="7" rx="1" />
+                      <rect x="14" y="3" width="7" height="7" rx="1" />
+                      <rect x="3" y="14" width="7" height="7" rx="1" />
+                      <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                    {lang === "ko" ? "📥 폰트 이미지 다운로드" : "📥 Download Font Images"}
                   </button>
                 </div>
               );
@@ -686,14 +686,14 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                 setShareOpen("result");
                 logAction({ type: "page_share_open", source: "result", inputName: currentInput, uiLang: lang });
               }}
-              className="mt-1 w-full flex items-center justify-center gap-2 text-sm bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white px-4 py-3 rounded-xl transition font-medium shadow-sm"
+              className="mt-3 w-full flex items-center justify-center gap-2 text-base bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-6 py-4 rounded-xl transition font-bold shadow-lg hover:shadow-xl"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
                 <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
                 <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
               </svg>
-              {lang === "ko" ? "결과 공유하기" : "Share this result"}
+              {lang === "ko" ? "📤 결과 공유하기" : "📤 Share this result"}
             </button>
 
             {/* 피드백 — 좋아요만 */}
