@@ -86,7 +86,12 @@ let chojung; //=chox
 let chox;
 let jongy; //  //종성 시작점 믐...초성은 전체 차지, 종성도 전체 차지...y축을 3개로 나누어야함... 
 let bgcolor = 255;
-let whitebg = 0; //배경 없앰
+let whitebg = (() => {
+  try {
+    const bg = new URLSearchParams(window.location.search).get("bg");
+    return bg === "white" ? 1 : 0;
+  } catch (e) { return 0; }
+})(); //배경 없앰
 let mybgcolor = "white";
 let dhanul = 1; //ㅗ 일때 ㅣ ㅡ(세로 가로) , ㅏ 일때 ㅣ-(세로 가로)... 만약 dhanul==0  ㅏ 에서 ㅣ - 모두 grad가 세로임...(세로, 세로) 
 

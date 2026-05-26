@@ -651,8 +651,21 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                   )}
 
                   <button
+                    onClick={() => openGallery(options[0] ?? v.phonetic)}
+                    className="mt-4 w-full flex items-center justify-center gap-2 text-sm bg-purple-500 hover:bg-purple-600 text-white border-2 border-purple-300 px-4 py-3 rounded-xl transition font-bold shadow-md hover:shadow-lg"
+                  >
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                      <rect x="3" y="3" width="7" height="7" rx="1" />
+                      <rect x="14" y="3" width="7" height="7" rx="1" />
+                      <rect x="3" y="14" width="7" height="7" rx="1" />
+                      <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                    {lang === "ko" ? "📥 폰트 이미지 다운로드" : "📥 Download Font Images"}
+                  </button>
+
+                  <button
                     onClick={() => openArt(options[0] ?? v.phonetic)}
-                    className="mt-4 w-full flex items-center justify-center gap-2 text-sm bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-2 border-pink-300 px-4 py-3.5 rounded-xl transition font-bold shadow-lg hover:shadow-xl"
+                    className="mt-2 w-full flex items-center justify-center gap-2 text-sm bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-2 border-pink-300 px-4 py-3.5 rounded-xl transition font-bold shadow-lg hover:shadow-xl"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="13.5" cy="6.5" r="1.5" />
@@ -662,19 +675,6 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       <path d="M12 2a10 10 0 0 0 0 20c1.5 0 2.5-1 2.5-2.5 0-1-.5-1.5-.5-2.5 0-1 1-2 2-2H18a4 4 0 0 0 4-4 10 10 0 0 0-10-10z" />
                     </svg>
                     {lang === "ko" ? "🎨 한글아트로 보기" : "🎨 View as Hangul Art"}
-                  </button>
-
-                  <button
-                    onClick={() => openGallery(options[0] ?? v.phonetic)}
-                    className="mt-2 w-full flex items-center justify-center gap-2 text-sm bg-purple-500 hover:bg-purple-600 text-white border-2 border-purple-300 px-4 py-3 rounded-xl transition font-bold shadow-md hover:shadow-lg"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                      <rect x="3" y="3" width="7" height="7" rx="1" />
-                      <rect x="14" y="3" width="7" height="7" rx="1" />
-                      <rect x="3" y="14" width="7" height="7" rx="1" />
-                      <rect x="14" y="14" width="7" height="7" rx="1" />
-                    </svg>
-                    {lang === "ko" ? "📥 폰트 이미지 다운로드" : "📥 Download Font Images"}
                   </button>
                 </div>
               );

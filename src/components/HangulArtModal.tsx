@@ -23,8 +23,9 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
   // bump to force iframe reload (regenerate art for same text)
   const [nonce, setNonce] = useState(0);
   const [shareOpen, setShareOpen] = useState(false);
+  const [whiteBackground, setWhiteBackground] = useState(false);
 
-  const src = `/hangulart/index.html?text=${encodeURIComponent(currentText)}&n=${nonce}`;
+  const src = `/hangulart/index.html?text=${encodeURIComponent(currentText)}&n=${nonce}&bg=${whiteBackground ? 'white' : 'default'}`;
   const isCustom = currentText !== text;
 
   useEffect(() => {
@@ -112,11 +113,31 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
             <h2 className="text-2xl font-bold text-slate-800 truncate" dir="auto" title={currentText}>
               {currentText}
             </h2>
-            <p className="text-xs text-slate-400 mt-1">
-              {isKo
-                ? "한글아트 — 캔버스를 탭하거나 새로 만들기를 눌러 다른 작품을 만들어 보세요"
-                : "Hangul Art — tap the canvas or press Regenerate for a new variation"}
-            </p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-xs text-slate-400">
+                {isKo
+                  ? "한글아트 — 캔버스를 탭하거나 새로 만들기를 눌러 다른 작품을 만들어 보세요"
+                  : "Hangul Art — tap the canvas or press Regenerate for a new variation"}
+              </p>
+              <button
+                onClick={() => {
+                  setWhiteBackground(!whiteBackground);
+                  setLoaded(false);
+                  onLog?.({ type: "hangulart_toggle_background", white: !whiteBackground, text: currentText, uiLang });
+                }}
+                className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition ${
+                  whiteBackground
+                    ? "bg-slate-700 text-white"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+                title={isKo ? "배경색 전환" : "Toggle background"}
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill={whiteBackground ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                </svg>
+                <span>{isKo ? "하얀배경" : "White"}</span>
+              </button>
+            </div>
           </div>
           <button
             onClick={onClose}
