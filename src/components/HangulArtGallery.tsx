@@ -34,7 +34,7 @@ function PreviewTile({
     >
       <div className="aspect-square w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-pink-50/40 rounded-lg mb-0.5">
         <span
-          className="text-xl sm:text-2xl font-bold text-slate-700 group-hover:text-pink-600 transition tracking-wide"
+          className="text-base sm:text-lg font-bold text-slate-700 group-hover:text-pink-600 transition tracking-tight leading-tight"
           style={{ fontFamily: "'NanumGothic', sans-serif" }}
         >
           {item.text}
@@ -73,7 +73,7 @@ function CategorySection({
           {cat.items.length > limit ? `${items.length}/${cat.items.length}` : ""}
         </span>
       </h3>
-      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-1.5">
+      <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 lg:grid-cols-12 gap-1.5">
         {items.map((it) => (
           <PreviewTile key={cat.id + "-" + it.text} item={it} isKo={isKo} onOpen={onOpen} />
         ))}
