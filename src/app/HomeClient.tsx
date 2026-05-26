@@ -357,7 +357,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               width={1982}
               height={1021}
               priority
-              className="h-14 w-auto drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
+              className="h-14 w-auto brightness-0 invert drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
             />
           </a>
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2 drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]">{t.title}</h1>

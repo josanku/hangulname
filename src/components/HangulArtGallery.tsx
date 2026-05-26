@@ -29,23 +29,23 @@ function PreviewTile({
     <button
       type="button"
       onClick={() => onOpen(item.text)}
-      className="group relative flex flex-col items-center gap-1 bg-white border border-slate-100 rounded-2xl p-3 transition hover:border-pink-200 hover:shadow-md hover:-translate-y-0.5"
+      className="group relative flex flex-col items-center gap-0.5 bg-white border border-slate-100 rounded-xl p-2 transition hover:border-pink-200 hover:shadow-md hover:-translate-y-0.5"
       title={isKo ? `${item.text} 한글아트로 보기` : `View ${item.text} as Hangul Art`}
     >
-      <div className="aspect-square w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-pink-50/40 rounded-xl mb-1">
+      <div className="aspect-square w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-pink-50/40 rounded-lg mb-0.5">
         <span
-          className="text-3xl sm:text-4xl font-bold text-slate-700 group-hover:text-pink-600 transition tracking-wide"
+          className="text-xl sm:text-2xl font-bold text-slate-700 group-hover:text-pink-600 transition tracking-wide"
           style={{ fontFamily: "'NanumGothic', sans-serif" }}
         >
           {item.text}
         </span>
       </div>
       {item.sub && (
-        <span className="text-[10px] text-slate-400 text-center leading-tight truncate w-full">
+        <span className="text-[9px] text-slate-400 text-center leading-tight truncate w-full">
           {item.sub}
         </span>
       )}
-      <span className="absolute top-1.5 right-1.5 text-[9px] bg-pink-50 text-pink-600 px-1.5 py-0.5 rounded-md opacity-0 group-hover:opacity-100 transition">
+      <span className="absolute top-1 right-1 text-[8px] bg-pink-50 text-pink-600 px-1 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">
         {isKo ? "아트" : "Art"}
       </span>
     </button>
@@ -73,7 +73,7 @@ function CategorySection({
           {cat.items.length > limit ? `${items.length}/${cat.items.length}` : ""}
         </span>
       </h3>
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-1.5">
         {items.map((it) => (
           <PreviewTile key={cat.id + "-" + it.text} item={it} isKo={isKo} onOpen={onOpen} />
         ))}
