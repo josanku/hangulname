@@ -34,7 +34,7 @@ function PreviewTile({
     >
       <div className="aspect-square w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-pink-50/40 rounded-lg mb-0.5">
         <span
-          className="text-base sm:text-lg font-bold text-slate-700 group-hover:text-pink-600 transition tracking-tight leading-tight"
+          className="text-sm sm:text-base font-bold text-slate-700 group-hover:text-pink-600 transition tracking-tighter leading-tight px-0.5"
           style={{ fontFamily: "'NanumGothic', sans-serif" }}
         >
           {item.text}
