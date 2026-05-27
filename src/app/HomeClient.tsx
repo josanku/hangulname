@@ -341,7 +341,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             href="https://wehome.me"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block mb-4 transition hover:opacity-85"
+            className="inline-block mb-2 transition hover:opacity-85"
             onClick={() => logAction({ type: "wehome_logo_click", uiLang: lang })}
           >
             <Image
@@ -353,8 +353,20 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               className="h-14 w-auto brightness-0 invert drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
             />
           </a>
+          <a
+            href="https://wehome.me"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block mb-6 text-white/80 hover:text-white text-sm font-medium transition drop-shadow-[0_2px_6px_rgba(0,0,0,0.3)]"
+            onClick={() => logAction({ type: "wehome_tagline_click", uiLang: lang })}
+          >
+            Your Home in Korea
+          </a>
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2 drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]">{t.title}</h1>
-          <p className="text-base text-white/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]">{t.subtitle}</p>
+          <p className="text-base text-white/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)] mb-2">{t.subtitle}</p>
+          <p className="text-sm text-white/70 drop-shadow-[0_2px_6px_rgba(0,0,0,0.3)] italic">
+            Hangul Name in various fonts and Hangul Art
+          </p>
         </div>
 
         {/* Input - 더 크고 눈에 띄게 */}
