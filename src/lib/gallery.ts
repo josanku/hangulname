@@ -17,6 +17,28 @@ export interface GalleryCategory {
 
 export const GALLERY: GalleryCategory[] = [
   {
+    id: "oxford-words",
+    labelKo: "옥스포드 영어 단어",
+    labelEn: "Oxford English Words",
+    emoji: "📖",
+    items: [
+      { text: "한글",   sub: "Hangul" },
+      { text: "김치",   sub: "Kimchi" },
+      { text: "불고기", sub: "Bulgogi" },
+      { text: "막걸리", sub: "Makgeolli" },
+      { text: "갓",     sub: "Gat" },
+      { text: "온돌",   sub: "Ondol" },
+      { text: "태권도", sub: "Taekwondo" },
+      { text: "한복",   sub: "Hanbok" },
+      { text: "재벌",   sub: "Chaebol" },
+      { text: "아이고", sub: "Aigoo" },
+      { text: "갑질",   sub: "Gapjil" },
+      { text: "노래방", sub: "Noraebang" },
+      { text: "먹방",   sub: "Mukbang" },
+      { text: "치맥",   sub: "Chimaek" },
+    ],
+  },
+  {
     id: "bts",
     labelKo: "BTS",
     labelEn: "BTS",
