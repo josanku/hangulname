@@ -23,7 +23,7 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
   // bump to force iframe reload (regenerate art for same text)
   const [nonce, setNonce] = useState(0);
   const [shareOpen, setShareOpen] = useState(false);
-  const [whiteBackground, setWhiteBackground] = useState(false);
+  const [whiteBackground, setWhiteBackground] = useState(true); // Default: white background
 
   const src = `/hangulart/index.html?text=${encodeURIComponent(currentText)}&n=${nonce}&bg=${whiteBackground ? 'white' : 'default'}`;
   const isCustom = currentText !== text;

@@ -89,9 +89,9 @@ let bgcolor = 255;
 let whitebg = (() => {
   try {
     const bg = new URLSearchParams(window.location.search).get("bg");
-    return bg === "white" ? 1 : 0;
-  } catch (e) { return 0; }
-})(); //배경 없앰
+    return bg === "default" ? 0 : 1; // Default is now white (1)
+  } catch (e) { return 1; }
+})(); //배경 설정 - 기본값 하얀색
 let mybgcolor = "white";
 let dhanul = 1; //ㅗ 일때 ㅣ ㅡ(세로 가로) , ㅏ 일때 ㅣ-(세로 가로)... 만약 dhanul==0  ㅏ 에서 ㅣ - 모두 grad가 세로임...(세로, 세로) 
 
@@ -130,11 +130,17 @@ function setup() {
 	mal= mal.replace(/\./g, '');  //blank 없앰
 	mal= mal.replace(/\,/g, '');  //blank 없앰
 
-	// Dynamic grid: render every character of `mal` (no more "only the first char")
+	// Dynamic grid: N×N based on character count
 	{
 		const len = Math.max(mal.length, 1);
-		if (len <= 3)      { xnum = len;                  ynum = 1; }
-		else if (len <= 6) { xnum = 3;                    ynum = Math.ceil(len / 3); }
+		if (len === 1)     { xnum = 2; ynum = 2; } // 1자: 2×2 (한 칸만 채움)
+		else if (len === 2){ xnum = 2; ynum = 1; } // 2자: 2×1
+		else if (len === 3){ xnum = 2; ynum = 2; } // 3자: 2×2 (한 칸 빔)
+		else if (len === 4){ xnum = 2; ynum = 2; } // 4자: 2×2
+		else if (len <= 6) { xnum = 3; ynum = 2; } // 5-6자: 3×2
+		else if (len <= 9) { xnum = 3; ynum = 3; } // 7-9자: 3×3
+		else if (len <= 12){ xnum = 4; ynum = 3; } // 10-12자: 4×3
+		else if (len <= 16){ xnum = 4; ynum = 4; } // 13-16자: 4×4
 		else               { xnum = Math.ceil(Math.sqrt(len)); ynum = Math.ceil(len / xnum); }
 	}
 

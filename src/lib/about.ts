@@ -21,10 +21,10 @@ const KO: AboutContent = {
   menuLabel: "정보",
   hangulnameTitle: "한글이름이란?",
   hangulnameBody:
-    "외국 이름을 한국어 발음으로 어떻게 표기하면 좋을지 알려주는 무료 도구입니다. 19개 언어를 지원하며, 변환 결과마다 한글 표기·음성 듣기·IPA 발음기호·여러 폰트 미리보기를 제공합니다. 한국 친구나 동료의 이름을 명함, 청첩장, 학교 등록 서류 등에 정확히 표기하고 싶을 때 사용해보세요.",
+    "외국 이름을 한국어 발음으로 어떻게 표기하면 좋을지 알려주는 무료 도구입니다. 19개 언어를 지원하며, 변환 결과마다 한글 표기·음성 듣기·IPA 발음기호·여러 폰트 미리보기·한글아트 생성을 제공합니다. 한국 친구나 동료의 이름을 명함, 청첩장, 학교 등록 서류, SNS 프로필 등에 정확히 표기하고 싶을 때 사용해보세요.",
   wehomeTitle: "Wehome.me 소개",
   wehomeBody:
-    "위홈은 한국 정부에 합법 등록된 공유숙박 플랫폼입니다. 에어비앤비와 동일한 숙소를 평균 7% 더 저렴한 즉시 할인 가격으로 예약할 수 있고, 한국어·영어 24/7 현지 고객지원이 제공됩니다. \"Your Home in Korea\" — 한국에서의 나만의 집, 위홈에서.",
+    "위홈은 한국 정부에 합법 등록된 공유숙박 플랫폼입니다. AI 기반 로컬 추천 시스템으로 여행객에게 최적의 숙소를 제안하고, 24/7 한국어·영어 현지 고객지원을 제공합니다. 한국 문화와 라이프스타일을 경험할 수 있는 다양한 숙소를 만나보세요. \"Your Home in Korea\" — 한국에서의 나만의 집, 위홈에서.",
   wehomeCta: "Wehome.me 방문하기 →",
   faqTitle: "한글이름 FAQ",
   faqEntries: [
@@ -42,7 +42,7 @@ const KO: AboutContent = {
     },
     {
       q: "어떤 폰트를 선택해야 하나요?",
-      a: "용도에 맞춰 고르시면 됩니다. 명함·서류는 명조나 고딕(가독성 우수), 청첩장·증서는 궁서(전통미), SNS·캐주얼 용도는 나눔붓글씨나 개구체(친근감)를 추천합니다. \"여러 폰트 이미지 내려받기\" 버튼으로 12개 폰트를 한 번에 비교하실 수 있습니다.",
+      a: "용도에 맞춰 고르시면 됩니다. 명함·서류는 명조나 고딕(가독성 우수), 청첩장·증서는 궁서(전통미), SNS·캐주얼 용도는 나눔붓글씨나 개구체(친근감)를 추천합니다. \"폰트 갤러리\" 버튼으로 12개 폰트를 한 번에 비교하실 수 있고, \"한글아트\" 버튼으로 생성형 한글 예술 작품도 만들 수 있습니다.",
     },
     {
       q: "음성 입력(마이크)이 동작하지 않아요.",
@@ -68,10 +68,10 @@ const EN: AboutContent = {
   menuLabel: "About",
   hangulnameTitle: "What is hangulname?",
   hangulnameBody:
-    "A free tool that helps you write any foreign name in Korean (Hangul) with the closest natural pronunciation. Supports 19 languages and provides audio playback, IPA phonetics, and multiple font previews for every result. Useful for business cards, wedding invites, school registrations, or anywhere you need to render a non-Korean name in Hangul cleanly.",
+    "A free tool that helps you write any foreign name in Korean (Hangul) with the closest natural pronunciation. Supports 19 languages and provides audio playback, IPA phonetics, multiple font previews, and generative Hangul Art for every result. Useful for business cards, wedding invites, school registrations, social media profiles, or anywhere you need to render a non-Korean name in Hangul cleanly.",
   wehomeTitle: "About Wehome.me",
   wehomeBody:
-    "Wehome is a government-registered legal short-term rental platform in Korea. Book the same homes you'd find on Airbnb at an instant 7% discount on average, with 24/7 local support in Korean and English. \"Your Home in Korea\" — Wehome.me.",
+    "Wehome is a government-registered legal short-term rental platform in Korea. Our AI-powered local recommendation system matches travelers with the perfect accommodations, backed by 24/7 local support in Korean and English. Experience authentic Korean culture and lifestyle through our diverse selection of homes. \"Your Home in Korea\" — Wehome.me.",
   wehomeCta: "Visit Wehome.me →",
   faqTitle: "hangulname FAQ",
   faqEntries: [
@@ -89,7 +89,7 @@ const EN: AboutContent = {
     },
     {
       q: "Which font should I pick?",
-      a: "Match it to the use case. For business cards or formal documents try Myeongjo or Gothic (clean and readable). For wedding invitations or certificates, Gungsuh has a classic feel. For social or casual use, Nanum Brush Script or Gaegu feel friendly. Use the \"Download all font images\" button to compare all 12 at once.",
+      a: "Match it to the use case. For business cards or formal documents try Myeongjo or Gothic (clean and readable). For wedding invitations or certificates, Gungsuh has a classic feel. For social or casual use, Nanum Brush Script or Gaegu feel friendly. Use the \"Font Gallery\" button to compare all 12 fonts at once, and the \"Hangul Art\" button to generate unique artistic compositions.",
     },
     {
       q: "The microphone input doesn't work for me.",

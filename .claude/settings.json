@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(curl -s \"https://docs.google.com/spreadsheets/d/1LtmOzQ2_tdJMoeqbYxvpNMGj-NliEt1aS31LTyruTnQ/export?format=csv&gid=475530553\")"
     ]
   }
 }

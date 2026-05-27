@@ -337,34 +337,9 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="mb-8 text-center flex flex-col items-center">
-          <a
-            href="https://wehome.me"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block mb-2 transition hover:opacity-85"
-            onClick={() => logAction({ type: "wehome_logo_click", uiLang: lang })}
-          >
-            <Image
-              src="/wehome-logo.png"
-              alt="Wehome"
-              width={1982}
-              height={1021}
-              priority
-              className="h-14 w-auto brightness-0 invert drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
-            />
-          </a>
-          <a
-            href="https://wehome.me"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block mb-6 text-white/80 hover:text-white text-sm font-medium transition drop-shadow-[0_2px_6px_rgba(0,0,0,0.3)]"
-            onClick={() => logAction({ type: "wehome_tagline_click", uiLang: lang })}
-          >
-            Your Home in Korea
-          </a>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2 drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]">{t.title}</h1>
-          <p className="text-base text-white/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)] mb-2">{t.subtitle}</p>
-          <p className="text-sm text-white/70 drop-shadow-[0_2px_6px_rgba(0,0,0,0.3)] italic">
+          <h1 className="text-5xl sm:text-6xl font-black text-white mb-3 drop-shadow-[0_4px_16px_rgba(0,0,0,0.5)] tracking-tight">{t.title}</h1>
+          <p className="text-lg text-white/95 drop-shadow-[0_2px_10px_rgba(0,0,0,0.4)] mb-2 font-medium">{t.subtitle}</p>
+          <p className="text-sm text-white/80 drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)] italic font-light">
             Hangul Name in various fonts and Hangul Art
           </p>
         </div>
@@ -766,27 +741,29 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           </div>
         </section>
 
-        {/* Wehome 바이라인 */}
-        <footer className="mt-10 pb-2 text-center space-y-0.5" dir="ltr">
-          <p className="text-[11px] text-white/40 font-medium tracking-wide uppercase">
-            Powered by
-          </p>
-          <p className="text-xs text-white/70">
+        {/* Wehome Footer */}
+        <footer className="mt-12 pb-4 text-center" dir="ltr">
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 inline-block">
             <a
               href="https://wehome.me"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-300 hover:text-blue-200 font-semibold transition"
-              onClick={() => logAction({ type: "wehome_click", uiLang: lang })}
+              className="inline-block mb-2 transition hover:opacity-80"
+              onClick={() => logAction({ type: "wehome_footer_logo_click", uiLang: lang })}
             >
-              Wehome.me
+              <Image
+                src="/wehome-logo.png"
+                alt="Wehome"
+                width={1982}
+                height={1021}
+                className="h-10 w-auto brightness-0 invert drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+              />
             </a>
-            {", Your Home in Korea"}
-          </p>
-          {t.wehomeTagline1 && (
-            <p className="text-xs text-white/60">{t.wehomeTagline1}</p>
-          )}
-          <p className="text-xs text-white/60">{t.wehomeTagline2}</p>
+            <p className="text-white/90 text-sm font-medium mb-1">Your Home in Korea</p>
+            <p className="text-white/70 text-xs leading-relaxed max-w-sm mx-auto">
+              {t.wehomeTagline2}
+            </p>
+          </div>
         </footer>
       </div>
     </main>
