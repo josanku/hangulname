@@ -336,7 +336,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     >
       <div className="w-full max-w-lg">
         {/* Header */}
-        <div className="mb-8 text-center">
+        <div className="mb-8 text-center flex flex-col items-center">
           <a
             href="https://wehome.me"
             target="_blank"
@@ -582,112 +582,124 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               return (
                 <div
                   key={i}
-                  className={`w-full bg-white rounded-2xl px-5 py-5
-                    ${i === 0 ? "border-2 border-blue-300 shadow-lg" : "border border-slate-200 shadow-md"}`}
+                  className={`w-full bg-gradient-to-br rounded-3xl px-6 py-6 backdrop-blur-sm
+                    ${i === 0
+                      ? "from-blue-50 via-white to-purple-50 border-2 border-blue-200 shadow-xl"
+                      : "from-white to-slate-50/80 border border-slate-150 shadow-lg"}`}
                 >
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xl">{v.flag}</span>
-                    <span className="text-sm font-medium text-slate-500">{v.country}</span>
-                    {v.ipa && (
-                      <span className="text-xs text-slate-300 font-mono ml-auto">{v.ipa}</span>
-                    )}
+                  <div className="flex items-center gap-3 mb-4 pb-3 border-b border-slate-100">
+                    <div className="text-2xl">{v.flag}</div>
+                    <div className="flex-1">
+                      <div className={`font-bold ${i === 0 ? "text-blue-600" : "text-slate-700"}`}>{v.country}</div>
+                      {v.ipa && (
+                        <div className="text-xs text-slate-400 font-mono mt-0.5">{v.ipa}</div>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="grid gap-2 mb-1">
+                  <div className="space-y-3 mb-4">
                     {options.map((opt, j) => (
-                      <div key={j} className="flex items-center gap-3">
-                        <div className="flex-1">
-                          {options.length > 1 && (
-                            <div className="text-xs text-slate-300 mb-0.5">
-                              {j === 0 ? t.primarySpelling : `${t.altSpelling} ${j}`}
+                      <div key={j} className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-slate-100/50">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1">
+                            {options.length > 1 && (
+                              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">
+                                {j === 0 ? t.primarySpelling : `${t.altSpelling} ${j}`}
+                              </div>
+                            )}
+                            <div className={`font-bold tracking-tight
+                              ${j === 0
+                                ? `text-3xl ${i === 0 ? "text-blue-600" : "text-slate-800"}`
+                                : "text-2xl text-slate-600"}`}>
+                              {opt}
                             </div>
-                          )}
-                          <div className={`font-bold tracking-wide
-                            ${j === 0
-                              ? `text-2xl ${i === 0 ? "text-blue-600" : "text-slate-700"}`
-                              : "text-xl text-slate-500"}`}>
-                            {opt}
                           </div>
+                          <button
+                            onClick={() => speakText(`ko-${i}-${j}`, opt, "ko-KR")}
+                            title={t.listen}
+                            className={`p-3 rounded-xl transition flex-shrink-0 shadow-sm
+                              ${playing === `ko-${i}-${j}`
+                                ? "text-blue-600 bg-blue-100 shadow-md"
+                                : "text-slate-400 bg-white hover:text-blue-500 hover:bg-blue-50 hover:shadow-md"}`}
+                          >
+                            <SpeakerIcon active={playing === `ko-${i}-${j}`} />
+                          </button>
+                          <button
+                            onClick={() => copy(opt)}
+                            className={`flex-shrink-0 text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm
+                              ${copied === opt
+                                ? "bg-green-500 text-white shadow-md"
+                                : "bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 hover:shadow-md"}`}
+                          >
+                            {copied === opt ? t.copied : t.copy}
+                          </button>
                         </div>
-                        <button
-                          onClick={() => speakText(`ko-${i}-${j}`, opt, "ko-KR")}
-                          title={t.listen}
-                          className={`p-2 rounded-xl transition flex-shrink-0
-                            ${playing === `ko-${i}-${j}`
-                              ? "text-blue-500 bg-blue-50"
-                              : "text-slate-300 hover:text-blue-400 hover:bg-blue-50"}`}
-                        >
-                          <SpeakerIcon active={playing === `ko-${i}-${j}`} />
-                        </button>
-                        <button
-                          onClick={() => copy(opt)}
-                          className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-lg transition
-                            ${copied === opt
-                              ? "bg-green-100 text-green-600"
-                              : "bg-slate-100 text-slate-400 hover:bg-slate-200"}`}
-                        >
-                          {copied === opt ? t.copied : t.copy}
-                        </button>
                       </div>
                     ))}
                   </div>
 
                   {hasPhonetic && (
-                    <div className="flex items-center gap-3 pt-2 border-t border-slate-50">
-                      <div className="flex-1">
-                        <div className="text-xs text-amber-400 mb-0.5">{t.actualPronun}</div>
-                        <div className="text-xl font-semibold text-amber-600 tracking-wide">
-                          {v.phonetic}
+                    <div className="bg-gradient-to-r from-amber-50 to-orange-50/50 backdrop-blur-sm rounded-2xl p-4 mb-4 border border-amber-200/50">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1">
+                          <div className="text-[10px] uppercase tracking-wider text-amber-500 font-bold mb-1">{t.actualPronun}</div>
+                          <div className="text-2xl font-bold text-amber-600 tracking-tight">
+                            {v.phonetic}
+                          </div>
                         </div>
+                        <button
+                          onClick={() => speakText(`ph-${i}`, v.phonetic, "ko-KR")}
+                          title={t.listen}
+                          className={`p-3 rounded-xl transition flex-shrink-0 shadow-sm
+                            ${playing === `ph-${i}`
+                              ? "text-amber-600 bg-amber-200 shadow-md"
+                              : "text-amber-400 bg-white hover:text-amber-600 hover:bg-amber-100 hover:shadow-md"}`}
+                        >
+                          <SpeakerIcon active={playing === `ph-${i}`} />
+                        </button>
+                        <button
+                          onClick={() => copy(v.phonetic)}
+                          className={`flex-shrink-0 text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm
+                            ${copied === v.phonetic
+                              ? "bg-green-500 text-white shadow-md"
+                              : "bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 hover:shadow-md"}`}
+                        >
+                          {copied === v.phonetic ? t.copied : t.copy}
+                        </button>
                       </div>
-                      <button
-                        onClick={() => speakText(`ph-${i}`, v.phonetic, "ko-KR")}
-                        title={t.listen}
-                        className={`p-2 rounded-xl transition flex-shrink-0
-                          ${playing === `ph-${i}`
-                            ? "text-amber-500 bg-amber-50"
-                            : "text-amber-200 hover:text-amber-400 hover:bg-amber-50"}`}
-                      >
-                        <SpeakerIcon active={playing === `ph-${i}`} />
-                      </button>
-                      <button
-                        onClick={() => copy(v.phonetic)}
-                        className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-lg transition
-                          ${copied === v.phonetic
-                            ? "bg-green-100 text-green-600"
-                            : "bg-slate-100 text-slate-400 hover:bg-slate-200"}`}
-                      >
-                        {copied === v.phonetic ? t.copied : t.copy}
-                      </button>
                     </div>
                   )}
 
-                  <button
-                    onClick={() => openGallery(options[0] ?? v.phonetic)}
-                    className="mt-4 w-full flex items-center justify-center gap-2 text-sm bg-purple-500 hover:bg-purple-600 text-white border-2 border-purple-300 px-4 py-3 rounded-xl transition font-bold shadow-md hover:shadow-lg"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                      <rect x="3" y="3" width="7" height="7" rx="1" />
-                      <rect x="14" y="3" width="7" height="7" rx="1" />
-                      <rect x="3" y="14" width="7" height="7" rx="1" />
-                      <rect x="14" y="14" width="7" height="7" rx="1" />
-                    </svg>
-                    {lang === "ko" ? "📥 폰트 이미지 다운로드" : "📥 Download Font Images"}
-                  </button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => openGallery(options[0] ?? v.phonetic)}
+                      className="flex items-center justify-center gap-2 text-sm bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-4 py-3.5 rounded-xl transition font-bold shadow-md hover:shadow-lg active:scale-95"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" rx="1" />
+                      </svg>
+                      <span className="hidden sm:inline">{lang === "ko" ? "폰트 갤러리" : "Font Gallery"}</span>
+                      <span className="sm:hidden">📥</span>
+                    </button>
 
-                  <button
-                    onClick={() => openArt(options[0] ?? v.phonetic)}
-                    className="mt-2 w-full flex items-center justify-center gap-2 text-sm bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-2 border-pink-300 px-4 py-3.5 rounded-xl transition font-bold shadow-lg hover:shadow-xl"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="13.5" cy="6.5" r="1.5" />
-                      <circle cx="17.5" cy="10.5" r="1.5" />
-                      <circle cx="8.5" cy="7.5" r="1.5" />
-                      <circle cx="6.5" cy="12.5" r="1.5" />
-                      <path d="M12 2a10 10 0 0 0 0 20c1.5 0 2.5-1 2.5-2.5 0-1-.5-1.5-.5-2.5 0-1 1-2 2-2H18a4 4 0 0 0 4-4 10 10 0 0 0-10-10z" />
-                    </svg>
-                    {lang === "ko" ? "🎨 한글아트로 보기" : "🎨 View as Hangul Art"}
-                  </button>
+                    <button
+                      onClick={() => openArt(options[0] ?? v.phonetic)}
+                      className="flex items-center justify-center gap-2 text-sm bg-gradient-to-br from-pink-500 via-rose-500 to-pink-600 hover:from-pink-600 hover:via-rose-600 hover:to-pink-700 text-white px-4 py-3.5 rounded-xl transition font-bold shadow-md hover:shadow-lg active:scale-95"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="13.5" cy="6.5" r="1.5" />
+                        <circle cx="17.5" cy="10.5" r="1.5" />
+                        <circle cx="8.5" cy="7.5" r="1.5" />
+                        <circle cx="6.5" cy="12.5" r="1.5" />
+                        <path d="M12 2a10 10 0 0 0 0 20c1.5 0 2.5-1 2.5-2.5 0-1-.5-1.5-.5-2.5 0-1 1-2 2-2H18a4 4 0 0 0 4-4 10 10 0 0 0-10-10z" />
+                      </svg>
+                      <span className="hidden sm:inline">{lang === "ko" ? "한글아트" : "Hangul Art"}</span>
+                      <span className="sm:hidden">🎨</span>
+                    </button>
+                  </div>
                 </div>
               );
             })}
