@@ -17,7 +17,7 @@ export const translations = {
   },
   en: {
     title: "My Name in Hangul",
-    subtitle: "Convert any name to Korean pronunciation",
+    subtitle: "Get your name in Korean",
     placeholder: "e.g. Caroline · Emma · Michael · Olivia",
     convert: "Convert", converting: "Analyzing",
     copy: "Copy", copied: "Copied!",
