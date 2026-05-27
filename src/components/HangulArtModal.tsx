@@ -187,8 +187,8 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
           </div>
         </div>
 
-        {/* Canvas iframe */}
-        <div className="relative bg-slate-50" style={{ aspectRatio: "1 / 1" }}>
+        {/* Canvas iframe - scrollable to show full content */}
+        <div className="relative flex-1 overflow-auto bg-slate-50">
           {!loaded && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <svg className="animate-spin w-8 h-8 text-slate-300" viewBox="0 0 24 24" fill="none">
@@ -197,17 +197,19 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
               </svg>
             </div>
           )}
-          <iframe
-            key={nonce + "-" + currentText}
-            ref={iframeRef}
-            src={src}
-            title={`Hangul Art for ${currentText}`}
-            className="block w-full h-full border-0"
-            onLoad={() => {
-              setLoaded(true);
-              onLog?.({ type: "hangulart_open", text: currentText, originalName, uiLang });
-            }}
-          />
+          <div className="w-full min-h-full flex items-center justify-center p-4">
+            <iframe
+              key={nonce + "-" + currentText}
+              ref={iframeRef}
+              src={src}
+              title={`Hangul Art for ${currentText}`}
+              className="block w-full aspect-square max-w-full border-0 rounded-xl shadow-lg"
+              onLoad={() => {
+                setLoaded(true);
+                onLog?.({ type: "hangulart_open", text: currentText, originalName, uiLang });
+              }}
+            />
+          </div>
         </div>
 
         {/* Action bar */}
