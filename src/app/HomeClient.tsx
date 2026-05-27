@@ -337,18 +337,42 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
       <div className="w-full max-w-lg">
         {/* Hero Section */}
         <div className="mb-10 text-center">
-          <div className="inline-block mb-6 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full">
-            <span className="text-white/90 text-sm font-medium">✨ {lang === "ko" ? "19개 언어 지원 · 무료 · 광고 없음" : "19 Languages · Free · No Ads"}</span>
-          </div>
           <h1 className="text-5xl sm:text-7xl font-black text-white mb-4 drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)] tracking-tight leading-tight">
             {t.title}
           </h1>
-          <p className="text-xl sm:text-2xl text-white/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)] mb-3 font-semibold max-w-md mx-auto leading-snug">
+          <p className="text-xl sm:text-2xl text-white/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)] mb-4 font-semibold max-w-md mx-auto leading-snug">
             {t.subtitle}
           </p>
-          <p className="text-base text-white/80 drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)] font-light">
+          <p className="text-base text-white/80 drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)] font-light mb-6">
             {lang === "ko" ? "폰트 갤러리 · 한글아트 · 음성 듣기" : "Font Gallery · Hangul Art · Audio Playback"}
           </p>
+
+          {/* Example Categories */}
+          <div className="flex flex-wrap items-center justify-center gap-2 max-w-2xl mx-auto">
+            <span className="text-white/70 text-sm font-medium mr-1">{lang === "ko" ? "예시:" : "Try:"}</span>
+            {[
+              { text: "한글", emoji: "📖" },
+              { text: "김치", emoji: "🌶️" },
+              { text: "태권도", emoji: "🥋" },
+              { text: "사랑", emoji: "❤️" },
+              { text: "꿈", emoji: "✨" },
+              { text: "정국", emoji: "💜" },
+              { text: "지수", emoji: "🖤" },
+              { text: "민지", emoji: "🐰" },
+            ].map((item) => (
+              <button
+                key={item.text}
+                onClick={() => {
+                  setArtText(item.text);
+                  logAction({ type: "example_category_click", text: item.text, uiLang: lang });
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/30 hover:border-white/50 rounded-full text-white text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+              >
+                <span>{item.emoji}</span>
+                <span>{item.text}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Input Card - Premium Design */}
