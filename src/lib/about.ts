@@ -9,6 +9,9 @@ export interface AboutContent {
   menuLabel: string;
   hangulnameTitle: string;
   hangulnameBody: string;
+  hunminjeongeum: string;
+  hunminjeongTitle: string;
+  hunminjeongBody: string;
   wehomeTitle: string;
   wehomeBody: string;
   wehomeCta: string;
@@ -22,6 +25,10 @@ const KO: AboutContent = {
   hangulnameTitle: "한글이름이란?",
   hangulnameBody:
     "외국 이름을 한국어 발음으로 어떻게 표기하면 좋을지 알려주는 무료 도구입니다. 19개 언어를 지원하며, 변환 결과마다 한글 표기·음성 듣기·IPA 발음기호·여러 폰트 미리보기·한글아트 생성을 제공합니다. 한국 친구나 동료의 이름을 명함, 청첩장, 학교 등록 서류, SNS 프로필 등에 정확히 표기하고 싶을 때 사용해보세요.",
+  hunminjeongeum: "한글정음",
+  hunminjeongTitle: "훈민정음",
+  hunminjeongBody:
+    "훈민정음(訓民正音)은 1443년 세종대왕이 창제하고 1446년에 반포한 한국의 고유 문자입니다. '백성을 가르치는 바른 소리'라는 뜻으로, 당시 한자를 사용하지 못하는 일반 백성들이 쉽게 배워 사용할 수 있도록 만들어졌습니다.\n\n한글은 자음 14자(ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ)와 모음 10자(ㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ)로 구성되어 있으며, 이들을 조합하여 모든 소리를 표현할 수 있습니다. 자음은 발음기관의 모양을, 모음은 천·지·인(하늘·땅·사람)의 철학을 담아 설계되었습니다.\n\n세계적으로 가장 과학적이고 체계적인 문자로 평가받고 있으며, 유네스코 세계기록유산으로 등재되어 있습니다.",
   wehomeTitle: "Wehome.me 소개",
   wehomeBody:
     "위홈은 한국 정부에 합법 등록된 공유숙박 플랫폼입니다. AI 기반 로컬 추천 시스템으로 여행객에게 최적의 숙소를 제안하고, 24/7 한국어·영어 현지 고객지원을 제공합니다. 한국 문화와 라이프스타일을 경험할 수 있는 다양한 숙소를 만나보세요. \"Your Home in Korea\" — 한국에서의 나만의 집, 위홈에서.",
@@ -69,6 +76,10 @@ const EN: AboutContent = {
   hangulnameTitle: "What is hangulname?",
   hangulnameBody:
     "A free tool that helps you write any foreign name in Korean (Hangul) with the closest natural pronunciation. Supports 19 languages and provides audio playback, IPA phonetics, multiple font previews, and generative Hangul Art for every result. Useful for business cards, wedding invites, school registrations, social media profiles, or anywhere you need to render a non-Korean name in Hangul cleanly.",
+  hunminjeongeum: "HANGUL HMJE",
+  hunminjeongTitle: "Hunminjeongeum (훈민정음)",
+  hunminjeongBody:
+    "Hunminjeongeum (訓民正音), meaning \"The Correct Sounds for the Instruction of the People,\" is the original name of the Korean alphabet created by King Sejong the Great in 1443 and promulgated in 1446. It was designed so that common people who couldn't use Chinese characters could easily learn and communicate in writing.\n\nHangul consists of 14 consonants (ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ) and 10 vowels (ㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ), which can be combined to express all sounds. Consonants were designed to mimic the shape of speech organs, while vowels embody the philosophy of Heaven, Earth, and Humanity.\n\nHangul is recognized worldwide as one of the most scientific and systematic writing systems, and Hunminjeongeum has been designated as a UNESCO Memory of the World.",
   wehomeTitle: "About Wehome.me",
   wehomeBody:
     "Wehome is a government-registered legal short-term rental platform in Korea. Our AI-powered local recommendation system matches travelers with the perfect accommodations, backed by 24/7 local support in Korean and English. Experience authentic Korean culture and lifestyle through our diverse selection of homes. \"Your Home in Korea\" — Wehome.me.",

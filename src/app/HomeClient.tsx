@@ -12,7 +12,7 @@ import ShareLinkModal from "@/components/ShareLinkModal";
 import KoreaBackground from "@/components/KoreaBackground";
 import FeedbackButton from "@/components/FeedbackButton";
 
-type AboutKey = "hangulname" | "wehome" | "faq";
+type AboutKey = "hangulname" | "hunminjeong" | "wehome" | "faq";
 type ShareKind = "site" | "result";
 
 const SPEECH_LANG: Record<Lang, string> = {
@@ -119,6 +119,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   const [micSupported, setMicSupported] = useState(false);
   const recognitionRef = useRef<MinimalSpeechRecognition | null>(null);
   const [kakaoIOS, setKakaoIOS] = useState(false);
+  const [jamoIndex, setJamoIndex] = useState(0);
 
   const logAction = useCallback(async (data: Record<string, unknown>) => {
     try {
@@ -259,6 +260,16 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     setError("");
     setResult(null);
     setFeedback(null);
+    setJamoIndex(0);
+
+    // Animate Jamo sequence
+    const jamoSequence = ["ㅇㅎ", "ㅅㅈㅊ", "ㅁㅂㅍ", "ㄱㄴㄷㅌㄹ", "ㅣㅡ", "ㅏㅓㅑㅕ", "ㅗㅜㅛㅠ"];
+    let idx = 0;
+    const jamoInterval = setInterval(() => {
+      idx++;
+      setJamoIndex(idx);
+      if (idx >= jamoSequence.length) clearInterval(jamoInterval);
+    }, 150);
 
     try {
       const res = await fetch("/api/transliterate", {
@@ -267,6 +278,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         body: JSON.stringify({ name: input.trim(), uiLang: lang }),
       });
       const data = await res.json();
+      clearInterval(jamoInterval);
       if (!res.ok) throw new Error(data.error);
       setResult(data);
       setCurrentInput(input.trim());
@@ -283,6 +295,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         results: data.variants?.map((v: Variant) => ({ country: v.country, options: v.options })),
       });
     } catch (e) {
+      clearInterval(jamoInterval);
       setError(e instanceof Error ? e.message : t.errorGeneral);
     } finally {
       setLoading(false);
@@ -416,13 +429,12 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               <button
                 onClick={convert}
                 disabled={loading || !input.trim()}
-                className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-700 disabled:from-slate-300 disabled:to-slate-400 text-white px-8 py-4 rounded-2xl font-bold transition-all duration-300 text-lg shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 disabled:scale-100 disabled:shadow-none"
+                className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-700 disabled:from-slate-300 disabled:to-slate-400 text-white px-8 py-4 rounded-2xl font-bold transition-all duration-300 text-lg shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 disabled:scale-100 disabled:shadow-none min-w-[120px]"
               >
                 {loading ? (
-                  <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                  </svg>
+                  <span className="text-2xl font-black tracking-wider animate-pulse">
+                    {["ㅇㅎ", "ㅅㅈㅊ", "ㅁㅂㅍ", "ㄱㄴㄷㅌㄹ", "ㅣㅡ", "ㅏㅓㅑㅕ", "ㅗㅜㅛㅠ"][jamoIndex] || "ㅇㅎ"}
+                  </span>
                 ) : (
                   <span className="drop-shadow-sm">{t.convert}</span>
                 )}
@@ -509,6 +521,26 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                   >
                     {ABOUT_CONTENT[lang].hangulnameTitle}
                   </button>
+                  <button
+                    onClick={() => {
+                      setAboutOpen("hunminjeong");
+                      setShowInfoMenu(false);
+                      logAction({ type: "about_open", target: "hunminjeong", uiLang: lang });
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition"
+                  >
+                    {ABOUT_CONTENT[lang].hunminjeongeum}
+                  </button>
+                  <a
+                    href="/learn-hangul"
+                    onClick={() => {
+                      setShowInfoMenu(false);
+                      logAction({ type: "learn_hangul_click", uiLang: lang });
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition"
+                  >
+                    {lang === "ko" ? "59초 한글 배우기" : "Learn Hangul in 59s"}
+                  </a>
                   <button
                     onClick={() => {
                       setAboutOpen("faq");
@@ -894,6 +926,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-slate-100">
             <h2 className="text-lg font-bold text-slate-800">
               {aboutOpen === "hangulname" && ABOUT_CONTENT[lang].hangulnameTitle}
+              {aboutOpen === "hunminjeong" && ABOUT_CONTENT[lang].hunminjeongTitle}
               {aboutOpen === "wehome" && ABOUT_CONTENT[lang].wehomeTitle}
               {aboutOpen === "faq" && ABOUT_CONTENT[lang].faqTitle}
             </h2>
@@ -930,9 +963,9 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           ) : (
           <div className="px-6 py-5 space-y-4">
             <p className="text-sm leading-relaxed text-slate-600 whitespace-pre-line">
-              {aboutOpen === "hangulname"
-                ? ABOUT_CONTENT[lang].hangulnameBody
-                : ABOUT_CONTENT[lang].wehomeBody}
+              {aboutOpen === "hangulname" && ABOUT_CONTENT[lang].hangulnameBody}
+              {aboutOpen === "hunminjeong" && ABOUT_CONTENT[lang].hunminjeongBody}
+              {aboutOpen === "wehome" && ABOUT_CONTENT[lang].wehomeBody}
             </p>
             {aboutOpen === "wehome" && (
               <a
