@@ -90,6 +90,31 @@ export async function GET(req: NextRequest) {
 
   const allFeedback = await getAllFeedback();
 
+  // Daily detailed stats: visits, conversions, hangul art downloads per day
+  const hangulArtDownloads = logs.filter((l) => l.type === "hangulart_download");
+  const dailyDetails: Record<string, { visits: number; conversions: number; hangulartDownloads: number }> = {};
+
+  for (const e of visits) {
+    if (!e.ts) continue;
+    const day = bucket(e.ts, "day");
+    if (!dailyDetails[day]) dailyDetails[day] = { visits: 0, conversions: 0, hangulartDownloads: 0 };
+    dailyDetails[day].visits++;
+  }
+
+  for (const e of conversions) {
+    if (!e.ts) continue;
+    const day = bucket(e.ts, "day");
+    if (!dailyDetails[day]) dailyDetails[day] = { visits: 0, conversions: 0, hangulartDownloads: 0 };
+    dailyDetails[day].conversions++;
+  }
+
+  for (const e of hangulArtDownloads) {
+    if (!e.ts) continue;
+    const day = bucket(e.ts, "day");
+    if (!dailyDetails[day]) dailyDetails[day] = { visits: 0, conversions: 0, hangulartDownloads: 0 };
+    dailyDetails[day].hangulartDownloads++;
+  }
+
   return NextResponse.json({
     storage: usingKV() ? "vercel-kv" : "local-files",
     totals: {
@@ -101,10 +126,14 @@ export async function GET(req: NextRequest) {
       feedbackCount: allFeedback.length,
       copies:        copies.length,
       cacheSize:     await getCacheSize(),
+      hangulartDownloads: hangulArtDownloads.length,
     },
     daily:   byPeriod("day"),
     weekly:  byPeriod("week"),
     monthly: byPeriod("month"),
+    dailyDetails: Object.entries(dailyDetails)
+      .sort(([a], [b]) => b.localeCompare(a)) // Most recent first
+      .slice(0, 60), // Last 60 days
     langCount:       tally(conversions, "uiLang"),
     sourceLangCount: tally(conversions.map(e => ({ ...e, sl: e.sourceLang?.split("-")[0] ?? "unknown" })), "sl" as keyof LogEntry),
     topNames: Object.entries(nameCount).sort(([, a], [, b]) => b - a).slice(0, 50),

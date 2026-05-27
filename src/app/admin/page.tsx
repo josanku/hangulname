@@ -15,11 +15,12 @@ interface Stats {
   totals: {
     visits: number; conversions: number; shares: number;
     wehomeClicks: number; feedbackUp: number; feedbackCount: number;
-    copies: number; cacheSize: number;
+    copies: number; cacheSize: number; hangulartDownloads: number;
   };
   daily: [string, number][];
   weekly: [string, number][];
   monthly: [string, number][];
+  dailyDetails: [string, { visits: number; conversions: number; hangulartDownloads: number }][];
   langCount: [string, number][];
   sourceLangCount: [string, number][];
   topNames: [string, number][];
@@ -217,22 +218,79 @@ export default function AdminPage() {
         {tab === "stats" && (
           <>
             {/* Totals */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {[
-                { label: "방문자",    value: stats.totals.visits,        color: "text-sky-600" },
-                { label: "변환",      value: stats.totals.conversions,   color: "text-blue-600" },
-                { label: "공유",      value: stats.totals.shares,        color: "text-emerald-600" },
-                { label: "위홈클릭",  value: stats.totals.wehomeClicks,  color: "text-orange-500" },
-                { label: "좋아요",    value: stats.totals.feedbackUp,    color: "text-green-600" },
-                { label: "피드백",    value: stats.totals.feedbackCount, color: "text-violet-600" },
-                { label: "복사",      value: stats.totals.copies,        color: "text-purple-600" },
-                { label: "캐시",      value: stats.totals.cacheSize,     color: "text-amber-600" },
+                { label: "방문자",         value: stats.totals.visits,              color: "text-sky-600" },
+                { label: "변환",           value: stats.totals.conversions,         color: "text-blue-600" },
+                { label: "한글아트 다운",  value: stats.totals.hangulartDownloads, color: "text-pink-600" },
+                { label: "공유",           value: stats.totals.shares,              color: "text-emerald-600" },
+                { label: "위홈클릭",       value: stats.totals.wehomeClicks,        color: "text-orange-500" },
+                { label: "좋아요",         value: stats.totals.feedbackUp,          color: "text-green-600" },
+                { label: "피드백",         value: stats.totals.feedbackCount,       color: "text-violet-600" },
+                { label: "복사",           value: stats.totals.copies,              color: "text-purple-600" },
+                { label: "캐시",           value: stats.totals.cacheSize,           color: "text-amber-600" },
               ].map((item) => (
                 <div key={item.label} className="bg-white rounded-2xl border border-slate-100 p-4 text-center">
                   <div className={`text-2xl font-bold ${item.color}`}>{item.value.toLocaleString()}</div>
                   <div className="text-xs text-slate-400 mt-0.5">{item.label}</div>
                 </div>
               ))}
+            </div>
+
+            {/* Daily Details Table */}
+            <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+              <div className="p-5 border-b border-slate-100 bg-gradient-to-r from-blue-50 to-purple-50">
+                <h2 className="text-sm font-bold text-slate-800">📅 일별 상세 통계</h2>
+                <p className="text-xs text-slate-500 mt-0.5">오늘부터 최근 60일</p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50 border-b border-slate-100">
+                    <tr>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-600">날짜</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-slate-600">요일</th>
+                      <th className="text-right px-4 py-3 text-xs font-semibold text-sky-600">방문자</th>
+                      <th className="text-right px-4 py-3 text-xs font-semibold text-blue-600">변환</th>
+                      <th className="text-right px-4 py-3 text-xs font-semibold text-pink-600">한글아트 다운</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {stats.dailyDetails.map(([date, data]) => {
+                      const d = new Date(date + "T00:00:00");
+                      const isToday = date === new Date().toISOString().slice(0, 10);
+                      const dayOfWeek = ["일", "월", "화", "수", "목", "금", "토"][d.getDay()];
+                      const [year, month, day] = date.split("-");
+                      return (
+                        <tr key={date} className={`hover:bg-slate-50 transition ${isToday ? "bg-blue-50/50" : ""}`}>
+                          <td className="px-4 py-3 font-mono text-slate-700">
+                            <span className={isToday ? "font-bold text-blue-600" : ""}>
+                              {month}/{day}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-slate-500">
+                            <span className={`inline-block px-2 py-0.5 rounded text-xs ${
+                              dayOfWeek === "토" ? "bg-blue-100 text-blue-600" :
+                              dayOfWeek === "일" ? "bg-red-100 text-red-600" :
+                              "bg-slate-100 text-slate-600"
+                            }`}>
+                              {dayOfWeek}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right font-semibold text-sky-600">
+                            {data.visits.toLocaleString()}
+                          </td>
+                          <td className="px-4 py-3 text-right font-semibold text-blue-600">
+                            {data.conversions.toLocaleString()}
+                          </td>
+                          <td className="px-4 py-3 text-right font-semibold text-pink-600">
+                            {data.hangulartDownloads.toLocaleString()}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* Conversion trend */}
