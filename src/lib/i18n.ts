@@ -318,7 +318,8 @@ export const LANG_LABELS: Record<Lang, string> = {
 export function detectLang(): Lang {
   if (typeof navigator === "undefined") return "en";
   const l = navigator.language.toLowerCase();
-  if (l.startsWith("ko")) return "ko";
+  // Korean users also get English UI
+  if (l.startsWith("ko")) return "en";
   if (l.startsWith("zh")) return "zh";
   if (l.startsWith("ja")) return "ja";
   if (l.startsWith("es")) return "es";
