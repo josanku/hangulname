@@ -56,6 +56,11 @@ Rules:
 - Examples: Caroline(US) → options=["캐롤라인","캐롤린"], phonetic="캘로린"`;
 }
 
+function isHangul(text: string): boolean {
+  // Check if text contains Hangul characters (한글)
+  return /[가-힣ᄀ-ᇿ㄰-㆏]/.test(text);
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { name, uiLang = "en" } = await req.json();
@@ -64,11 +69,42 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Please enter a name" }, { status: 400 });
     }
 
-    const key = cacheKey(name);
+    const trimmedName = name.trim();
+
+    // If input is already Hangul, return it directly
+    if (isHangul(trimmedName)) {
+      const hangulResponse = {
+        sourceLang: "ko-KR",
+        variants: [
+          {
+            country: uiLang === "ko" ? "한국" : "Korea",
+            flag: "🇰🇷",
+            options: [trimmedName],
+            phonetic: "",
+            ipa: ""
+          }
+        ],
+        origin: uiLang === "ko"
+          ? "이미 한글로 입력되었습니다"
+          : "Already in Hangul (Korean script)"
+      };
+
+      await appendLog({
+        type: "conversion",
+        inputName: trimmedName,
+        uiLang,
+        sourceLang: "ko-KR",
+        cached: false,
+      });
+
+      return NextResponse.json(hangulResponse);
+    }
+
+    const key = cacheKey(trimmedName);
     const cached = await getCached(key);
 
     if (cached) {
-      console.log("[HANGULNAME_CACHE_HIT]", JSON.stringify({ name: name.trim(), uiLang }));
+      console.log("[HANGULNAME_CACHE_HIT]", JSON.stringify({ name: trimmedName, uiLang }));
       return NextResponse.json(cached);
     }
 
@@ -76,7 +112,7 @@ export async function POST(req: NextRequest) {
       model: "claude-sonnet-4-6",
       max_tokens: 600,
       system: buildSystem(uiLang),
-      messages: [{ role: "user", content: `Name: ${name.trim()}` }],
+      messages: [{ role: "user", content: `Name: ${trimmedName}` }],
     });
 
     const text = message.content[0].type === "text" ? message.content[0].text.trim() : "";
@@ -87,7 +123,7 @@ export async function POST(req: NextRequest) {
 
     await appendLog({
       type: "conversion",
-      inputName: name.trim(),
+      inputName: trimmedName,
       uiLang,
       sourceLang: data.sourceLang,
       cached: false,

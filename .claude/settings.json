@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(git commit -m ' *)",
-      "Bash(curl -s \"https://docs.google.com/spreadsheets/d/1LtmOzQ2_tdJMoeqbYxvpNMGj-NliEt1aS31LTyruTnQ/export?format=csv&gid=475530553\")"
+      "Bash(curl -s \"https://docs.google.com/spreadsheets/d/1LtmOzQ2_tdJMoeqbYxvpNMGj-NliEt1aS31LTyruTnQ/export?format=csv&gid=475530553\")",
+      "Bash(node -e \"console.log\\(decodeURIComponent\\('%EB%B6%80%EC%82%B0%EB%91%A5%EC%A7%80'\\)\\)\")"
     ]
   }
 }
