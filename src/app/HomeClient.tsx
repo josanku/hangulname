@@ -348,49 +348,19 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
       onClick={() => { setShowLangMenu(false); setShowInfoMenu(false); }}
     >
       <div className="w-full max-w-lg">
-        {/* Hero Section */}
-        <div className="mb-10 text-center">
-          <h1 className="text-5xl sm:text-7xl font-black text-white mb-4 drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)] tracking-tight leading-tight">
+        {/* Hero */}
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2 tracking-tight">
             {t.title}
           </h1>
-          <p className="text-xl sm:text-2xl text-white/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)] mb-4 font-semibold max-w-md mx-auto leading-snug">
+          <p className="text-lg text-indigo-200/90 font-medium">
             {t.subtitle}
           </p>
-          <p className="text-base text-white/80 drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)] font-light mb-6">
-            {lang === "ko" ? "폰트 갤러리 · 한글아트 · 음성 듣기" : "Font Gallery · Hangul Art · Audio Playback"}
-          </p>
-
-          {/* Example Categories */}
-          <div className="flex flex-wrap items-center justify-center gap-2 max-w-2xl mx-auto">
-            <span className="text-white/70 text-sm font-medium mr-1">{lang === "ko" ? "예시:" : "Try:"}</span>
-            {[
-              { text: "한글", emoji: "📖" },
-              { text: "김치", emoji: "🌶️" },
-              { text: "태권도", emoji: "🥋" },
-              { text: "사랑", emoji: "❤️" },
-              { text: "꿈", emoji: "✨" },
-              { text: "정국", emoji: "💜" },
-              { text: "지수", emoji: "🖤" },
-              { text: "민지", emoji: "🐰" },
-            ].map((item) => (
-              <button
-                key={item.text}
-                onClick={() => {
-                  setArtText(item.text);
-                  logAction({ type: "example_category_click", text: item.text, uiLang: lang });
-                }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/30 hover:border-white/50 rounded-full text-white text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-              >
-                <span>{item.emoji}</span>
-                <span>{item.text}</span>
-              </button>
-            ))}
-          </div>
         </div>
 
-        {/* Input Card - Premium Design */}
-        <div className="bg-white/98 backdrop-blur-xl rounded-[2rem] shadow-[0_20px_70px_rgba(0,0,0,0.3)] border border-white/50 p-8 mb-6">
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+        {/* Input */}
+        <div className="bg-white rounded-2xl shadow-lg p-5 mb-4">
+          <div className="flex gap-2 items-center">
             <input
               type="text"
               value={input}
@@ -398,92 +368,106 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               onKeyDown={(e) => e.key === "Enter" && convert()}
               placeholder={t.placeholder}
               dir="auto"
-              className="flex-1 min-w-0 text-slate-800 placeholder:text-slate-400 focus:outline-none text-xl sm:text-2xl font-semibold bg-transparent"
+              className="flex-1 min-w-0 text-slate-800 placeholder:text-slate-400 focus:outline-none text-lg font-medium"
               autoFocus
             />
-            <div className="flex gap-2 shrink-0">
-              {micSupported && (
-                <button
-                  onClick={toggleMic}
-                  aria-label={isListening ? (lang === "ko" ? "녹음 중지" : "Stop recording") : (lang === "ko" ? "음성으로 입력" : "Speak to input")}
-                  title={isListening ? (lang === "ko" ? "녹음 중지" : "Stop recording") : (lang === "ko" ? "음성으로 입력" : "Speak to input")}
-                  className={`rounded-2xl p-4 transition-all duration-300 shadow-md
-                    ${isListening
-                      ? "bg-red-500 text-white animate-pulse scale-105"
-                      : "bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 hover:from-slate-200 hover:to-slate-300 hover:scale-105 active:scale-95"}`}
-                >
-                  {isListening ? (
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                      <rect x="6" y="6" width="12" height="12" rx="2" />
-                    </svg>
-                  ) : (
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                      <line x1="12" y1="19" x2="12" y2="23" />
-                      <line x1="8" y1="23" x2="16" y2="23" />
-                    </svg>
-                  )}
-                </button>
-              )}
+            {micSupported && (
               <button
-                onClick={convert}
-                disabled={loading || !input.trim()}
-                className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-700 disabled:from-slate-300 disabled:to-slate-400 text-white px-8 py-4 rounded-2xl font-bold transition-all duration-300 text-lg shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 disabled:scale-100 disabled:shadow-none min-w-[120px]"
+                onClick={toggleMic}
+                aria-label={isListening ? (lang === "ko" ? "녹음 중지" : "Stop recording") : (lang === "ko" ? "음성으로 입력" : "Speak to input")}
+                className={`shrink-0 rounded-xl p-2.5 transition
+                  ${isListening
+                    ? "bg-red-500 text-white animate-pulse"
+                    : "text-slate-400 hover:text-indigo-500 hover:bg-indigo-50"}`}
               >
-                {loading ? (
-                  <span className="text-2xl font-black tracking-wider animate-pulse">
-                    {["ㅇㅎ", "ㅅㅈㅊ", "ㅁㅂㅍ", "ㄱㄴㄷㅌㄹ", "ㅣㅡ", "ㅏㅓㅑㅕ", "ㅗㅜㅛㅠ"][jamoIndex] || "ㅇㅎ"}
-                  </span>
+                {isListening ? (
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="6" width="12" height="12" rx="2" />
+                  </svg>
                 ) : (
-                  <span className="drop-shadow-sm">{t.convert}</span>
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    <line x1="12" y1="19" x2="12" y2="23" />
+                    <line x1="8" y1="23" x2="16" y2="23" />
+                  </svg>
                 )}
               </button>
-            </div>
+            )}
+            <button
+              onClick={convert}
+              disabled={loading || !input.trim()}
+              className="shrink-0 bg-indigo-500 hover:bg-indigo-600 disabled:bg-slate-300 text-white px-5 py-2.5 rounded-xl font-semibold transition text-sm min-w-[80px]"
+            >
+              {loading ? (
+                <span className="text-base font-bold animate-pulse">
+                  {["ㅇㅎ", "ㅅㅈㅊ", "ㅁㅂㅍ", "ㄱㄴㄷㅌㄹ", "ㅣㅡ", "ㅏㅓㅑㅕ", "ㅗㅜㅛㅠ"][jamoIndex] || "ㅇㅎ"}
+                </span>
+              ) : t.convert}
+            </button>
           </div>
         </div>
 
-        {/* Meta bar - Sleek Design */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="text-sm text-white/90 bg-white/15 backdrop-blur-md border border-white/30 rounded-2xl px-4 py-2.5 shadow-lg">
+        {/* Quick Examples */}
+        <div className="flex flex-wrap justify-center gap-1.5 mb-6">
+          {[
+            { text: "한글", emoji: "📖" },
+            { text: "김치", emoji: "🌶️" },
+            { text: "사랑", emoji: "❤️" },
+            { text: "정국", emoji: "💜" },
+            { text: "지수", emoji: "🖤" },
+            { text: "민지", emoji: "🐰" },
+          ].map((item) => (
+            <button
+              key={item.text}
+              onClick={() => {
+                setArtText(item.text);
+                logAction({ type: "example_category_click", text: item.text, uiLang: lang });
+              }}
+              className="px-3 py-1 text-xs bg-white/8 hover:bg-white/15 border border-white/10 hover:border-white/25 rounded-full text-white/70 hover:text-white transition"
+            >
+              {item.emoji} {item.text}
+            </button>
+          ))}
+        </div>
+
+        {/* Meta bar */}
+        <div className="flex items-center justify-between mb-5">
+          <div className="text-xs text-white/60">
             {count > 0 ? (
               <span dangerouslySetInnerHTML={{
-                __html: t.counter.replace("{n}", `<span class="font-bold text-yellow-300">${count.toLocaleString()}</span>`)
+                __html: t.counter.replace("{n}", `<span class="text-indigo-300 font-semibold">${count.toLocaleString()}</span>`)
               }} />
             ) : (
-              <span className="font-medium">{t.counterFirst}</span>
+              <span>{t.counterFirst}</span>
             )}
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <div className="relative">
               <button
                 onClick={(e) => { e.stopPropagation(); setShowLangMenu(!showLangMenu); setShowInfoMenu(false); }}
-                className="flex items-center gap-2 text-sm font-medium text-white bg-white/15 backdrop-blur-md border border-white/30 hover:bg-white/25 rounded-2xl px-4 py-2.5 transition-all duration-200 shadow-lg hover:scale-105 active:scale-95"
+                className="flex items-center gap-1.5 text-xs text-white/70 hover:text-white border border-white/15 hover:border-white/30 rounded-lg px-3 py-1.5 transition"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                </svg>
                 <span>{LANG_LABELS[lang]}</span>
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
               </button>
 
               {showLangMenu && (
                 <div
-                  className="absolute bottom-full mb-2 right-0 bg-white/98 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-2xl py-2 z-10 min-w-44 max-h-80 overflow-y-auto"
+                  className="absolute bottom-full mb-1 right-0 bg-[#1e1e2e] border border-white/10 rounded-xl shadow-xl py-1 z-10 min-w-40 max-h-80 overflow-y-auto"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {(Object.keys(LANG_LABELS) as Lang[]).map((l) => (
                     <button
                       key={l}
                       onClick={() => { setLang(l); setShowLangMenu(false); }}
-                      className={`w-full text-left px-4 py-2.5 text-sm transition-all duration-150
+                      className={`w-full text-left px-3 py-2 text-xs transition
                         ${l === lang
-                          ? "text-purple-600 bg-purple-50 font-bold"
-                          : "text-slate-700 hover:bg-slate-50 font-medium"}`}
+                          ? "text-indigo-300 bg-indigo-500/10 font-semibold"
+                          : "text-white/70 hover:bg-white/5"}`}
                     >
                       {LANG_LABELS[l]}
                     </button>
@@ -497,9 +481,9 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                 onClick={(e) => { e.stopPropagation(); setShowInfoMenu(!showInfoMenu); setShowLangMenu(false); }}
                 aria-label={ABOUT_CONTENT[lang].menuLabel}
                 title={ABOUT_CONTENT[lang].menuLabel}
-                className="flex items-center justify-center text-white bg-white/15 backdrop-blur-md border border-white/30 hover:bg-white/25 rounded-2xl p-2.5 transition-all duration-200 shadow-lg hover:scale-105 active:scale-95"
+                className="text-white/70 hover:text-white border border-white/15 hover:border-white/30 rounded-lg p-1.5 transition"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   <line x1="4" y1="7"  x2="20" y2="7"  />
                   <line x1="4" y1="12" x2="20" y2="12" />
                   <line x1="4" y1="17" x2="20" y2="17" />
@@ -508,7 +492,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
               {showInfoMenu && (
                 <div
-                  className="absolute bottom-full mb-2 right-0 bg-white/98 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-2xl py-2 z-10 min-w-52"
+                  className="absolute bottom-full mb-1 right-0 bg-[#1e1e2e] border border-white/10 rounded-xl shadow-xl py-1 z-10 min-w-48"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
@@ -517,7 +501,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       setShowInfoMenu(false);
                       logAction({ type: "about_open", target: "hangulname", uiLang: lang });
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition"
+                    className="w-full text-left px-3 py-2 text-xs text-white/70 hover:text-white hover:bg-white/5 transition"
                   >
                     {ABOUT_CONTENT[lang].hangulnameTitle}
                   </button>
@@ -527,7 +511,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       setShowInfoMenu(false);
                       logAction({ type: "about_open", target: "hunminjeong", uiLang: lang });
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition"
+                    className="w-full text-left px-3 py-2 text-xs text-white/70 hover:text-white hover:bg-white/5 transition"
                   >
                     {ABOUT_CONTENT[lang].hunminjeongeum}
                   </button>
@@ -537,7 +521,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       setShowInfoMenu(false);
                       logAction({ type: "learn_hangul_click", uiLang: lang });
                     }}
-                    className="block w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition"
+                    className="block w-full text-left px-3 py-2 text-xs text-white/70 hover:text-white hover:bg-white/5 transition"
                   >
                     {lang === "ko" ? "59초 한글 배우기" : "Learn Hangul in 59s"}
                   </a>
@@ -547,7 +531,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       setShowInfoMenu(false);
                       logAction({ type: "about_open", target: "faq", uiLang: lang });
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition"
+                    className="w-full text-left px-3 py-2 text-xs text-white/70 hover:text-white hover:bg-white/5 transition"
                   >
                     {ABOUT_CONTENT[lang].faqTitle}
                   </button>
@@ -557,7 +541,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       setShowInfoMenu(false);
                       logAction({ type: "page_share_open", source: "menu", uiLang: lang });
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs text-white/70 hover:text-white hover:bg-white/5 transition flex items-center gap-2"
                   >
                     <svg className="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
@@ -572,7 +556,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       setShowInfoMenu(false);
                       logAction({ type: "about_open", target: "wehome", uiLang: lang });
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 transition"
+                    className="w-full text-left px-3 py-2 text-xs text-white/70 hover:text-white hover:bg-white/5 transition"
                   >
                     {ABOUT_CONTENT[lang].wehomeTitle}
                   </button>
@@ -584,8 +568,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 mb-4">
-            <p className="text-red-500 text-sm">{error}</p>
+          <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-4">
+            <p className="text-red-300 text-sm">{error}</p>
           </div>
         )}
 
@@ -593,31 +577,26 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         {result && (
           <div className="grid gap-2">
             {result.origin && (
-              <p className="text-xs text-white/70 px-1 drop-shadow-sm">{result.origin}</p>
+              <p className="text-xs text-white/50 px-1">{result.origin}</p>
             )}
 
             {/* 원어 발음 카드 */}
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl px-5 py-4 flex items-center gap-4 shadow-md">
-              <div className="flex-shrink-0 text-center w-14">
-                <div className="text-2xl mb-0.5">🗣️</div>
-                <div className="text-xs text-amber-600 font-medium">{t.listenOriginal}</div>
-              </div>
-              <div className="w-px h-12 bg-amber-200 flex-shrink-0" />
+            <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3">
               <div className="flex-1 min-w-0">
-                <div className="text-2xl font-bold text-amber-900 truncate" dir="auto">
+                <div className="text-xl font-bold text-white truncate" dir="auto">
                   {currentInput}
                 </div>
                 {result.sourceLang && (
-                  <div className="text-xs text-amber-500 mt-1 font-medium">{result.sourceLang}</div>
+                  <div className="text-xs text-white/40 mt-0.5">{result.sourceLang}</div>
                 )}
               </div>
               <button
                 onClick={() => speakText("original", currentInput, result.sourceLang ?? "en-US")}
                 title={t.listenOriginal}
-                className={`flex-shrink-0 p-3 rounded-xl transition
+                className={`flex-shrink-0 p-2 rounded-lg transition
                   ${playing === "original"
-                    ? "text-amber-600 bg-amber-200"
-                    : "text-amber-400 hover:text-amber-600 hover:bg-amber-100"}`}
+                    ? "text-indigo-300 bg-indigo-500/20"
+                    : "text-white/40 hover:text-white/80 hover:bg-white/5"}`}
               >
                 <SpeakerIcon active={playing === "original"} />
               </button>
@@ -630,87 +609,81 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               return (
                 <div
                   key={i}
-                  className={`w-full bg-gradient-to-br rounded-3xl px-6 py-6 backdrop-blur-sm
+                  className={`w-full rounded-2xl px-5 py-5
                     ${i === 0
-                      ? "from-blue-50 via-white to-purple-50 border-2 border-blue-200 shadow-xl"
-                      : "from-white to-slate-50/80 border border-slate-150 shadow-lg"}`}
+                      ? "bg-white shadow-lg"
+                      : "bg-white/95 shadow-md"}`}
                 >
-                  <div className="flex items-center gap-3 mb-4 pb-3 border-b border-slate-100">
-                    <div className="text-2xl">{v.flag}</div>
-                    <div className="flex-1">
-                      <div className={`font-bold ${i === 0 ? "text-blue-600" : "text-slate-700"}`}>{v.country}</div>
-                      {v.ipa && (
-                        <div className="text-xs text-slate-400 font-mono mt-0.5">{v.ipa}</div>
-                      )}
-                    </div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-lg">{v.flag}</span>
+                    <span className="text-sm font-medium text-slate-600">{v.country}</span>
+                    {v.ipa && (
+                      <span className="text-xs text-slate-300 font-mono ml-auto">{v.ipa}</span>
+                    )}
                   </div>
 
-                  <div className="space-y-3 mb-4">
+                  <div className="space-y-2 mb-3">
                     {options.map((opt, j) => (
-                      <div key={j} className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-slate-100/50">
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1">
-                            {options.length > 1 && (
-                              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">
-                                {j === 0 ? t.primarySpelling : `${t.altSpelling} ${j}`}
-                              </div>
-                            )}
-                            <div className={`font-bold tracking-tight
-                              ${j === 0
-                                ? `text-3xl ${i === 0 ? "text-blue-600" : "text-slate-800"}`
-                                : "text-2xl text-slate-600"}`}>
-                              {opt}
+                      <div key={j} className="flex items-center gap-2">
+                        <div className="flex-1">
+                          {options.length > 1 && (
+                            <div className="text-[10px] text-slate-400 mb-0.5">
+                              {j === 0 ? t.primarySpelling : `${t.altSpelling} ${j}`}
                             </div>
+                          )}
+                          <div className={`font-bold tracking-tight
+                            ${j === 0 ? "text-2xl text-slate-800" : "text-xl text-slate-500"}`}>
+                            {opt}
                           </div>
-                          <button
-                            onClick={() => speakText(`ko-${i}-${j}`, opt, "ko-KR")}
-                            title={t.listen}
-                            className={`p-3 rounded-xl transition flex-shrink-0 shadow-sm
-                              ${playing === `ko-${i}-${j}`
-                                ? "text-blue-600 bg-blue-100 shadow-md"
-                                : "text-slate-400 bg-white hover:text-blue-500 hover:bg-blue-50 hover:shadow-md"}`}
-                          >
-                            <SpeakerIcon active={playing === `ko-${i}-${j}`} />
-                          </button>
-                          <button
-                            onClick={() => copy(opt)}
-                            className={`flex-shrink-0 text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm
-                              ${copied === opt
-                                ? "bg-green-500 text-white shadow-md"
-                                : "bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 hover:shadow-md"}`}
-                          >
-                            {copied === opt ? t.copied : t.copy}
-                          </button>
                         </div>
+                        <button
+                          onClick={() => speakText(`ko-${i}-${j}`, opt, "ko-KR")}
+                          title={t.listen}
+                          className={`p-2 rounded-lg transition flex-shrink-0
+                            ${playing === `ko-${i}-${j}`
+                              ? "text-indigo-500 bg-indigo-50"
+                              : "text-slate-300 hover:text-indigo-500 hover:bg-indigo-50"}`}
+                        >
+                          <SpeakerIcon active={playing === `ko-${i}-${j}`} />
+                        </button>
+                        <button
+                          onClick={() => copy(opt)}
+                          className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-lg transition
+                            ${copied === opt
+                              ? "bg-green-500 text-white"
+                              : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}
+                        >
+                          {copied === opt ? t.copied : t.copy}
+                        </button>
                       </div>
                     ))}
                   </div>
 
                   {hasPhonetic && (
-                    <div className="bg-gradient-to-r from-amber-50 to-orange-50/50 backdrop-blur-sm rounded-2xl p-4 mb-4 border border-amber-200/50">
-                      <div className="flex items-center gap-3">
+                    <div className="bg-amber-50 rounded-xl p-3 mb-3 border border-amber-100">
+                      <div className="flex items-center gap-2">
                         <div className="flex-1">
-                          <div className="text-[10px] uppercase tracking-wider text-amber-500 font-bold mb-1">{t.actualPronun}</div>
-                          <div className="text-2xl font-bold text-amber-600 tracking-tight">
+                          <div className="text-[10px] text-amber-500 mb-0.5">{t.actualPronun}</div>
+                          <div className="text-xl font-bold text-amber-600 tracking-tight">
                             {v.phonetic}
                           </div>
                         </div>
                         <button
                           onClick={() => speakText(`ph-${i}`, v.phonetic, "ko-KR")}
                           title={t.listen}
-                          className={`p-3 rounded-xl transition flex-shrink-0 shadow-sm
+                          className={`p-2 rounded-lg transition flex-shrink-0
                             ${playing === `ph-${i}`
-                              ? "text-amber-600 bg-amber-200 shadow-md"
-                              : "text-amber-400 bg-white hover:text-amber-600 hover:bg-amber-100 hover:shadow-md"}`}
+                              ? "text-amber-600 bg-amber-100"
+                              : "text-amber-300 hover:text-amber-500 hover:bg-amber-100"}`}
                         >
                           <SpeakerIcon active={playing === `ph-${i}`} />
                         </button>
                         <button
                           onClick={() => copy(v.phonetic)}
-                          className={`flex-shrink-0 text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm
+                          className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-lg transition
                             ${copied === v.phonetic
-                              ? "bg-green-500 text-white shadow-md"
-                              : "bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 hover:shadow-md"}`}
+                              ? "bg-green-500 text-white"
+                              : "bg-white text-slate-500 hover:bg-slate-50"}`}
                         >
                           {copied === v.phonetic ? t.copied : t.copy}
                         </button>
@@ -718,81 +691,73 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
                       onClick={() => openGallery(options[0] ?? v.phonetic)}
-                      className="flex items-center justify-center gap-2 text-sm bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-4 py-3.5 rounded-xl transition font-bold shadow-md hover:shadow-lg active:scale-95"
+                      className="flex items-center justify-center gap-1.5 text-xs bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2.5 rounded-lg transition font-semibold"
                     >
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                         <rect x="3" y="3" width="7" height="7" rx="1" />
                         <rect x="14" y="3" width="7" height="7" rx="1" />
                         <rect x="3" y="14" width="7" height="7" rx="1" />
                         <rect x="14" y="14" width="7" height="7" rx="1" />
                       </svg>
-                      <span className="hidden sm:inline">{lang === "ko" ? "폰트 갤러리" : "Font Gallery"}</span>
-                      <span className="sm:hidden">📥</span>
+                      {lang === "ko" ? "폰트 갤러리" : "Font Gallery"}
                     </button>
 
                     <button
                       onClick={() => openArt(options[0] ?? v.phonetic)}
-                      className="flex items-center justify-center gap-2 text-sm bg-gradient-to-br from-pink-500 via-rose-500 to-pink-600 hover:from-pink-600 hover:via-rose-600 hover:to-pink-700 text-white px-4 py-3.5 rounded-xl transition font-bold shadow-md hover:shadow-lg active:scale-95"
+                      className="flex items-center justify-center gap-1.5 text-xs bg-pink-500 hover:bg-pink-600 text-white px-3 py-2.5 rounded-lg transition font-semibold"
                     >
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="13.5" cy="6.5" r="1.5" />
                         <circle cx="17.5" cy="10.5" r="1.5" />
                         <circle cx="8.5" cy="7.5" r="1.5" />
                         <circle cx="6.5" cy="12.5" r="1.5" />
                         <path d="M12 2a10 10 0 0 0 0 20c1.5 0 2.5-1 2.5-2.5 0-1-.5-1.5-.5-2.5 0-1 1-2 2-2H18a4 4 0 0 0 4-4 10 10 0 0 0-10-10z" />
                       </svg>
-                      <span className="hidden sm:inline">{lang === "ko" ? "한글아트" : "Hangul Art"}</span>
-                      <span className="sm:hidden">🎨</span>
+                      {lang === "ko" ? "한글아트" : "Hangul Art"}
                     </button>
                   </div>
                 </div>
               );
             })}
 
-            {/* 결과 공유 */}
-            <button
-              onClick={() => {
-                setShareOpen("result");
-                logAction({ type: "page_share_open", source: "result", inputName: currentInput, uiLang: lang });
-              }}
-              className="mt-3 w-full flex items-center justify-center gap-2 text-base bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-6 py-4 rounded-xl transition font-bold shadow-lg hover:shadow-xl"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-              </svg>
-              {lang === "ko" ? "📤 결과 공유하기" : "📤 Share this result"}
-            </button>
-
-            {/* 피드백 — 좋아요만 */}
-            <div className="flex items-center justify-center gap-3 pt-1">
-              <span className="text-xs text-white/60">{t.feedbackQ}</span>
+            {/* 결과 공유 + 피드백 */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setShareOpen("result");
+                  logAction({ type: "page_share_open", source: "result", inputName: currentInput, uiLang: lang });
+                }}
+                className="flex-1 flex items-center justify-center gap-2 text-sm bg-white/10 hover:bg-white/15 text-white/80 hover:text-white border border-white/10 hover:border-white/20 px-4 py-2.5 rounded-xl transition"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+                {lang === "ko" ? "공유하기" : "Share"}
+              </button>
               <button
                 onClick={() => {
                   const next = feedback === "up" ? null : "up";
                   setFeedback(next);
                   if (next === "up") logAction({ type: "feedback", value: "up", inputName: currentInput, uiLang: lang });
                 }}
-                className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl transition
+                className={`flex items-center gap-1 text-xs px-3 py-2.5 rounded-xl transition
                   ${feedback === "up"
-                    ? "bg-green-100 text-green-600 font-medium"
-                    : "bg-white border border-slate-100 text-slate-400 hover:border-green-200 hover:text-green-500"}`}
+                    ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                    : "bg-white/10 border border-white/10 text-white/50 hover:text-white/80"}`}
               >
-                {t.feedbackYes}
+                {feedback === "up" ? t.feedbackThanks : t.feedbackYes}
               </button>
-              {feedback === "up" && (
-                <span className="text-xs text-white/70">{t.feedbackThanks}</span>
-              )}
             </div>
           </div>
         )}
 
         {/* Hangul Art Gallery preview */}
-        <section className="mt-10 mb-2 bg-white/95 backdrop-blur rounded-3xl shadow-sm border border-slate-100 p-5">
+        <section className="mt-8 mb-2 bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-5">
           <HangulArtGallery
             isKo={lang === "ko"}
             uiLang={lang}
@@ -804,7 +769,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             <a
               href="/gallery"
               onClick={() => logAction({ type: "gallery_full_link_click", uiLang: lang })}
-              className="inline-flex items-center gap-1 text-xs text-pink-600 hover:text-pink-700 transition"
+              className="inline-flex items-center gap-1 text-xs text-indigo-300 hover:text-indigo-200 transition"
             >
               {lang === "ko" ? "전체 갤러리 보기" : "View full gallery"}
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -814,29 +779,24 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           </div>
         </section>
 
-        {/* Wehome Footer */}
-        <footer className="mt-12 pb-4 text-center" dir="ltr">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 inline-block">
-            <a
-              href="https://wehome.me"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block mb-2 transition hover:opacity-80"
-              onClick={() => logAction({ type: "wehome_footer_logo_click", uiLang: lang })}
-            >
-              <Image
-                src="/wehome-logo.png"
-                alt="Wehome"
-                width={1982}
-                height={1021}
-                className="h-10 w-auto brightness-0 invert drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
-              />
-            </a>
-            <p className="text-white/90 text-sm font-medium mb-1">Your Home in Korea</p>
-            <p className="text-white/70 text-xs leading-relaxed max-w-sm mx-auto">
-              {t.wehomeTagline2}
-            </p>
-          </div>
+        {/* Footer */}
+        <footer className="mt-10 pb-4 text-center" dir="ltr">
+          <a
+            href="https://wehome.me"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 transition hover:opacity-80"
+            onClick={() => logAction({ type: "wehome_footer_logo_click", uiLang: lang })}
+          >
+            <Image
+              src="/wehome-logo.png"
+              alt="Wehome"
+              width={1982}
+              height={1021}
+              className="h-6 w-auto brightness-0 invert opacity-50"
+            />
+          </a>
+          <p className="text-white/40 text-[11px] mt-1.5">Your Home in Korea</p>
         </footer>
       </div>
     </main>
