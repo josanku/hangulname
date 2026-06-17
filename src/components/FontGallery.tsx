@@ -12,6 +12,7 @@ interface Props {
   onClose: () => void;
   onPickFont?: (fontId: string) => void;
   onLog?: (data: Record<string, unknown>) => void;
+  onOpenArt?: (text: string) => void;
 }
 
 // "Various Korean fonts" — translated per UI language (falls back to en)
@@ -68,7 +69,7 @@ interface RenderedFont {
   error: boolean;
 }
 
-export default function FontGallery({ text, originalName, isKo, uiLang, onClose, onPickFont, onLog }: Props) {
+export default function FontGallery({ text, originalName, isKo, uiLang, onClose, onPickFont, onLog, onOpenArt }: Props) {
   const [rendered, setRendered] = useState<RenderedFont[]>(
     FONTS.map((f) => ({ font: f, dataUrl: null, error: false })),
   );
@@ -156,6 +157,21 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            {onOpenArt && (
+              <button
+                onClick={() => onOpenArt(text)}
+                className="flex items-center gap-1.5 text-xs bg-violet-50 hover:bg-violet-100 text-violet-600 border border-violet-200 px-3 py-2 rounded-xl transition"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="13.5" cy="6.5" r="1.5" />
+                  <circle cx="17.5" cy="10.5" r="1.5" />
+                  <circle cx="8.5" cy="7.5" r="1.5" />
+                  <circle cx="6.5" cy="12.5" r="1.5" />
+                  <path d="M12 2a10 10 0 0 0 0 20c1.5 0 2.5-1 2.5-2.5 0-1-.5-1.5-.5-2.5 0-1 1-2 2-2H18a4 4 0 0 0 4-4 10 10 0 0 0-10-10z" />
+                </svg>
+                {isKo ? "한글아트" : "Hangul Art"}
+              </button>
+            )}
             <button
               onClick={() => {
                 setShareOpen(true);

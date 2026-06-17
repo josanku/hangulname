@@ -29,12 +29,12 @@ function PreviewTile({
     <button
       type="button"
       onClick={() => onOpen(item.text)}
-      className="group relative flex flex-col items-center gap-0.5 bg-white border border-zinc-100 rounded-xl p-2 transition hover:border-indigo-200 hover:shadow-md hover:-translate-y-0.5"
+      className="group relative flex flex-col items-center gap-0.5 bg-white border border-violet-100 rounded-xl p-2 transition hover:border-violet-300 hover:shadow-md hover:-translate-y-0.5"
       title={isKo ? `${item.text} 한글아트로 보기` : `View ${item.text} as Hangul Art`}
     >
       <div className="aspect-square w-full flex items-center justify-center bg-zinc-50 rounded-lg mb-0.5">
         <span
-          className="text-sm sm:text-base font-bold text-slate-700 group-hover:text-pink-600 transition tracking-tighter leading-tight px-0.5"
+          className="text-sm sm:text-base font-bold text-slate-700 group-hover:text-violet-600 transition tracking-tighter leading-tight px-0.5"
           style={{ fontFamily: "'NanumGothic', sans-serif" }}
         >
           {item.text}
@@ -45,7 +45,7 @@ function PreviewTile({
           {item.sub}
         </span>
       )}
-      <span className="absolute top-1 right-1 text-[8px] bg-indigo-50 text-indigo-600 px-1 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">
+      <span className="absolute top-1 right-1 text-[8px] bg-violet-50 text-violet-600 px-1 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">
         {isKo ? "아트" : "Art"}
       </span>
     </button>

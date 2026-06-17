@@ -31,12 +31,12 @@ export const metadata: Metadata = {
 
 export default function GalleryPage() {
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-8 sm:py-12">
+    <main className="min-h-screen bg-gradient-to-b from-violet-50 via-white to-purple-50/50 px-4 py-8 sm:py-12">
       <div className="max-w-5xl mx-auto">
         <nav className="mb-8 text-sm">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-white/40 hover:text-white/70 transition text-xs font-medium"
+            className="inline-flex items-center gap-1.5 text-violet-400 hover:text-violet-600 transition text-xs font-medium"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <polyline points="15 18 9 12 15 6" />
@@ -44,9 +44,7 @@ export default function GalleryPage() {
             <span>Back</span>
           </Link>
         </nav>
-        <div className="bg-white rounded-xl p-6 shadow-lg shadow-black/20">
-          <GalleryClient />
-        </div>
+        <GalleryClient />
       </div>
     </main>
   );

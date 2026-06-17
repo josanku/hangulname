@@ -10,10 +10,10 @@ export default function GalleryClient() {
   return (
     <>
       <div className="mb-10 text-center">
-        <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3 drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)]">
+        <h1 className="text-4xl sm:text-5xl font-bold text-violet-900 mb-3">
           한글아트 갤러리
         </h1>
-        <p className="text-white/90 text-base sm:text-lg drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
+        <p className="text-violet-400 text-base sm:text-lg">
           원하는 이름이나 단어를 클릭해서 한글아트로 만들어 보세요
         </p>
       </div>
@@ -39,9 +39,9 @@ export default function GalleryClient() {
                 <button
                   key={item.text}
                   onClick={() => setArtText(item.text)}
-                  className="group relative aspect-square bg-gradient-to-br from-slate-50 to-pink-50/40 hover:from-pink-50 hover:to-rose-50 rounded-2xl border-2 border-slate-100 hover:border-pink-300 transition-all duration-300 hover:scale-105 hover:shadow-lg flex flex-col items-center justify-center p-3"
+                  className="group relative aspect-square bg-gradient-to-br from-violet-50/50 to-purple-50/40 hover:from-violet-100 hover:to-purple-100 rounded-2xl border-2 border-violet-100 hover:border-violet-400 transition-all duration-300 hover:scale-105 hover:shadow-lg flex flex-col items-center justify-center p-3"
                 >
-                  <span className="text-lg sm:text-xl font-bold text-slate-700 group-hover:text-pink-600 transition tracking-tight leading-tight text-center break-keep">
+                  <span className="text-lg sm:text-xl font-bold text-slate-700 group-hover:text-violet-600 transition tracking-tight leading-tight text-center break-keep">
                     {item.text}
                   </span>
                   {item.sub && (
@@ -50,7 +50,7 @@ export default function GalleryClient() {
                     </span>
                   )}
                   <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition">
-                    <svg className="w-4 h-4 text-pink-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <svg className="w-4 h-4 text-violet-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <circle cx="13.5" cy="6.5" r="1.5" />
                       <circle cx="17.5" cy="10.5" r="1.5" />
                       <circle cx="8.5" cy="7.5" r="1.5" />

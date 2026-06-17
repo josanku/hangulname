@@ -137,7 +137,7 @@ export default function FeedbackButton({ lang }: Props) {
       {/* 플로팅 버튼 */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-5 z-40 flex items-center gap-1.5 bg-white/90 hover:bg-white border border-white/50 backdrop-blur-sm text-slate-700 text-xs font-medium px-3 py-2 rounded-full shadow-lg transition"
+        className="fixed bottom-6 right-5 z-40 flex items-center gap-1.5 bg-white/90 hover:bg-white border border-violet-200 backdrop-blur-sm text-violet-600 text-xs font-medium px-3 py-2 rounded-full shadow-lg shadow-violet-200/30 transition"
       >
         <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>

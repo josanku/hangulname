@@ -10,9 +10,10 @@ interface Props {
   uiLang: string;
   onClose: () => void;
   onLog?: (data: Record<string, unknown>) => void;
+  onOpenFontGallery?: (text: string) => void;
 }
 
-export default function HangulArtModal({ text, originalName, isKo, uiLang, onClose, onLog }: Props) {
+export default function HangulArtModal({ text, originalName, isKo, uiLang, onClose, onLog, onOpenFontGallery }: Props) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [loaded, setLoaded] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -214,6 +215,20 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
 
         {/* Action bar */}
         <div className="flex items-center justify-end gap-2 px-6 py-3 border-t border-slate-100 bg-white">
+          {onOpenFontGallery && (
+            <button
+              onClick={() => onOpenFontGallery(currentText)}
+              className="flex items-center gap-1.5 text-xs bg-violet-50 hover:bg-violet-100 text-violet-600 border border-violet-200 px-4 py-2 rounded-xl transition mr-auto"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+              {isKo ? "폰트 갤러리" : "Font Gallery"}
+            </button>
+          )}
           <button
             onClick={() => {
               setShareOpen(true);

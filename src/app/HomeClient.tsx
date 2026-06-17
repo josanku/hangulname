@@ -7,7 +7,6 @@ import { ABOUT_CONTENT } from "@/lib/about";
 import FontModal from "@/components/FontModal";
 import FontGallery from "@/components/FontGallery";
 import HangulArtModal from "@/components/HangulArtModal";
-import HangulArtGallery from "@/components/HangulArtGallery";
 import ShareLinkModal from "@/components/ShareLinkModal";
 import KoreaBackground from "@/components/KoreaBackground";
 import FeedbackButton from "@/components/FeedbackButton";
@@ -48,6 +47,16 @@ interface Result {
   variants: Variant[];
   origin: string;
 }
+
+const JAMO_STEPS = [
+  { jamo: "ㅇㅎ", label: "후음" },
+  { jamo: "ㅅㅈㅊ", label: "치음" },
+  { jamo: "ㅁㅂㅍ", label: "순음" },
+  { jamo: "ㄱㄴㄷㅌㄹ", label: "설음" },
+  { jamo: "ㅣㅡ", label: "모음" },
+  { jamo: "ㅏㅓㅑㅕ", label: "양성" },
+  { jamo: "ㅗㅜㅛㅠ", label: "음성" },
+];
 
 function SpeakerIcon({ active }: { active: boolean }) {
   return (
@@ -139,15 +148,13 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     // ── KakaoTalk 인앱 브라우저 처리 ───────────────────────────────────────
     if (/KAKAOTALK/i.test(ua)) {
       if (/Android/i.test(ua)) {
-        // Android: intent URL로 기본 브라우저(Chrome 등)에서 자동으로 열기
         const intentUrl =
           `intent://${window.location.host}${window.location.pathname}${window.location.search}` +
           `#Intent;scheme=https;action=android.intent.action.VIEW;` +
           `category=android.intent.category.BROWSABLE;end`;
         window.location.replace(intentUrl);
-        return; // 이 후 코드는 실행하지 않음
+        return;
       } else {
-        // iOS: 자동 redirect 불가 → 배너로 안내
         setKakaoIOS(true);
       }
     }
@@ -157,10 +164,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     const stored = parseInt(safeStorageGet("convertCount", "0"), 10);
     setCount(stored);
 
-    // speechSynthesis는 지원 여부 확인 후 호출
     if (hasSpeech()) window.speechSynthesis.getVoices();
 
-    // 방문자 로그 (세션당 1회)
     if (!safeSessionGet("hg_visited")) {
       safeSessionSet("hg_visited", "1");
       fetch("/api/log", {
@@ -170,7 +175,6 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
       }).catch(() => {});
     }
 
-    // Auto-convert: prefer server-provided initialName, fallback to URL param
     const nameParam = initialName ?? new URLSearchParams(window.location.search).get("name") ?? null;
     if (nameParam) {
       setInput(nameParam);
@@ -262,14 +266,11 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     setFeedback(null);
     setJamoIndex(0);
 
-    // Animate Jamo sequence
-    const jamoSequence = ["ㅇㅎ", "ㅅㅈㅊ", "ㅁㅂㅍ", "ㄱㄴㄷㅌㄹ", "ㅣㅡ", "ㅏㅓㅑㅕ", "ㅗㅜㅛㅠ"];
     let idx = 0;
     const jamoInterval = setInterval(() => {
-      idx++;
+      idx = (idx + 1) % JAMO_STEPS.length;
       setJamoIndex(idx);
-      if (idx >= jamoSequence.length) clearInterval(jamoInterval);
-    }, 150);
+    }, 220);
 
     try {
       const res = await fetch("/api/transliterate", {
@@ -311,7 +312,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
 
   const speakText = useCallback((id: string, text: string, speakLang: string) => {
-    if (!hasSpeech()) return; // speechSynthesis 미지원 환경(KakaoTalk WebView 등)
+    if (!hasSpeech()) return;
     window.speechSynthesis.cancel();
     if (playing === id) { setPlaying(null); return; }
 
@@ -333,7 +334,6 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     <>
     <KoreaBackground />
 
-    {/* iOS KakaoTalk: 자동 redirect 불가 — 배너로 안내 */}
     {kakaoIOS && (
       <div className="fixed top-0 inset-x-0 z-50 bg-[#FEE500] text-slate-900 py-3 px-4 text-center shadow-lg">
         <p className="text-sm font-bold">카카오톡 브라우저에서는 일부 기능이 제한됩니다</p>
@@ -362,23 +362,23 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               alt="Wehome"
               width={1982}
               height={1021}
-              className="h-7 w-auto brightness-0 invert opacity-60"
+              className="h-7 w-auto opacity-40"
             />
           </a>
         </div>
 
         {/* Hero */}
         <div className="mb-10 text-center">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-violet-900 tracking-tight">
             {t.title}
           </h1>
-          <p className="text-sm text-white/45 mt-1.5">
+          <p className="text-sm text-violet-400 mt-1.5">
             {t.subtitle}
           </p>
         </div>
 
         {/* Input */}
-        <div className="bg-white/[0.05] rounded-xl border border-white/[0.08] p-4 mb-3 transition-shadow focus-within:border-indigo-500/30 focus-within:shadow-[0_0_0_3px_rgba(99,102,241,0.08)]">
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-violet-200 p-4 mb-3 shadow-sm transition-shadow focus-within:border-violet-400 focus-within:shadow-[0_0_0_3px_rgba(139,92,246,0.1)]">
           <div className="flex gap-2 items-center">
             <input
               type="text"
@@ -387,7 +387,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               onKeyDown={(e) => e.key === "Enter" && convert()}
               placeholder={t.placeholder}
               dir="auto"
-              className="flex-1 min-w-0 text-white placeholder:text-white/25 focus:outline-none text-base bg-transparent"
+              className="flex-1 min-w-0 text-violet-900 placeholder:text-violet-300 focus:outline-none text-base bg-transparent"
               autoFocus
             />
             {micSupported && (
@@ -397,7 +397,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                 className={`shrink-0 rounded-lg p-2.5 transition
                   ${isListening
                     ? "bg-red-500 text-white animate-pulse"
-                    : "text-white/25 hover:text-white/60 hover:bg-white/[0.06]"}`}
+                    : "text-violet-300 hover:text-violet-500 hover:bg-violet-50"}`}
               >
                 {isListening ? (
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -416,16 +416,45 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             <button
               onClick={convert}
               disabled={loading || !input.trim()}
-              className="shrink-0 bg-indigo-600 hover:bg-indigo-500 disabled:bg-white/[0.06] disabled:text-white/20 text-white px-5 py-2.5 rounded-lg font-medium transition text-sm min-w-[80px]"
+              className="shrink-0 bg-violet-600 hover:bg-violet-500 disabled:bg-violet-100 disabled:text-violet-300 text-white px-5 py-2.5 rounded-lg font-medium transition text-sm min-w-[80px]"
             >
               {loading ? (
-                <span className="text-base font-bold animate-pulse">
-                  {["ㅇㅎ", "ㅅㅈㅊ", "ㅁㅂㅍ", "ㄱㄴㄷㅌㄹ", "ㅣㅡ", "ㅏㅓㅑㅕ", "ㅗㅜㅛㅠ"][jamoIndex] || "ㅇㅎ"}
+                <span className="flex items-center justify-center gap-1">
+                  {JAMO_STEPS.map((_, idx) => (
+                    <span
+                      key={idx}
+                      className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
+                        idx <= jamoIndex
+                          ? "bg-white scale-125"
+                          : "bg-white/30"
+                      }`}
+                    />
+                  ))}
                 </span>
               ) : t.convert}
             </button>
           </div>
         </div>
+
+        {/* Loading progress indicator */}
+        {loading && (
+          <div className="flex items-center justify-center gap-3 py-6 mb-2">
+            {JAMO_STEPS.map((step, idx) => (
+              <div key={idx} className="flex flex-col items-center gap-1.5">
+                <div className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                  idx === jamoIndex
+                    ? "bg-violet-500 shadow-lg shadow-violet-400/60 scale-125"
+                    : idx === (jamoIndex - 1 + JAMO_STEPS.length) % JAMO_STEPS.length
+                      ? "bg-violet-300 scale-105"
+                      : "bg-violet-100 scale-90"
+                }`} />
+                <span className={`text-[10px] font-medium transition-colors duration-300 ${
+                  idx === jamoIndex ? "text-violet-600" : "text-violet-300"
+                }`}>{step.jamo}</span>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Quick Examples */}
         <div className="flex flex-wrap justify-center gap-1.5 mb-8">
@@ -443,30 +472,20 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                 setArtText(item.text);
                 logAction({ type: "example_category_click", text: item.text, uiLang: lang });
               }}
-              className="px-3 py-1 text-xs border border-white/[0.08] hover:border-white/20 rounded-full text-white/30 hover:text-white/70 transition"
+              className="px-3 py-1 text-xs border border-violet-200 hover:border-violet-400 rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50 transition"
             >
               {item.emoji} {item.text}
             </button>
           ))}
         </div>
 
-        {/* Meta bar */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="text-xs text-white/30">
-            {count > 0 ? (
-              <span dangerouslySetInnerHTML={{
-                __html: t.counter.replace("{n}", `<span class="text-indigo-400 font-semibold">${count.toLocaleString()}</span>`)
-              }} />
-            ) : (
-              <span>{t.counterFirst}</span>
-            )}
-          </div>
-
+        {/* Menu bar */}
+        <div className="flex items-center justify-end mb-6">
           <div className="flex items-center gap-2">
             <div className="relative">
               <button
                 onClick={(e) => { e.stopPropagation(); setShowLangMenu(!showLangMenu); setShowInfoMenu(false); }}
-                className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 border border-white/[0.08] hover:border-white/20 rounded-lg px-3 py-1.5 transition"
+                className="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-600 border border-violet-200 hover:border-violet-400 rounded-lg px-3 py-1.5 transition"
               >
                 <span>{LANG_LABELS[lang]}</span>
                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -476,7 +495,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
               {showLangMenu && (
                 <div
-                  className="absolute bottom-full mb-1 right-0 bg-zinc-900/95 backdrop-blur-xl border border-white/[0.08] rounded-xl shadow-2xl py-1 z-10 min-w-40 max-h-80 overflow-y-auto"
+                  className="absolute bottom-full mb-1 right-0 bg-white/95 backdrop-blur-xl border border-violet-200 rounded-xl shadow-xl shadow-violet-200/30 py-1 z-10 min-w-40 max-h-80 overflow-y-auto"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {(Object.keys(LANG_LABELS) as Lang[]).map((l) => (
@@ -485,8 +504,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       onClick={() => { setLang(l); setShowLangMenu(false); }}
                       className={`w-full text-left px-3 py-2 text-xs transition
                         ${l === lang
-                          ? "text-indigo-400 bg-indigo-500/10 font-semibold"
-                          : "text-white/50 hover:bg-white/[0.05] hover:text-white/80"}`}
+                          ? "text-violet-600 bg-violet-50 font-semibold"
+                          : "text-slate-500 hover:bg-violet-50 hover:text-violet-700"}`}
                     >
                       {LANG_LABELS[l]}
                     </button>
@@ -500,7 +519,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                 onClick={(e) => { e.stopPropagation(); setShowInfoMenu(!showInfoMenu); setShowLangMenu(false); }}
                 aria-label={ABOUT_CONTENT[lang].menuLabel}
                 title={ABOUT_CONTENT[lang].menuLabel}
-                className="text-white/40 hover:text-white/70 border border-white/[0.08] hover:border-white/20 rounded-lg p-1.5 transition"
+                className="text-violet-400 hover:text-violet-600 border border-violet-200 hover:border-violet-400 rounded-lg p-1.5 transition"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   <line x1="4" y1="7"  x2="20" y2="7"  />
@@ -511,7 +530,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
               {showInfoMenu && (
                 <div
-                  className="absolute bottom-full mb-1 right-0 bg-zinc-900/95 backdrop-blur-xl border border-white/[0.08] rounded-xl shadow-2xl py-1 z-10 min-w-48"
+                  className="absolute bottom-full mb-1 right-0 bg-white/95 backdrop-blur-xl border border-violet-200 rounded-xl shadow-xl shadow-violet-200/30 py-1 z-10 min-w-48"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
@@ -520,7 +539,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       setShowInfoMenu(false);
                       logAction({ type: "about_open", target: "hangulname", uiLang: lang });
                     }}
-                    className="w-full text-left px-3 py-2 text-xs text-white/50 hover:text-white hover:bg-white/[0.05] transition"
+                    className="w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
                   >
                     {ABOUT_CONTENT[lang].hangulnameTitle}
                   </button>
@@ -530,17 +549,34 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       setShowInfoMenu(false);
                       logAction({ type: "about_open", target: "hunminjeong", uiLang: lang });
                     }}
-                    className="w-full text-left px-3 py-2 text-xs text-white/50 hover:text-white hover:bg-white/[0.05] transition"
+                    className="w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
                   >
                     {ABOUT_CONTENT[lang].hunminjeongeum}
                   </button>
+                  <a
+                    href="/gallery"
+                    onClick={() => {
+                      setShowInfoMenu(false);
+                      logAction({ type: "gallery_menu_click", uiLang: lang });
+                    }}
+                    className="flex items-center gap-2 w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
+                  >
+                    <svg className="w-3.5 h-3.5 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="13.5" cy="6.5" r="1.5" />
+                      <circle cx="17.5" cy="10.5" r="1.5" />
+                      <circle cx="8.5" cy="7.5" r="1.5" />
+                      <circle cx="6.5" cy="12.5" r="1.5" />
+                      <path d="M12 2a10 10 0 0 0 0 20c1.5 0 2.5-1 2.5-2.5 0-1-.5-1.5-.5-2.5 0-1 1-2 2-2H18a4 4 0 0 0 4-4 10 10 0 0 0-10-10z" />
+                    </svg>
+                    {lang === "ko" ? "한글아트 갤러리" : "Hangul Art Gallery"}
+                  </a>
                   <a
                     href="/learn-hangul"
                     onClick={() => {
                       setShowInfoMenu(false);
                       logAction({ type: "learn_hangul_click", uiLang: lang });
                     }}
-                    className="block w-full text-left px-3 py-2 text-xs text-white/50 hover:text-white hover:bg-white/[0.05] transition"
+                    className="block w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
                   >
                     {lang === "ko" ? "59초 한글 배우기" : "Learn Hangul in 59s"}
                   </a>
@@ -550,7 +586,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       setShowInfoMenu(false);
                       logAction({ type: "about_open", target: "faq", uiLang: lang });
                     }}
-                    className="w-full text-left px-3 py-2 text-xs text-white/50 hover:text-white hover:bg-white/[0.05] transition"
+                    className="w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
                   >
                     {ABOUT_CONTENT[lang].faqTitle}
                   </button>
@@ -560,9 +596,9 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       setShowInfoMenu(false);
                       logAction({ type: "page_share_open", source: "menu", uiLang: lang });
                     }}
-                    className="w-full text-left px-3 py-2 text-xs text-white/50 hover:text-white hover:bg-white/[0.05] transition flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition flex items-center gap-2"
                   >
-                    <svg className="w-4 h-4 text-white/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg className="w-4 h-4 text-violet-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
                       <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
                       <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
@@ -575,7 +611,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       setShowInfoMenu(false);
                       logAction({ type: "about_open", target: "wehome", uiLang: lang });
                     }}
-                    className="w-full text-left px-3 py-2 text-xs text-white/50 hover:text-white hover:bg-white/[0.05] transition"
+                    className="w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
                   >
                     {ABOUT_CONTENT[lang].wehomeTitle}
                   </button>
@@ -587,8 +623,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-4">
-            <p className="text-red-400 text-sm">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
+            <p className="text-red-500 text-sm">{error}</p>
           </div>
         )}
 
@@ -596,17 +632,17 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         {result && (
           <div className="grid gap-3">
             {result.origin && (
-              <p className="text-xs text-white/40 px-1">{result.origin}</p>
+              <p className="text-xs text-violet-400 px-1">{result.origin}</p>
             )}
 
             {/* 원어 발음 카드 */}
-            <div className="bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 flex items-center gap-3">
+            <div className="bg-violet-50/60 border border-violet-200 rounded-xl px-4 py-3 flex items-center gap-3">
               <div className="flex-1 min-w-0">
-                <div className="text-xl font-bold text-white truncate" dir="auto">
+                <div className="text-xl font-bold text-violet-900 truncate" dir="auto">
                   {currentInput}
                 </div>
                 {result.sourceLang && (
-                  <div className="text-xs text-white/30 mt-0.5">{result.sourceLang}</div>
+                  <div className="text-xs text-violet-400 mt-0.5">{result.sourceLang}</div>
                 )}
               </div>
               <button
@@ -614,8 +650,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                 title={t.listenOriginal}
                 className={`flex-shrink-0 p-2 rounded-lg transition
                   ${playing === "original"
-                    ? "text-indigo-400 bg-indigo-500/15"
-                    : "text-white/25 hover:text-white/60 hover:bg-white/[0.06]"}`}
+                    ? "text-violet-600 bg-violet-100"
+                    : "text-violet-300 hover:text-violet-500 hover:bg-violet-100"}`}
               >
                 <SpeakerIcon active={playing === "original"} />
               </button>
@@ -630,14 +666,14 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                   key={i}
                   className={`w-full rounded-xl px-5 py-5
                     ${i === 0
-                      ? "bg-white shadow-lg shadow-black/20"
-                      : "bg-white/95 shadow-md shadow-black/10"}`}
+                      ? "bg-white shadow-lg shadow-violet-200/40 border border-violet-100"
+                      : "bg-white/95 shadow-md shadow-violet-100/30 border border-violet-50"}`}
                 >
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-lg">{v.flag}</span>
-                    <span className="text-xs font-medium text-zinc-500 uppercase tracking-wide">{v.country}</span>
+                    <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">{v.country}</span>
                     {v.ipa && (
-                      <span className="text-xs text-zinc-400 font-mono ml-auto">{v.ipa}</span>
+                      <span className="text-xs text-slate-400 font-mono ml-auto">{v.ipa}</span>
                     )}
                   </div>
 
@@ -646,12 +682,12 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                       <div key={j} className="flex items-center gap-2">
                         <div className="flex-1">
                           {options.length > 1 && (
-                            <div className="text-[10px] text-zinc-400 mb-0.5">
+                            <div className="text-[10px] text-slate-400 mb-0.5">
                               {j === 0 ? t.primarySpelling : `${t.altSpelling} ${j}`}
                             </div>
                           )}
                           <div className={`font-bold tracking-tight
-                            ${j === 0 ? "text-3xl text-zinc-900" : "text-xl text-zinc-400"}`}>
+                            ${j === 0 ? "text-3xl text-violet-900" : "text-xl text-slate-400"}`}>
                             {opt}
                           </div>
                         </div>
@@ -660,8 +696,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                           title={t.listen}
                           className={`p-2 rounded-lg transition flex-shrink-0
                             ${playing === `ko-${i}-${j}`
-                              ? "text-indigo-600 bg-indigo-50"
-                              : "text-zinc-300 hover:text-indigo-500 hover:bg-indigo-50"}`}
+                              ? "text-violet-600 bg-violet-50"
+                              : "text-violet-300 hover:text-violet-500 hover:bg-violet-50"}`}
                         >
                           <SpeakerIcon active={playing === `ko-${i}-${j}`} />
                         </button>
@@ -669,8 +705,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                           onClick={() => copy(opt)}
                           className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-lg transition
                             ${copied === opt
-                              ? "bg-zinc-900 text-white"
-                              : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"}`}
+                              ? "bg-violet-600 text-white"
+                              : "bg-violet-50 text-violet-500 hover:bg-violet-100"}`}
                         >
                           {copied === opt ? t.copied : t.copy}
                         </button>
@@ -701,8 +737,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                           onClick={() => copy(v.phonetic)}
                           className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-lg transition
                             ${copied === v.phonetic
-                              ? "bg-zinc-900 text-white"
-                              : "bg-white text-zinc-500 hover:bg-zinc-50"}`}
+                              ? "bg-violet-600 text-white"
+                              : "bg-white text-slate-500 hover:bg-slate-50"}`}
                         >
                           {copied === v.phonetic ? t.copied : t.copy}
                         </button>
@@ -713,7 +749,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
                       onClick={() => openGallery(options[0] ?? v.phonetic)}
-                      className="flex items-center justify-center gap-1.5 text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2.5 rounded-lg transition font-medium"
+                      className="flex items-center justify-center gap-1.5 text-xs bg-violet-600 hover:bg-violet-500 text-white px-3 py-2.5 rounded-lg transition font-medium"
                     >
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                         <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -726,7 +762,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
                     <button
                       onClick={() => openArt(options[0] ?? v.phonetic)}
-                      className="flex items-center justify-center gap-1.5 text-xs bg-zinc-100 text-zinc-600 hover:bg-zinc-900 hover:text-white px-3 py-2.5 rounded-lg transition font-medium"
+                      className="flex items-center justify-center gap-1.5 text-xs bg-violet-50 text-violet-600 hover:bg-violet-600 hover:text-white px-3 py-2.5 rounded-lg transition font-medium border border-violet-200 hover:border-violet-600"
                     >
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="13.5" cy="6.5" r="1.5" />
@@ -749,7 +785,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                   setShareOpen("result");
                   logAction({ type: "page_share_open", source: "result", inputName: currentInput, uiLang: lang });
                 }}
-                className="flex-1 flex items-center justify-center gap-2 text-sm bg-white/[0.04] hover:bg-white/[0.07] text-white/50 hover:text-white/80 border border-white/[0.08] px-4 py-2.5 rounded-xl transition"
+                className="flex-1 flex items-center justify-center gap-2 text-sm bg-white/60 hover:bg-white text-violet-500 hover:text-violet-700 border border-violet-200 px-4 py-2.5 rounded-xl transition"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
@@ -766,8 +802,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                 }}
                 className={`flex items-center gap-1 text-xs px-3 py-2.5 rounded-xl transition
                   ${feedback === "up"
-                    ? "bg-green-500/15 text-green-400 border border-green-500/25"
-                    : "bg-white/[0.04] border border-white/[0.08] text-white/30 hover:text-white/60"}`}
+                    ? "bg-green-50 text-green-600 border border-green-200"
+                    : "bg-white/60 border border-violet-200 text-violet-400 hover:text-violet-600"}`}
               >
                 {feedback === "up" ? t.feedbackThanks : t.feedbackYes}
               </button>
@@ -775,32 +811,9 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           </div>
         )}
 
-        {/* Hangul Art Gallery preview */}
-        <section className="mt-10 mb-2 bg-white rounded-xl p-5 shadow-lg shadow-black/10">
-          <HangulArtGallery
-            isKo={lang === "ko"}
-            uiLang={lang}
-            itemsPerCategory={4}
-            compact
-            onLog={logAction}
-          />
-          <div className="mt-3 text-right">
-            <a
-              href="/gallery"
-              onClick={() => logAction({ type: "gallery_full_link_click", uiLang: lang })}
-              className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-indigo-600 transition"
-            >
-              {lang === "ko" ? "전체 갤러리 보기" : "View full gallery"}
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </a>
-          </div>
-        </section>
-
         {/* Footer */}
         <footer className="mt-12 pb-4 text-center" dir="ltr">
-          <p className="text-white/15 text-[10px] tracking-wide">Your Home in Korea</p>
+          <p className="text-violet-300/50 text-[10px] tracking-wide">Your Home in Korea</p>
         </footer>
       </div>
     </main>
@@ -814,6 +827,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         initialFontId={modalInitialFont}
         onClose={() => { setModalText(null); setModalInitialFont(undefined); }}
         onLog={logAction}
+        onOpenArt={(t) => { setModalText(null); setModalInitialFont(undefined); setArtText(t); }}
       />
     )}
 
@@ -829,6 +843,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           setGalleryText(null);
         }}
         onLog={logAction}
+        onOpenArt={(t) => { setGalleryText(null); setArtText(t); }}
       />
     )}
 
@@ -840,6 +855,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         uiLang={lang}
         onClose={() => setArtText(null)}
         onLog={logAction}
+        onOpenFontGallery={(t) => { setArtText(null); setGalleryText(t); }}
       />
     )}
 
@@ -876,7 +892,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
     {aboutOpen !== null && (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
         onClick={() => setAboutOpen(null)}
         role="dialog"
         aria-modal="true"
@@ -887,8 +903,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           onClick={(e) => e.stopPropagation()}
           dir={t.dir}
         >
-          <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-slate-100">
-            <h2 className="text-lg font-bold text-slate-800">
+          <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-violet-100">
+            <h2 className="text-lg font-bold text-violet-900">
               {aboutOpen === "hangulname" && ABOUT_CONTENT[lang].hangulnameTitle}
               {aboutOpen === "hunminjeong" && ABOUT_CONTENT[lang].hunminjeongTitle}
               {aboutOpen === "wehome" && ABOUT_CONTENT[lang].wehomeTitle}
@@ -897,7 +913,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             <button
               onClick={() => setAboutOpen(null)}
               aria-label={ABOUT_CONTENT[lang].close}
-              className="text-slate-400 hover:text-slate-700 transition p-1"
+              className="text-violet-300 hover:text-violet-600 transition p-1"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <line x1="18" y1="6" x2="6" y2="18" />
@@ -910,11 +926,11 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               {ABOUT_CONTENT[lang].faqEntries.map((entry, i) => (
                 <details
                   key={i}
-                  className="group border border-slate-100 rounded-xl bg-slate-50/50 open:bg-white open:border-blue-100 transition"
+                  className="group border border-violet-100 rounded-xl bg-violet-50/30 open:bg-white open:border-violet-200 transition"
                 >
                   <summary className="cursor-pointer list-none px-4 py-3 flex items-center justify-between gap-3 text-sm font-medium text-slate-700">
                     <span className="flex-1">{entry.q}</span>
-                    <svg className="w-4 h-4 text-slate-400 transition group-open:rotate-180 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg className="w-4 h-4 text-violet-300 transition group-open:rotate-180 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polyline points="6 9 12 15 18 9" />
                     </svg>
                   </summary>
@@ -937,7 +953,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => logAction({ type: "wehome_modal_cta_click", uiLang: lang })}
-                className="block w-full text-center bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-medium transition text-sm"
+                className="block w-full text-center bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white px-4 py-2.5 rounded-xl font-medium transition text-sm"
               >
                 {ABOUT_CONTENT[lang].wehomeCta}
               </a>
