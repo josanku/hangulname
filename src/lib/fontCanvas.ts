@@ -64,35 +64,62 @@ function jamoColor(ch: string): JamoColor {
   return "default";
 }
 
-interface Jamo { ch: string; color: JamoColor }
-interface Group { jamos: Jamo[]; space: boolean }
+// 가로(아래 배치) 모음 / 복합 모음의 중성 인덱스 (JUNGSEONG 기준)
+const HORIZ_V = new Set([8, 12, 13, 17, 18]);          // ㅗ ㅛ ㅜ ㅠ ㅡ
+const COMPLEX_V = new Set([9, 10, 11, 14, 15, 16, 19]); // ㅘ ㅙ ㅚ ㅝ ㅞ ㅟ ㅢ
 
-function mk(ch: string): Jamo {
-  return { ch, color: jamoColor(ch) };
-}
+interface Region { x0: number; y0: number; x1: number; y1: number; color: JamoColor }
 
-// 음절을 초성/중성/종성 자모로 분리하고, 음절 단위 그룹 배열로 반환
-function toGroups(text: string): Group[] {
-  const groups: Group[] = [];
-  for (const ch of text) {
-    const code = ch.codePointAt(0) ?? 0;
-    if (code >= 0xac00 && code <= 0xd7a3) {
-      const s = code - 0xac00;
-      const l = Math.floor(s / 588);
-      const v = Math.floor((s % 588) / 28);
-      const t = s % 28;
-      const jamos = [mk(CHOSEONG[l]), mk(JUNGSEONG[v])];
-      if (t > 0) jamos.push(mk(JONGSEONG[t]));
-      groups.push({ jamos, space: false });
-    } else if (code >= 0x3131 && code <= 0x3163) {
-      groups.push({ jamos: [mk(ch)], space: false });
-    } else if (/\s/.test(ch)) {
-      groups.push({ jamos: [{ ch: " ", color: "default" }], space: true });
+// 음절 글자는 온전히 유지하되, 초성·중성·종성이 놓이는 위치별로
+// 클립 영역을 나눠 각각의 자모 색으로 칠한다.
+function syllableRegions(
+  l: number, v: number, t: number,
+  L: number, T: number, R: number, B: number,
+): Region[] {
+  const Wd = R - L, H = B - T;
+  const cInit = jamoColor(CHOSEONG[l]);
+  const cVow = jamoColor(JUNGSEONG[v]);
+  const cFin = t > 0 ? jamoColor(JONGSEONG[t]) : "default";
+  const hasT = t > 0;
+  const out: Region[] = [];
+  const push = (x0: number, y0: number, x1: number, y1: number, color: JamoColor) =>
+    out.push({ x0, y0, x1, y1, color });
+
+  if (HORIZ_V.has(v)) {
+    // 가로 모음: 초성(위) · 중성(중간) · [종성(아래)]
+    if (hasT) {
+      const y1 = T + H * 0.40, y2 = B - H * 0.30;
+      push(L, T, R, y1, cInit);
+      push(L, y1, R, y2, cVow);
+      push(L, y2, R, B, cFin);
     } else {
-      groups.push({ jamos: [{ ch, color: "default" }], space: false });
+      const y1 = T + H * 0.52;
+      push(L, T, R, y1, cInit);
+      push(L, y1, R, B, cVow);
+    }
+  } else if (COMPLEX_V.has(v)) {
+    // 복합 모음(ㅘ 등): 근사 — 초성(좌상) · 중성(우측+좌하) · [종성(아래)]
+    const splitX = L + Wd * 0.5;
+    const by = hasT ? B - H * 0.30 : B;
+    const midY = T + H * 0.55;
+    push(L, T, splitX, midY, cInit);
+    push(splitX, T, R, by, cVow);
+    push(L, midY, splitX, by, cVow);
+    if (hasT) push(L, by, R, B, cFin);
+  } else {
+    // 세로 모음: 초성(좌) · 중성(우) · [종성(아래)]
+    const splitX = L + Wd * 0.55;
+    if (hasT) {
+      const by = B - H * 0.30;
+      push(L, T, splitX, by, cInit);
+      push(splitX, T, R, by, cVow);
+      push(L, by, R, B, cFin);
+    } else {
+      push(L, T, splitX, B, cInit);
+      push(splitX, T, R, B, cVow);
     }
   }
-  return groups;
+  return out;
 }
 
 export async function buildFontCanvas({ text, originalName, font }: BuildArgs): Promise<HTMLCanvasElement> {
@@ -114,69 +141,81 @@ export async function buildFontCanvas({ text, originalName, font }: BuildArgs): 
   ctx.roundRect(0, 0, W, H, 24);
   ctx.fill();
 
-  const groups = toGroups(text.trim());
+  const chars = Array.from(text.trim());
   const weight = font.id === "hunmin-ebs" ? "900" : "bold";
   const maxW = W * 0.9;
 
-  // 주어진 글자 크기로 그룹을 측정하고 줄바꿈한다
-  type Item = { jamos: Jamo[]; w: number; space: boolean; gapBefore: number };
+  // 주어진 글자 크기로 음절을 줄바꿈 (한글은 공백이 없어 글자 단위로 줄넘김)
   const layout = (fs: number) => {
     ctx.font = `${weight} ${fs}px ${font.css}`;
-    const intra = fs * 0.04;   // 음절 내 자모 간격
-    const inter = fs * 0.30;   // 음절 간 간격
-    const spaceW = fs * 0.45;  // 공백 폭
-    const lines: { items: Item[]; width: number }[] = [];
-    let cur: Item[] = [];
+    const lines: { items: { ch: string; w: number }[]; width: number }[] = [];
+    let cur: { ch: string; w: number }[] = [];
     let curW = 0;
-    for (const g of groups) {
-      let w: number;
-      if (g.space) {
-        w = spaceW;
-      } else {
-        w = 0;
-        g.jamos.forEach((j, i) => { w += ctx.measureText(j.ch).width + (i > 0 ? intra : 0); });
-      }
-      const gap = cur.length ? inter : 0;
-      if (cur.length && curW + gap + w > maxW) {
+    for (const ch of chars) {
+      const w = ctx.measureText(ch).width;
+      if (cur.length && curW + w > maxW) {
         lines.push({ items: cur, width: curW });
         cur = [];
         curW = 0;
       }
-      const gapBefore = cur.length ? inter : 0;
-      cur.push({ jamos: g.jamos, w, space: g.space, gapBefore });
-      curW += gapBefore + w;
+      cur.push({ ch, w });
+      curW += w;
     }
     if (cur.length) lines.push({ items: cur, width: curW });
-    return { lines, intra };
+    return lines;
   };
 
   // 세로로도 들어맞을 때까지 글자 크기를 줄인다
-  let fs = 96;
-  let lay = layout(fs);
-  while (lay.lines.length * fs * 1.3 > H * 0.6 && fs > 30) {
+  let fs = 100;
+  let lines = layout(fs);
+  while (lines.length * fs * 1.28 > H * 0.62 && fs > 32) {
     fs -= 6;
-    lay = layout(fs);
+    lines = layout(fs);
   }
 
   ctx.font = `${weight} ${fs}px ${font.css}`;
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
-  const lineH = fs * 1.3;
-  const blockH = lay.lines.length * lineH;
+  const lineH = fs * 1.28;
+  const blockH = lines.length * lineH;
   const startY = (H - blockH) / 2 - 16;
 
-  lay.lines.forEach((line, idx) => {
+  // 한 글자를 위치별 색으로 그린다
+  const drawChar = (ch: string, penX: number, cy: number) => {
+    const code = ch.codePointAt(0) ?? 0;
+    const m = ctx.measureText(ch);
+    const aT = m.actualBoundingBoxAscent || fs * 0.5;
+    const aD = m.actualBoundingBoxDescent || fs * 0.18;
+    const T = cy - aT, B = cy + aD;
+    const L = penX, R = penX + m.width;
+
+    if (code >= 0xac00 && code <= 0xd7a3) {
+      const s = code - 0xac00;
+      const l = Math.floor(s / 588);
+      const v = Math.floor((s % 588) / 28);
+      const t = s % 28;
+      for (const rg of syllableRegions(l, v, t, L, T, R, B)) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(rg.x0, rg.y0, rg.x1 - rg.x0, rg.y1 - rg.y0);
+        ctx.clip();
+        ctx.fillStyle = JAMO_COLORS[rg.color];
+        ctx.fillText(ch, penX, cy);
+        ctx.restore();
+      }
+    } else {
+      // 낱자모·기타 문자: 한 색으로
+      ctx.fillStyle = JAMO_COLORS[jamoColor(ch)];
+      ctx.fillText(ch, penX, cy);
+    }
+  };
+
+  lines.forEach((line, idx) => {
     const y = startY + lineH * idx + lineH / 2;
     let x = (W - line.width) / 2;
     for (const item of line.items) {
-      x += item.gapBefore;
-      if (item.space) { x += item.w; continue; }
-      item.jamos.forEach((j, i) => {
-        if (i > 0) x += lay.intra;
-        ctx.fillStyle = JAMO_COLORS[j.color];
-        ctx.fillText(j.ch, x, y);
-        x += ctx.measureText(j.ch).width;
-      });
+      drawChar(item.ch, x, y);
+      x += item.w;
     }
   });
 
