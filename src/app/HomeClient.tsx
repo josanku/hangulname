@@ -415,6 +415,148 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           </p>
         </div>
 
+        {/* Menu bar */}
+        <div className="flex items-center justify-end mb-2">
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowLangMenu(!showLangMenu); setShowInfoMenu(false); }}
+                className="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-600 border border-violet-200 hover:border-violet-400 rounded-lg px-3 py-1.5 transition"
+              >
+                <span>{LANG_LABELS[lang]}</span>
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+
+              {showLangMenu && (
+                <div
+                  className="absolute top-full mt-1 right-0 bg-white/95 backdrop-blur-xl border border-violet-200 rounded-xl shadow-xl shadow-violet-200/30 py-1 z-10 min-w-40 max-h-80 overflow-y-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {(Object.keys(LANG_LABELS) as Lang[]).map((l) => (
+                    <button
+                      key={l}
+                      onClick={() => { setLang(l); setShowLangMenu(false); }}
+                      className={`w-full text-left px-3 py-2 text-xs transition
+                        ${l === lang
+                          ? "text-violet-600 bg-violet-50 font-semibold"
+                          : "text-slate-500 hover:bg-violet-50 hover:text-violet-700"}`}
+                    >
+                      {LANG_LABELS[l]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="relative">
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowInfoMenu(!showInfoMenu); setShowLangMenu(false); }}
+                aria-label={ABOUT_CONTENT[lang].menuLabel}
+                title={ABOUT_CONTENT[lang].menuLabel}
+                className="text-violet-400 hover:text-violet-600 border border-violet-200 hover:border-violet-400 rounded-lg p-1.5 transition"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="4" y1="7"  x2="20" y2="7"  />
+                  <line x1="4" y1="12" x2="20" y2="12" />
+                  <line x1="4" y1="17" x2="20" y2="17" />
+                </svg>
+              </button>
+
+              {showInfoMenu && (
+                <div
+                  className="absolute top-full mt-1 right-0 bg-white/95 backdrop-blur-xl border border-violet-200 rounded-xl shadow-xl shadow-violet-200/30 py-1 z-10 min-w-48"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <a
+                    href={`/hangul-name?lang=${lang}`}
+                    onClick={() => {
+                      setShowInfoMenu(false);
+                      logAction({ type: "about_open", target: "hangulname", uiLang: lang });
+                    }}
+                    className="block w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
+                  >
+                    Hangul Name
+                  </a>
+                  <button
+                    onClick={() => {
+                      setAboutOpen("hunminjeong");
+                      setShowInfoMenu(false);
+                      logAction({ type: "about_open", target: "hunminjeong", uiLang: lang });
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
+                  >
+                    {ABOUT_CONTENT[lang].hunminjeongeum}
+                  </button>
+                  <a
+                    href="/gallery"
+                    onClick={() => {
+                      setShowInfoMenu(false);
+                      logAction({ type: "gallery_menu_click", uiLang: lang });
+                    }}
+                    className="flex items-center gap-2 w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
+                  >
+                    <svg className="w-3.5 h-3.5 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="13.5" cy="6.5" r="1.5" />
+                      <circle cx="17.5" cy="10.5" r="1.5" />
+                      <circle cx="8.5" cy="7.5" r="1.5" />
+                      <circle cx="6.5" cy="12.5" r="1.5" />
+                      <path d="M12 2a10 10 0 0 0 0 20c1.5 0 2.5-1 2.5-2.5 0-1-.5-1.5-.5-2.5 0-1 1-2 2-2H18a4 4 0 0 0 4-4 10 10 0 0 0-10-10z" />
+                    </svg>
+                    {lang === "ko" ? "한글아트 갤러리" : "Hangul Art Gallery"}
+                  </a>
+                  <a
+                    href="/learn-hangul"
+                    onClick={() => {
+                      setShowInfoMenu(false);
+                      logAction({ type: "learn_hangul_click", uiLang: lang });
+                    }}
+                    className="block w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
+                  >
+                    {lang === "ko" ? "59초 한글 배우기" : "Learn Hangul in 59s"}
+                  </a>
+                  <button
+                    onClick={() => {
+                      setAboutOpen("faq");
+                      setShowInfoMenu(false);
+                      logAction({ type: "about_open", target: "faq", uiLang: lang });
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
+                  >
+                    {ABOUT_CONTENT[lang].faqTitle}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShareOpen("site");
+                      setShowInfoMenu(false);
+                      logAction({ type: "page_share_open", source: "menu", uiLang: lang });
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4 text-violet-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                    {lang === "ko" ? "사이트 공유" : "Share this site"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setAboutOpen("wehome");
+                      setShowInfoMenu(false);
+                      logAction({ type: "about_open", target: "wehome", uiLang: lang });
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
+                  >
+                    {ABOUT_CONTENT[lang].wehomeTitle}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Input */}
         <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-violet-200 p-4 mb-3 shadow-sm transition-shadow focus-within:border-violet-400 focus-within:shadow-[0_0_0_3px_rgba(139,92,246,0.1)]">
           <div className="flex gap-2 items-center">
@@ -515,148 +657,6 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               {item.emoji} {item.text}
             </button>
           ))}
-        </div>
-
-        {/* Menu bar */}
-        <div className="flex items-center justify-end mb-6">
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <button
-                onClick={(e) => { e.stopPropagation(); setShowLangMenu(!showLangMenu); setShowInfoMenu(false); }}
-                className="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-600 border border-violet-200 hover:border-violet-400 rounded-lg px-3 py-1.5 transition"
-              >
-                <span>{LANG_LABELS[lang]}</span>
-                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-
-              {showLangMenu && (
-                <div
-                  className="absolute bottom-full mb-1 right-0 bg-white/95 backdrop-blur-xl border border-violet-200 rounded-xl shadow-xl shadow-violet-200/30 py-1 z-10 min-w-40 max-h-80 overflow-y-auto"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {(Object.keys(LANG_LABELS) as Lang[]).map((l) => (
-                    <button
-                      key={l}
-                      onClick={() => { setLang(l); setShowLangMenu(false); }}
-                      className={`w-full text-left px-3 py-2 text-xs transition
-                        ${l === lang
-                          ? "text-violet-600 bg-violet-50 font-semibold"
-                          : "text-slate-500 hover:bg-violet-50 hover:text-violet-700"}`}
-                    >
-                      {LANG_LABELS[l]}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="relative">
-              <button
-                onClick={(e) => { e.stopPropagation(); setShowInfoMenu(!showInfoMenu); setShowLangMenu(false); }}
-                aria-label={ABOUT_CONTENT[lang].menuLabel}
-                title={ABOUT_CONTENT[lang].menuLabel}
-                className="text-violet-400 hover:text-violet-600 border border-violet-200 hover:border-violet-400 rounded-lg p-1.5 transition"
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <line x1="4" y1="7"  x2="20" y2="7"  />
-                  <line x1="4" y1="12" x2="20" y2="12" />
-                  <line x1="4" y1="17" x2="20" y2="17" />
-                </svg>
-              </button>
-
-              {showInfoMenu && (
-                <div
-                  className="absolute bottom-full mb-1 right-0 bg-white/95 backdrop-blur-xl border border-violet-200 rounded-xl shadow-xl shadow-violet-200/30 py-1 z-10 min-w-48"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <a
-                    href={`/hangul-name?lang=${lang}`}
-                    onClick={() => {
-                      setShowInfoMenu(false);
-                      logAction({ type: "about_open", target: "hangulname", uiLang: lang });
-                    }}
-                    className="block w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
-                  >
-                    Hangul Name
-                  </a>
-                  <button
-                    onClick={() => {
-                      setAboutOpen("hunminjeong");
-                      setShowInfoMenu(false);
-                      logAction({ type: "about_open", target: "hunminjeong", uiLang: lang });
-                    }}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
-                  >
-                    {ABOUT_CONTENT[lang].hunminjeongeum}
-                  </button>
-                  <a
-                    href="/gallery"
-                    onClick={() => {
-                      setShowInfoMenu(false);
-                      logAction({ type: "gallery_menu_click", uiLang: lang });
-                    }}
-                    className="flex items-center gap-2 w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
-                  >
-                    <svg className="w-3.5 h-3.5 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="13.5" cy="6.5" r="1.5" />
-                      <circle cx="17.5" cy="10.5" r="1.5" />
-                      <circle cx="8.5" cy="7.5" r="1.5" />
-                      <circle cx="6.5" cy="12.5" r="1.5" />
-                      <path d="M12 2a10 10 0 0 0 0 20c1.5 0 2.5-1 2.5-2.5 0-1-.5-1.5-.5-2.5 0-1 1-2 2-2H18a4 4 0 0 0 4-4 10 10 0 0 0-10-10z" />
-                    </svg>
-                    {lang === "ko" ? "한글아트 갤러리" : "Hangul Art Gallery"}
-                  </a>
-                  <a
-                    href="/learn-hangul"
-                    onClick={() => {
-                      setShowInfoMenu(false);
-                      logAction({ type: "learn_hangul_click", uiLang: lang });
-                    }}
-                    className="block w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
-                  >
-                    {lang === "ko" ? "59초 한글 배우기" : "Learn Hangul in 59s"}
-                  </a>
-                  <button
-                    onClick={() => {
-                      setAboutOpen("faq");
-                      setShowInfoMenu(false);
-                      logAction({ type: "about_open", target: "faq", uiLang: lang });
-                    }}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
-                  >
-                    {ABOUT_CONTENT[lang].faqTitle}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShareOpen("site");
-                      setShowInfoMenu(false);
-                      logAction({ type: "page_share_open", source: "menu", uiLang: lang });
-                    }}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4 text-violet-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                    </svg>
-                    {lang === "ko" ? "사이트 공유" : "Share this site"}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setAboutOpen("wehome");
-                      setShowInfoMenu(false);
-                      logAction({ type: "about_open", target: "wehome", uiLang: lang });
-                    }}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
-                  >
-                    {ABOUT_CONTENT[lang].wehomeTitle}
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
 
         {/* Error */}
