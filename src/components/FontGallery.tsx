@@ -76,6 +76,12 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [bulkDownloading, setBulkDownloading] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  // text rendered across the fonts — starts as the converted name, editable via input
+  const [currentText, setCurrentText] = useState(text);
+  const [draft, setDraft] = useState(text);
+  const isCustom = currentText !== text;
+  // when custom Hangul is typed, the romanized original no longer applies as subtitle
+  const effectiveOriginal = isCustom ? "" : originalName;
 
   const subtitleLabel = tr(VARIOUS_FONTS_LABEL, uiLang);
   const shareLabel = tr(SHARE_BUTTON_LABEL, uiLang);
@@ -83,7 +89,19 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
   const shareUrl = typeof window !== "undefined"
     ? `${window.location.origin}/?name=${encodeURIComponent(originalName)}`
     : `https://name.hangulmaru.com/?name=${encodeURIComponent(originalName)}`;
-  const shareText = `${originalName} → ${text} 🇰🇷 — ${subtitleLabel}`;
+  const shareText = `${isCustom ? "" : originalName + " → "}${currentText} 🇰🇷 — ${subtitleLabel}`;
+
+  const apply = () => {
+    const t = draft.trim();
+    if (!t || t === currentText) return;
+    setCurrentText(t);
+    onLog?.({ type: "gallery_apply_custom", text: t, originalName, uiLang });
+  };
+
+  const resetToOriginal = () => {
+    setDraft(text);
+    setCurrentText(text);
+  };
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -93,10 +111,11 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
 
   useEffect(() => {
     let cancelled = false;
+    setRendered(FONTS.map((f) => ({ font: f, dataUrl: null, error: false })));
     (async () => {
       for (const f of FONTS) {
         try {
-          const canvas = await buildFontCanvas({ text, originalName, font: f });
+          const canvas = await buildFontCanvas({ text: currentText, originalName: effectiveOriginal, font: f });
           if (cancelled) return;
           const dataUrl = canvas.toDataURL("image/png");
           setRendered((prev) => prev.map((r) => r.font.id === f.id ? { ...r, dataUrl } : r));
@@ -107,14 +126,14 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
       }
     })();
     return () => { cancelled = true; };
-  }, [text, originalName]);
+  }, [currentText, effectiveOriginal]);
 
   const downloadOne = async (font: Font) => {
     setDownloadingId(font.id);
     try {
-      const canvas = await buildFontCanvas({ text, originalName, font });
-      await downloadCanvasPng(canvas, `${text}_${font.id}.png`);
-      onLog?.({ type: "gallery_download_one", name: text, font: font.id, uiLang });
+      const canvas = await buildFontCanvas({ text: currentText, originalName: effectiveOriginal, font });
+      await downloadCanvasPng(canvas, `${currentText}_${font.id}.png`);
+      onLog?.({ type: "gallery_download_one", name: currentText, font: font.id, uiLang });
     } finally {
       setDownloadingId(null);
     }
@@ -124,11 +143,11 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
     setBulkDownloading(true);
     try {
       for (const f of FONTS) {
-        const canvas = await buildFontCanvas({ text, originalName, font: f });
-        await downloadCanvasPng(canvas, `${text}_${f.id}.png`);
+        const canvas = await buildFontCanvas({ text: currentText, originalName: effectiveOriginal, font: f });
+        await downloadCanvasPng(canvas, `${currentText}_${f.id}.png`);
         await new Promise((r) => setTimeout(r, 150));
       }
-      onLog?.({ type: "gallery_download_all", name: text, uiLang });
+      onLog?.({ type: "gallery_download_all", name: currentText, uiLang });
     } finally {
       setBulkDownloading(false);
     }
@@ -149,8 +168,8 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
       >
         <div className="flex items-start justify-between gap-3 px-6 pt-5 pb-3 border-b border-slate-100">
           <div className="min-w-0 flex-1">
-            <h2 className="text-2xl font-bold text-slate-800 truncate" dir="auto" title={text}>
-              {text}
+            <h2 className="text-2xl font-bold text-slate-800 truncate" dir="auto" title={currentText}>
+              {currentText}
             </h2>
             <p className="text-xs text-slate-400 mt-1">
               {subtitleLabel}
@@ -159,7 +178,7 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
           <div className="flex items-center gap-2 shrink-0">
             {onOpenArt && (
               <button
-                onClick={() => onOpenArt(text)}
+                onClick={() => onOpenArt(currentText)}
                 className="flex items-center gap-1.5 text-xs bg-violet-50 hover:bg-violet-100 text-violet-600 border border-violet-200 px-3 py-2 rounded-xl transition"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -215,6 +234,42 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
+          </div>
+        </div>
+
+        {/* Input row — type Hangul to preview across every font */}
+        <div className="px-6 py-3 border-b border-slate-100 bg-slate-50/50">
+          <div className="flex gap-2 items-center">
+            <input
+              type="text"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") apply(); }}
+              placeholder={isKo ? "한글 입력 후 만들기" : "Type Hangul and press Apply"}
+              dir="auto"
+              maxLength={20}
+              className="flex-1 min-w-0 bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none focus:border-violet-300"
+            />
+            <button
+              onClick={apply}
+              disabled={!draft.trim() || draft.trim() === currentText}
+              className="shrink-0 bg-violet-500 hover:bg-violet-600 disabled:bg-violet-200 text-white text-xs px-4 py-2 rounded-xl transition font-medium"
+            >
+              {isKo ? "만들기" : "Apply"}
+            </button>
+            {isCustom && (
+              <button
+                onClick={resetToOriginal}
+                title={isKo ? `${text}으로 돌아가기` : `Back to ${text}`}
+                className="shrink-0 flex items-center gap-1 bg-white border border-slate-200 hover:border-violet-300 text-slate-500 hover:text-violet-600 text-xs px-3 py-2 rounded-xl transition"
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="9 14 4 9 9 4" />
+                  <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
+                </svg>
+                <span className="truncate max-w-[6rem]">{isKo ? `${text} 다시` : text}</span>
+              </button>
+            )}
           </div>
         </div>
 
