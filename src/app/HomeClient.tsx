@@ -256,6 +256,16 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     setModalText(text);
   };
 
+  const goHome = () => {
+    setInput("");
+    setResult(null);
+    setError("");
+    setFeedback(null);
+    setCurrentInput("");
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+    logAction({ type: "go_home", uiLang: lang });
+  };
+
   const t = translations[lang];
 
   const convert = async () => {
@@ -348,6 +358,18 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
       onClick={() => { setShowLangMenu(false); setShowInfoMenu(false); }}
     >
       <div className="w-full max-w-lg mx-auto">
+        {/* Top-left brand — click to return to the main page */}
+        <div className="flex items-center mb-4">
+          <button
+            onClick={goHome}
+            title={lang === "ko" ? "메인으로" : "Home"}
+            className="flex items-center gap-1.5 text-lg font-extrabold text-violet-900 tracking-tight hover:text-violet-600 transition"
+          >
+            <span aria-hidden>🇰🇷</span>
+            <span>한글이름</span>
+          </button>
+        </div>
+
         {/* Wehome Logo + Hangulmaru mark */}
         <div className="flex flex-col items-center gap-3 mb-8">
           <a
@@ -794,42 +816,57 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               );
             })}
 
-            {/* 결과 공유 + 피드백 */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  setShareOpen("result");
-                  logAction({ type: "page_share_open", source: "result", inputName: currentInput, uiLang: lang });
-                }}
-                className="flex-1 flex items-center justify-center gap-2 text-sm bg-white/60 hover:bg-white text-violet-500 hover:text-violet-700 border border-violet-200 px-4 py-2.5 rounded-xl transition"
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                </svg>
-                {lang === "ko" ? "공유하기" : "Share"}
-              </button>
-              <button
-                onClick={() => {
-                  const next = feedback === "up" ? null : "up";
-                  setFeedback(next);
-                  if (next === "up") logAction({ type: "feedback", value: "up", inputName: currentInput, uiLang: lang });
-                }}
-                className={`flex items-center gap-1 text-xs px-3 py-2.5 rounded-xl transition
-                  ${feedback === "up"
-                    ? "bg-green-50 text-green-600 border border-green-200"
-                    : "bg-white/60 border border-violet-200 text-violet-400 hover:text-violet-600"}`}
-              >
-                {feedback === "up" ? t.feedbackThanks : t.feedbackYes}
-              </button>
-            </div>
           </div>
         )}
 
+        {/* 공유 + 좋아요 — 입력 전에도 항상 노출 */}
+        <div className="flex items-center gap-2 mt-4">
+          <button
+            onClick={() => {
+              const kind: ShareKind = currentInput && result ? "result" : "site";
+              setShareOpen(kind);
+              logAction({ type: "page_share_open", source: kind, inputName: currentInput, uiLang: lang });
+            }}
+            className="flex-1 flex items-center justify-center gap-2 text-sm bg-white/60 hover:bg-white text-violet-500 hover:text-violet-700 border border-violet-200 px-4 py-2.5 rounded-xl transition"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            {lang === "ko" ? "공유하기" : "Share"}
+          </button>
+          <button
+            onClick={() => {
+              const next = feedback === "up" ? null : "up";
+              setFeedback(next);
+              if (next === "up") logAction({ type: "feedback", value: "up", inputName: currentInput, uiLang: lang });
+            }}
+            className={`flex items-center gap-1 text-xs px-3 py-2.5 rounded-xl transition
+              ${feedback === "up"
+                ? "bg-green-50 text-green-600 border border-green-200"
+                : "bg-white/60 border border-violet-200 text-violet-400 hover:text-violet-600"}`}
+          >
+            {feedback === "up" ? t.feedbackThanks : t.feedbackYes}
+          </button>
+        </div>
+
         {/* Footer */}
-        <footer className="mt-12 pb-4 text-center" dir="ltr">
-          <p className="text-violet-300/50 text-[10px] tracking-wide">Your Home in Korea</p>
+        <footer className="mt-12 pb-6 text-center" dir="ltr">
+          <a
+            href="https://wehome.me"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => logAction({ type: "wehome_footer_click", uiLang: lang })}
+            className="inline-block transition hover:opacity-80"
+          >
+            <p className="text-violet-400/70 text-[11px] leading-relaxed max-w-xs mx-auto">
+              Powered by <span className="font-semibold text-violet-500">Wehome.me</span>, Korea&apos;s only government-authorized home sharing platform.
+            </p>
+            <p className="text-violet-900 font-bold text-sm mt-3">Wehome</p>
+            <p className="text-violet-400 text-xs">Your Home in Korea</p>
+            <p className="text-violet-300 text-[11px] mt-0.5">Live Locally, Stay Safely.</p>
+          </a>
         </footer>
       </div>
     </main>
