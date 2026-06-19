@@ -33,6 +33,68 @@ interface BuildArgs {
   font: Font;
 }
 
+// ─── Jamo coloring (오방색 계열, 발음 위치 기준) ──────────────────────────────
+type JamoColor = "blue" | "green" | "red" | "default";
+
+const JAMO_COLORS: Record<JamoColor, string> = {
+  blue: "#2563eb",
+  green: "#16a34a",
+  red: "#dc2626",
+  default: "#1e293b",
+};
+
+const CHOSEONG = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+const JUNGSEONG = ["ㅏ","ㅐ","ㅑ","ㅒ","ㅓ","ㅔ","ㅕ","ㅖ","ㅗ","ㅘ","ㅙ","ㅚ","ㅛ","ㅜ","ㅝ","ㅞ","ㅟ","ㅠ","ㅡ","ㅢ","ㅣ"];
+const JONGSEONG = ["","ㄱ","ㄲ","ㄳ","ㄴ","ㄵ","ㄶ","ㄷ","ㄹ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅁ","ㅂ","ㅄ","ㅅ","ㅆ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+
+const C_BLUE = new Set(["ㅇ", "ㅎ"]);          // 후음 (throat)
+const C_GREEN = new Set(["ㅅ", "ㅆ", "ㅈ", "ㅉ", "ㅊ"]); // 치음 (teeth)
+const V_RED = new Set(["ㅡ", "ㅗ", "ㅜ", "ㅛ", "ㅠ"]);   // 가로(천지) 계열 모음
+
+function jamoColor(ch: string): JamoColor {
+  const code = ch.codePointAt(0) ?? 0;
+  const isConsonant = code >= 0x3131 && code <= 0x314e; // ㄱ..ㅎ
+  const isVowel = code >= 0x314f && code <= 0x3163;     // ㅏ..ㅣ
+  if (isConsonant) {
+    if (C_BLUE.has(ch)) return "blue";
+    if (C_GREEN.has(ch)) return "green";
+    return "red"; // 순음·설음·아음 및 겹받침
+  }
+  if (isVowel) return V_RED.has(ch) ? "red" : "green"; // 세로 계열은 초록
+  return "default";
+}
+
+interface Jamo { ch: string; color: JamoColor }
+interface Group { jamos: Jamo[]; space: boolean }
+
+function mk(ch: string): Jamo {
+  return { ch, color: jamoColor(ch) };
+}
+
+// 음절을 초성/중성/종성 자모로 분리하고, 음절 단위 그룹 배열로 반환
+function toGroups(text: string): Group[] {
+  const groups: Group[] = [];
+  for (const ch of text) {
+    const code = ch.codePointAt(0) ?? 0;
+    if (code >= 0xac00 && code <= 0xd7a3) {
+      const s = code - 0xac00;
+      const l = Math.floor(s / 588);
+      const v = Math.floor((s % 588) / 28);
+      const t = s % 28;
+      const jamos = [mk(CHOSEONG[l]), mk(JUNGSEONG[v])];
+      if (t > 0) jamos.push(mk(JONGSEONG[t]));
+      groups.push({ jamos, space: false });
+    } else if (code >= 0x3131 && code <= 0x3163) {
+      groups.push({ jamos: [mk(ch)], space: false });
+    } else if (/\s/.test(ch)) {
+      groups.push({ jamos: [{ ch: " ", color: "default" }], space: true });
+    } else {
+      groups.push({ jamos: [{ ch, color: "default" }], space: false });
+    }
+  }
+  return groups;
+}
+
 export async function buildFontCanvas({ text, originalName, font }: BuildArgs): Promise<HTMLCanvasElement> {
   await document.fonts.load(`bold 80px ${font.css}`);
 
@@ -52,28 +114,76 @@ export async function buildFontCanvas({ text, originalName, font }: BuildArgs): 
   ctx.roundRect(0, 0, W, H, 24);
   ctx.fill();
 
-  const parts = text.trim().split(/\s+/);
-  const lines = parts.length >= 2 ? [parts[0], parts.slice(1).join(" ")] : [text];
-  const longestLen = Math.max(...lines.map((l) => l.length));
-  const fontSize = Math.min(100, Math.floor(W * 0.88 / Math.max(longestLen, 1) * 1.3));
-  const fs = Math.min(fontSize, 100);
-  const lineH = fs * 1.25;
+  const groups = toGroups(text.trim());
+  const weight = font.id === "hunmin-ebs" ? "900" : "bold";
+  const maxW = W * 0.9;
 
-  const fontWeightStr = font.id === "hunmin-ebs" ? "900" : "bold";
-  ctx.font = `${fontWeightStr} ${fs}px ${font.css}`;
-  ctx.fillStyle = "#1e293b";
-  ctx.textAlign = "center";
+  // 주어진 글자 크기로 그룹을 측정하고 줄바꿈한다
+  type Item = { jamos: Jamo[]; w: number; space: boolean; gapBefore: number };
+  const layout = (fs: number) => {
+    ctx.font = `${weight} ${fs}px ${font.css}`;
+    const intra = fs * 0.04;   // 음절 내 자모 간격
+    const inter = fs * 0.30;   // 음절 간 간격
+    const spaceW = fs * 0.45;  // 공백 폭
+    const lines: { items: Item[]; width: number }[] = [];
+    let cur: Item[] = [];
+    let curW = 0;
+    for (const g of groups) {
+      let w: number;
+      if (g.space) {
+        w = spaceW;
+      } else {
+        w = 0;
+        g.jamos.forEach((j, i) => { w += ctx.measureText(j.ch).width + (i > 0 ? intra : 0); });
+      }
+      const gap = cur.length ? inter : 0;
+      if (cur.length && curW + gap + w > maxW) {
+        lines.push({ items: cur, width: curW });
+        cur = [];
+        curW = 0;
+      }
+      const gapBefore = cur.length ? inter : 0;
+      cur.push({ jamos: g.jamos, w, space: g.space, gapBefore });
+      curW += gapBefore + w;
+    }
+    if (cur.length) lines.push({ items: cur, width: curW });
+    return { lines, intra };
+  };
+
+  // 세로로도 들어맞을 때까지 글자 크기를 줄인다
+  let fs = 96;
+  let lay = layout(fs);
+  while (lay.lines.length * fs * 1.3 > H * 0.6 && fs > 30) {
+    fs -= 6;
+    lay = layout(fs);
+  }
+
+  ctx.font = `${weight} ${fs}px ${font.css}`;
+  ctx.textAlign = "left";
   ctx.textBaseline = "middle";
+  const lineH = fs * 1.3;
+  const blockH = lay.lines.length * lineH;
+  const startY = (H - blockH) / 2 - 16;
 
-  const totalH = lines.length * lineH;
-  const startY = H / 2 - totalH / 2 - 10;
-  lines.forEach((line, idx) => {
-    ctx.fillText(line, W / 2, startY + lineH * idx + lineH / 2);
+  lay.lines.forEach((line, idx) => {
+    const y = startY + lineH * idx + lineH / 2;
+    let x = (W - line.width) / 2;
+    for (const item of line.items) {
+      x += item.gapBefore;
+      if (item.space) { x += item.w; continue; }
+      item.jamos.forEach((j, i) => {
+        if (i > 0) x += lay.intra;
+        ctx.fillStyle = JAMO_COLORS[j.color];
+        ctx.fillText(j.ch, x, y);
+        x += ctx.measureText(j.ch).width;
+      });
+    }
   });
 
+  ctx.textAlign = "center";
   ctx.font = `400 18px NanumGothic, sans-serif`;
   ctx.fillStyle = "#94a3b8";
-  ctx.fillText(originalName, W / 2, startY + totalH + 32);
+  ctx.fillText(originalName, W / 2, startY + blockH + 30);
 
   ctx.font = `400 13px NanumGothic, sans-serif`;
   ctx.fillStyle = "#cbd5e1";
