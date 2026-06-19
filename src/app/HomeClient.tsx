@@ -819,34 +819,37 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           </div>
         )}
 
-        {/* 공유 + 좋아요 — 입력 전에도 항상 노출 */}
-        <div className="flex items-center gap-2 mt-4">
+        {/* 공유 + 좋아요 — 작은 링크 메뉴 (입력 전에도 항상 노출) */}
+        <div className="flex items-center justify-center gap-4 mt-4 text-xs">
           <button
             onClick={() => {
               const kind: ShareKind = currentInput && result ? "result" : "site";
               setShareOpen(kind);
               logAction({ type: "page_share_open", source: kind, inputName: currentInput, uiLang: lang });
             }}
-            className="flex-1 flex items-center justify-center gap-2 text-sm bg-white/60 hover:bg-white text-violet-500 hover:text-violet-700 border border-violet-200 px-4 py-2.5 rounded-xl transition"
+            className="flex items-center gap-1 text-violet-400 hover:text-violet-600 transition"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
               <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
               <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
             </svg>
-            {lang === "ko" ? "공유하기" : "Share"}
+            {lang === "ko" ? "공유" : "Share"}
           </button>
+          <span className="text-violet-200" aria-hidden>·</span>
           <button
             onClick={() => {
               const next = feedback === "up" ? null : "up";
               setFeedback(next);
               if (next === "up") logAction({ type: "feedback", value: "up", inputName: currentInput, uiLang: lang });
             }}
-            className={`flex items-center gap-1 text-xs px-3 py-2.5 rounded-xl transition
-              ${feedback === "up"
-                ? "bg-green-50 text-green-600 border border-green-200"
-                : "bg-white/60 border border-violet-200 text-violet-400 hover:text-violet-600"}`}
+            className={`flex items-center gap-1 transition ${
+              feedback === "up" ? "text-green-600" : "text-violet-400 hover:text-violet-600"
+            }`}
           >
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill={feedback === "up" ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+            </svg>
             {feedback === "up" ? t.feedbackThanks : t.feedbackYes}
           </button>
         </div>
