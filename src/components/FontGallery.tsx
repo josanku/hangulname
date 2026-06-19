@@ -79,6 +79,8 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
   // text rendered across the fonts — starts as the converted name, editable via input
   const [currentText, setCurrentText] = useState(text);
   const [draft, setDraft] = useState(text);
+  // off by default: plain black. When on, color each jamo by category.
+  const [colorize, setColorize] = useState(false);
   const isCustom = currentText !== text;
   // when custom Hangul is typed, the romanized original no longer applies as subtitle
   const effectiveOriginal = isCustom ? "" : originalName;
@@ -115,7 +117,7 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
     (async () => {
       for (const f of FONTS) {
         try {
-          const canvas = await buildFontCanvas({ text: currentText, originalName: effectiveOriginal, font: f });
+          const canvas = await buildFontCanvas({ text: currentText, originalName: effectiveOriginal, font: f, colorize });
           if (cancelled) return;
           const dataUrl = canvas.toDataURL("image/png");
           setRendered((prev) => prev.map((r) => r.font.id === f.id ? { ...r, dataUrl } : r));
@@ -126,12 +128,12 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
       }
     })();
     return () => { cancelled = true; };
-  }, [currentText, effectiveOriginal]);
+  }, [currentText, effectiveOriginal, colorize]);
 
   const downloadOne = async (font: Font) => {
     setDownloadingId(font.id);
     try {
-      const canvas = await buildFontCanvas({ text: currentText, originalName: effectiveOriginal, font });
+      const canvas = await buildFontCanvas({ text: currentText, originalName: effectiveOriginal, font, colorize });
       await downloadCanvasPng(canvas, `${currentText}_${font.id}.png`);
       onLog?.({ type: "gallery_download_one", name: currentText, font: font.id, uiLang });
     } finally {
@@ -143,7 +145,7 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
     setBulkDownloading(true);
     try {
       for (const f of FONTS) {
-        const canvas = await buildFontCanvas({ text: currentText, originalName: effectiveOriginal, font: f });
+        const canvas = await buildFontCanvas({ text: currentText, originalName: effectiveOriginal, font: f, colorize });
         await downloadCanvasPng(canvas, `${currentText}_${f.id}.png`);
         await new Promise((r) => setTimeout(r, 150));
       }
@@ -270,6 +272,26 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
                 <span className="truncate max-w-[6rem]">{isKo ? `${text} 다시` : text}</span>
               </button>
             )}
+            <button
+              onClick={() => {
+                setColorize((v) => !v);
+                onLog?.({ type: "gallery_toggle_colorize", on: !colorize, name: currentText, uiLang });
+              }}
+              title={isKo ? "자모 색상 (닿소리·홀소리)" : "Jamo colors (consonant/vowel)"}
+              aria-pressed={colorize}
+              className={`shrink-0 flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl border transition ${
+                colorize
+                  ? "bg-violet-50 border-violet-300 text-violet-600"
+                  : "bg-white border-slate-200 text-slate-500 hover:border-violet-300 hover:text-violet-600"
+              }`}
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="13.5" cy="6.5" r="2.5" fill="#2563eb" stroke="none" />
+                <circle cx="7" cy="12" r="2.5" fill="#16a34a" stroke="none" />
+                <circle cx="15" cy="15" r="2.5" fill="#dc2626" stroke="none" />
+              </svg>
+              {isKo ? "색상" : "Color"}
+            </button>
           </div>
         </div>
 

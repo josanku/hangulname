@@ -31,6 +31,8 @@ interface BuildArgs {
   text: string;
   originalName: string;
   font: Font;
+  // When true, color each jamo by category; default renders plain black.
+  colorize?: boolean;
 }
 
 // ─── Jamo coloring (오방색 계열, 발음 위치 기준) ──────────────────────────────
@@ -122,7 +124,7 @@ function syllableRegions(
   return out;
 }
 
-export async function buildFontCanvas({ text, originalName, font }: BuildArgs): Promise<HTMLCanvasElement> {
+export async function buildFontCanvas({ text, originalName, font, colorize = false }: BuildArgs): Promise<HTMLCanvasElement> {
   await document.fonts.load(`bold 80px ${font.css}`);
 
   const SCALE = 2;
@@ -180,8 +182,13 @@ export async function buildFontCanvas({ text, originalName, font }: BuildArgs): 
   const blockH = lines.length * lineH;
   const startY = (H - blockH) / 2 - 16;
 
-  // 한 글자를 위치별 색으로 그린다
+  // 한 글자를 그린다 (colorize일 때만 위치별 색 적용)
   const drawChar = (ch: string, penX: number, cy: number) => {
+    if (!colorize) {
+      ctx.fillStyle = JAMO_COLORS.default;
+      ctx.fillText(ch, penX, cy);
+      return;
+    }
     const code = ch.codePointAt(0) ?? 0;
     const m = ctx.measureText(ch);
     const aT = m.actualBoundingBoxAscent || fs * 0.5;
