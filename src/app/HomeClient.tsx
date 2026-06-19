@@ -571,16 +571,16 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                   className="absolute bottom-full mb-1 right-0 bg-white/95 backdrop-blur-xl border border-violet-200 rounded-xl shadow-xl shadow-violet-200/30 py-1 z-10 min-w-48"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <button
+                  <a
+                    href={`/hangul-name?lang=${lang}`}
                     onClick={() => {
-                      setAboutOpen("hangulname");
                       setShowInfoMenu(false);
                       logAction({ type: "about_open", target: "hangulname", uiLang: lang });
                     }}
-                    className="w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
+                    className="block w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
                   >
-                    {ABOUT_CONTENT[lang].hangulnameTitle}
-                  </button>
+                    Hangul Name
+                  </a>
                   <button
                     onClick={() => {
                       setAboutOpen("hunminjeong");
