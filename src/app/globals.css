@@ -93,3 +93,9 @@ body { background: var(--background); color: var(--foreground); font-family: 'Na
   font-weight: 700 900;
   font-display: swap;
 }
+@font-face {
+  font-family: 'SangSangFlowerRoad';
+  src: url('/fonts/SangSangFlowerRoad.woff') format('woff');
+  font-weight: 400 700;
+  font-display: swap;
+}

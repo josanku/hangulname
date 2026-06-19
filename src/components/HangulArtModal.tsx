@@ -140,16 +140,32 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
               </button>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            aria-label={isKo ? "닫기" : "Close"}
-            className="text-slate-400 hover:text-slate-700 transition p-1 shrink-0"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            {onOpenFontGallery && (
+              <button
+                onClick={() => onOpenFontGallery(currentText)}
+                className="flex items-center gap-1.5 text-xs bg-violet-50 hover:bg-violet-100 text-violet-600 border border-violet-200 px-3 py-2 rounded-xl transition"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <rect x="3" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="3" width="7" height="7" rx="1" />
+                  <rect x="3" y="14" width="7" height="7" rx="1" />
+                  <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
+                {isKo ? "한글폰트" : "Hangul Fonts"}
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              aria-label={isKo ? "닫기" : "Close"}
+              className="text-slate-400 hover:text-slate-700 transition p-1 shrink-0"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Input row */}
@@ -215,20 +231,6 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
 
         {/* Action bar */}
         <div className="flex items-center justify-end gap-2 px-6 py-3 border-t border-slate-100 bg-white">
-          {onOpenFontGallery && (
-            <button
-              onClick={() => onOpenFontGallery(currentText)}
-              className="flex items-center gap-1.5 text-xs bg-violet-50 hover:bg-violet-100 text-violet-600 border border-violet-200 px-4 py-2 rounded-xl transition mr-auto"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <rect x="3" y="3" width="7" height="7" rx="1" />
-                <rect x="14" y="3" width="7" height="7" rx="1" />
-                <rect x="3" y="14" width="7" height="7" rx="1" />
-                <rect x="14" y="14" width="7" height="7" rx="1" />
-              </svg>
-              {isKo ? "폰트 갤러리" : "Font Gallery"}
-            </button>
-          )}
           <button
             onClick={() => {
               setShareOpen(true);
