@@ -1,4 +1,5 @@
 export const FONTS = [
+  { id: "flower-road",   labelKo: "상상꽃길체",     labelEn: "SangSang Flower Road",  css: "SangSangFlowerRoad, cursive" },
   { id: "gungsuh",       labelKo: "궁서",          labelEn: "Gungsuh",               css: "JSongMyung, serif" },
   { id: "myeongjo",      labelKo: "명조",          labelEn: "Myeongjo",              css: "NanumMyeongjo, serif" },
   { id: "gothic",        labelKo: "고딕",          labelEn: "Gothic",                css: "NanumGothic, sans-serif" },

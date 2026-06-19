@@ -348,8 +348,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
       onClick={() => { setShowLangMenu(false); setShowInfoMenu(false); }}
     >
       <div className="w-full max-w-lg mx-auto">
-        {/* Wehome Logo */}
-        <div className="flex justify-center mb-8">
+        {/* Wehome Logo + Hangulmaru mark */}
+        <div className="flex flex-col items-center gap-3 mb-8">
           <a
             href="https://wehome.me"
             target="_blank"
@@ -359,10 +359,26 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           >
             <Image
               src="/wehome-logo.png"
-              alt="Wehome"
+              alt="Welcome Home Wehome"
               width={1982}
               height={1021}
-              className="h-7 w-auto opacity-40"
+              priority
+              className="h-11 w-auto opacity-90"
+            />
+          </a>
+          <a
+            href="https://hangulmaru.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition hover:opacity-80"
+            title={lang === "ko" ? "한글마루 메인페이지" : "Hangulmaru home"}
+            onClick={() => logAction({ type: "hangulmaru_mark_click", uiLang: lang })}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/hangulmaru-osm.svg"
+              alt={lang === "ko" ? "한글마루 ㅇㅅㅁ" : "Hangulmaru"}
+              className="h-7 w-auto"
             />
           </a>
         </div>
@@ -469,8 +485,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             <button
               key={item.text}
               onClick={() => {
-                setArtText(item.text);
-                logAction({ type: "example_category_click", text: item.text, uiLang: lang });
+                setGalleryText(item.text);
+                logAction({ type: "example_category_click", text: item.text, dest: "fontgallery", uiLang: lang });
               }}
               className="px-3 py-1 text-xs border border-violet-200 hover:border-violet-400 rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50 transition"
             >
