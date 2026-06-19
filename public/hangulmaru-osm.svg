@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 400" role="img" aria-label="한글마루 ㅇㅅㅁ">
   <!-- ㅇ : circle -->
   <circle cx="160" cy="210" r="140" fill="#1d1de6"/>
-  <circle cx="178" cy="215" r="36" fill="#8ecae6"/>
+  <circle cx="160" cy="210" r="36" fill="#8ecae6"/>
 
   <!-- ㅅ : triangle (left/right halves) -->
   <polygon points="520,60 380,350 520,350" fill="#2ecc40"/>
