@@ -151,7 +151,7 @@ const jsonLd = {
         "Text-to-speech Korean pronunciation",
         "Download name as stylized image",
         "Share on social media",
-        "9 Korean font styles",
+        "20+ Korean font styles",
       ],
       inLanguage: ["en", "ko", "zh", "ja", "es", "fr", "de", "ar", "ru", "pt", "vi", "id", "th", "ms", "hi", "bn", "tl", "my", "mn"],
       author: {
