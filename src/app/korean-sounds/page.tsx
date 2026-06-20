@@ -4,15 +4,17 @@ import { SOUNDS, CAT_EN, CAT_ORDER, type SoundEntry } from "@/lib/sounds";
 
 const BASE = "https://www.myhangulname.com";
 
+const SOURCE_URL = "https://docs.google.com/spreadsheets/d/14rbn7yLpqUtDRYnzhFTfpbHllA7nP6FBMUuU2hO201k/edit?gid=473660675";
+
 export const metadata: Metadata = {
-  title: "Korean Onomatopoeia — 의성어·의태어 Sound & Mimetic Words",
+  title: "한글 소리결말 모양결말 — Korean Onomatopoeia & Ideophone",
   description:
-    "457 Korean onomatopoeia and mimetic words (의성어·의태어): 두근두근 (thump thump), 콩닥콩닥 (pit-a-pat), 반짝반짝 (twinkle) and more — with romanization, meaning and examples. Tap any to see it in Korean fonts and Hangul Art.",
-  keywords: ["Korean onomatopoeia", "의성어", "의태어", "Korean sound words", "Korean mimetic words", "두근두근", "반짝반짝", "Korean expressions"],
+    "457 Korean onomatopoeia & ideophones (한글 소리결말·모양결말): 두근두근 (thump thump), 콩닥콩닥 (pit-a-pat), 반짝반짝 (twinkle) and more — with romanization, meaning and examples. Tap any to see it in Korean fonts and Hangul Art.",
+  keywords: ["Korean onomatopoeia", "Korean ideophone", "소리결말", "모양결말", "한글정음", "Korean sound words", "두근두근", "반짝반짝"],
   alternates: { canonical: `${BASE}/korean-sounds` },
   openGraph: {
-    title: "Korean Onomatopoeia · 의성어·의태어",
-    description: "457 Korean sound & mimetic words with meanings and examples — tap to see them in Hangul fonts & art.",
+    title: "한글 소리결말 모양결말 · Onomatopoeia & Ideophone",
+    description: "457 Korean onomatopoeia & ideophones with meanings and examples — tap to see them in Hangul fonts & art.",
     url: `${BASE}/korean-sounds`,
     type: "article",
   },
@@ -47,9 +49,9 @@ export default function KoreanSoundsPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Korean Onomatopoeia & Mimetic Words",
+    name: "한글 소리결말 모양결말 — Korean Onomatopoeia & Ideophone",
     url: `${BASE}/korean-sounds`,
-    description: "Korean onomatopoeia (의성어) and mimetic words (의태어) with romanization, meaning and examples.",
+    description: "Korean onomatopoeia and ideophones (한글 소리결말·모양결말) with romanization, meaning and examples.",
     inLanguage: ["en", "ko"],
   };
 
@@ -64,10 +66,10 @@ export default function KoreanSoundsPage() {
 
         <header className="mb-5">
           <h1 className="text-2xl sm:text-3xl font-bold text-violet-900 tracking-tight mb-1.5">
-            Korean Onomatopoeia <span className="text-violet-400">· 의성어·의태어</span>
+            한글 소리결말 모양결말 <span className="text-violet-400 text-xl">· Onomatopoeia &amp; Ideophone</span>
           </h1>
           <p className="text-sm text-slate-500 leading-relaxed">
-            {SOUNDS.length} Korean sound &amp; mimetic words — 두근두근 (thump thump), 반짝반짝 (twinkle), 살금살금 (sneakily).
+            {SOUNDS.length} Korean onomatopoeia &amp; ideophones — 두근두근 (thump thump), 반짝반짝 (twinkle), 살금살금 (sneakily).
             Tap any word to see it in Korean fonts and Hangul Art.
           </p>
         </header>
@@ -89,6 +91,14 @@ export default function KoreanSoundsPage() {
         <Link href="/" className="block text-center bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium px-4 py-3 rounded-xl transition mt-7">
           Convert your own name →
         </Link>
+
+        {/* Source / attribution */}
+        <p className="text-center text-[11px] text-slate-400 mt-6 leading-relaxed">
+          출처 · Source:{" "}
+          <a href={SOURCE_URL} target="_blank" rel="noopener noreferrer" className="text-violet-500 hover:text-violet-700 underline underline-offset-2">
+            한글정음 한글 소리결말 모양결말 (onomatopoeia · ideophone) 사전
+          </a>
+        </p>
       </div>
     </div>
   );

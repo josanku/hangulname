@@ -103,7 +103,7 @@ export default function KoreanWordsPage() {
         {/* Explore — related content pages */}
         <nav className="flex flex-wrap gap-1.5 mb-5">
           <Link href="/korean-sounds" className="px-3 py-1.5 text-xs font-medium bg-violet-600 text-white rounded-full hover:bg-violet-500 transition">
-            🔊 의성어·의태어 Sound Words
+            🔊 소리결말·모양결말 (Onomatopoeia)
           </Link>
           <Link href="/name" className="px-3 py-1.5 text-xs font-medium bg-white border border-violet-200 text-violet-600 rounded-full hover:bg-violet-50 transition">
             🔤 Names in Korean

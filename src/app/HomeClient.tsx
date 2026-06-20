@@ -586,7 +586,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                     }}
                     className="block w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
                   >
-                    {lang === "ko" ? "한국어 의성어·의태어" : "Korean Sound Words (의성어)"}
+                    {lang === "ko" ? "한글 소리결말 모양결말" : "Onomatopoeia · Ideophone"}
                   </a>
                   <a
                     href="/api-docs"
