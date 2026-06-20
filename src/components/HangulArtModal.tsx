@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import ShareLinkModal from "@/components/ShareLinkModal";
+import { saveCanvasImage } from "@/lib/fontCanvas";
 
 interface Props {
   text: string;
@@ -64,23 +65,7 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
       const iframe = iframeRef.current;
       const canvas = iframe?.contentDocument?.querySelector("canvas") as HTMLCanvasElement | null;
       if (!canvas) return;
-      await new Promise<void>((resolve) => {
-        canvas.toBlob((blob) => {
-          if (!blob) { resolve(); return; }
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `${currentText}_hangulart.png`;
-          if (/iP(hone|ad|od)/i.test(navigator.userAgent)) {
-            a.target = "_blank";
-            a.rel = "noopener";
-          }
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setTimeout(() => { URL.revokeObjectURL(url); resolve(); }, 1000);
-        }, "image/png");
-      });
+      await saveCanvasImage(canvas, `${currentText}_hangulart.png`);
       onLog?.({ type: "hangulart_download", text: currentText, uiLang });
     } finally {
       setDownloading(false);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { FONTS, buildFontCanvas } from "@/lib/fontCanvas";
+import { FONTS, buildFontCanvas, saveCanvasImage } from "@/lib/fontCanvas";
 
 export { FONTS };
 
@@ -364,22 +364,7 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
     setDownloading(true);
     try {
       const canvas = await buildCanvas(font);
-      canvas.toBlob((blob) => {
-        if (!blob) return;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${text}.png`;
-        // iOS Safari: open in new tab so user can long-press to save to Photos
-        if (/iP(hone|ad|od)/i.test(navigator.userAgent)) {
-          a.target = "_blank";
-          a.rel = "noopener";
-        }
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-      }, "image/png");
+      await saveCanvasImage(canvas, `${text}.png`);
       onLog?.({ type: "download", name: text, font: selectedFont, uiLang });
     } finally {
       setDownloading(false);

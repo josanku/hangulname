@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { buildNameCard, makeQrImage, CARD_FONTS } from "@/lib/nameCard";
-import { downloadCanvasPng } from "@/lib/fontCanvas";
+import { saveCanvasImage } from "@/lib/fontCanvas";
 
 interface Props {
   korean: string;
@@ -57,7 +57,7 @@ export default function NameCardModal({ korean, original, pronun, tagline, isKo,
     try {
       const font = CARD_FONTS.find((f) => f.id === fontId) ?? CARD_FONTS[0];
       const canvas = await buildNameCard({ korean, original, pronun, tagline, font, qr: qrRef.current });
-      await downloadCanvasPng(canvas, `${korean}_namecard.png`);
+      await saveCanvasImage(canvas, `${korean}_namecard.png`);
       onLog?.({ type: "namecard_download", name: korean, font: fontId, uiLang });
     } finally { setBusy(null); }
   };

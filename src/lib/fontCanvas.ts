@@ -273,3 +273,38 @@ export function downloadCanvasPng(canvas: HTMLCanvasElement, filename: string): 
     }, "image/png");
   });
 }
+
+function isMobileLike(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /Android|iP(hone|ad|od)|Mobile/i.test(navigator.userAgent);
+}
+
+/**
+ * Save a canvas image. On mobile, opens the native share sheet so the user
+ * can "Save to Photos / 이미지 저장"; on desktop (or if share is unavailable),
+ * falls back to a normal file download.
+ */
+export async function saveCanvasImage(canvas: HTMLCanvasElement, filename: string): Promise<void> {
+  const blob = await new Promise<Blob | null>((res) => canvas.toBlob((b) => res(b), "image/png"));
+  if (!blob) return;
+  const file = new File([blob], filename, { type: "image/png" });
+  const nav = navigator as Navigator & { canShare?: (d?: ShareData) => boolean };
+  if (isMobileLike() && nav.canShare?.({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file] });
+      return;
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") return; // user cancelled
+      // otherwise fall through to download
+    }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  if (/iP(hone|ad|od)/i.test(navigator.userAgent)) { a.target = "_blank"; a.rel = "noopener"; }
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
