@@ -10,7 +10,8 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         has: [{ type: "host", value: "name.hangulmaru.com" }],
         destination: "https://myhangulname.com/:path*",
-        permanent: true,
+        // Exact 301 (permanent:true would emit 308); 301 is what we want here.
+        statusCode: 301,
       },
     ];
   },
