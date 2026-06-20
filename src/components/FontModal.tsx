@@ -412,7 +412,7 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
         <div
-          className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl flex flex-col items-center gap-5 p-8"
+          className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* 닫기 — 모바일에서도 잘 보이도록 크게 */}
@@ -426,6 +426,8 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
             </svg>
           </button>
 
+          {/* 스크롤 영역 — 폰트가 많아도 전부 볼 수 있도록 */}
+          <div className="overflow-y-auto flex flex-col items-center gap-5 p-8 w-full">
           {/* 이름 대형 표시 */}
           <div
             className={`w-full rounded-2xl flex items-center justify-center ${bgColor ? "" : "bg-gradient-to-br from-slate-50 to-blue-50"}`}
@@ -579,6 +581,14 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
                 </span>
               </button>
             ))}
+          </div>
+
+          <button
+            onClick={onClose}
+            className="w-full mt-1 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium transition"
+          >
+            {isKo ? "닫기 (메인으로)" : "Close"}
+          </button>
           </div>
         </div>
       </div>
