@@ -579,6 +579,16 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                     {lang === "ko" ? "알아두면 좋은 한글 단어" : "Korean Words to Know"}
                   </a>
                   <a
+                    href="/korean-sounds"
+                    onClick={() => {
+                      setShowInfoMenu(false);
+                      logAction({ type: "korean_sounds_click", uiLang: lang });
+                    }}
+                    className="block w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
+                  >
+                    {lang === "ko" ? "한국어 의성어·의태어" : "Korean Sound Words (의성어)"}
+                  </a>
+                  <a
                     href="/api-docs"
                     onClick={() => {
                       setShowInfoMenu(false);
