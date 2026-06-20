@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getCached } from "@/lib/store";
 import HomeClient from "./HomeClient";
 
-const BASE_URL = "https://myhangulname.com";
+const BASE_URL = "https://www.myhangulname.com";
 
 type Props = {
   searchParams: Promise<{ name?: string }>;

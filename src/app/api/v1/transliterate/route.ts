@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { transliterateName, TransliterateError } from "@/lib/transliterateCore";
 
-// Public API: https://myhangulname.com/api/v1/transliterate
+// Public API: https://www.myhangulname.com/api/v1/transliterate
 // CORS-enabled, GET (?name=&lang=) or POST ({name, lang}).
 
 const CORS: Record<string, string> = {
