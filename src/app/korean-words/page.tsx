@@ -123,7 +123,11 @@ export default function KoreanWordsPage() {
             <div className="space-y-4">
               {KPOP.map((g) => (
                 <div key={g.group}>
-                  <div className="text-xs font-medium text-violet-500 mb-1.5">{g.group}</div>
+                  <div className="text-xs font-medium text-violet-500 mb-1.5">
+                    {g.group.startsWith("방탄소년단") ? (
+                      <Link href="/bts" className="hover:underline">{g.group} →</Link>
+                    ) : g.group}
+                  </div>
                   <div className="flex flex-wrap gap-1.5">
                     {byConsonant(g.members).map((m) => <Chip key={g.group + m} text={m} />)}
                   </div>
