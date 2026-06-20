@@ -499,6 +499,25 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
           <div className="flex items-center gap-3 w-full justify-between px-1">
             <span className="text-xs text-slate-400">{fontLabel}</span>
             <div className="flex gap-2">
+              <button
+                onClick={downloadImage}
+                disabled={downloading}
+                className="flex items-center gap-1.5 text-xs bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white px-4 py-2 rounded-xl transition"
+              >
+                {downloading ? (
+                  <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                )}
+                PNG
+              </button>
               {onOpenArt && (
                 <button
                   onClick={() => onOpenArt(text)}
@@ -532,25 +551,6 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
                   </svg>
                 )}
                 {isKo ? "공유하기" : "Share"}
-              </button>
-              <button
-                onClick={downloadImage}
-                disabled={downloading}
-                className="flex items-center gap-1.5 text-xs bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white px-4 py-2 rounded-xl transition"
-              >
-                {downloading ? (
-                  <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                  </svg>
-                ) : (
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="7 10 12 15 17 10"/>
-                    <line x1="12" y1="15" x2="12" y2="3"/>
-                  </svg>
-                )}
-                PNG
               </button>
             </div>
           </div>
