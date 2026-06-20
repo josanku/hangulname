@@ -1,0 +1,143 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+const BASE = "https://myhangulname.com";
+
+export const metadata: Metadata = {
+  title: "Korean Words to Know — OED, K-pop, Songs & Beautiful Hangul",
+  description:
+    "A compact, curated gallery of Korean words: entries in the Oxford English Dictionary, famous Koreans, K-pop groups & members, iconic song titles, words foreigners love, and the most beautiful Hangul words — ordered by initial consonant.",
+  alternates: { canonical: `${BASE}/korean-words` },
+  openGraph: {
+    title: "Korean Words to Know",
+    description: "OED Korean words, K-pop members, song titles, and beautiful Hangul — in one compact page.",
+    url: `${BASE}/korean-words`,
+    type: "article",
+  },
+};
+
+// ── Consonant ordering: ㅇㅎ → ㅅㅈㅊ → ㅁㅂㅍ → ㄴㄷㅌㄹ → ㄱㅋ ──────────────
+const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+const GROUP_RANK: Record<string, number> = {};
+[["ㅇ","ㅎ"], ["ㅅ","ㅆ","ㅈ","ㅉ","ㅊ"], ["ㅁ","ㅂ","ㅃ","ㅍ"], ["ㄴ","ㄷ","ㄸ","ㅌ","ㄹ"], ["ㄱ","ㄲ","ㅋ"]]
+  .forEach((g, i) => g.forEach((c) => { GROUP_RANK[c] = i; }));
+
+function firstChoseong(word: string): string | null {
+  for (const ch of word) {
+    const code = ch.codePointAt(0)!;
+    if (code >= 0xac00 && code <= 0xd7a3) return CHO[Math.floor((code - 0xac00) / 588)];
+  }
+  return null;
+}
+function rank(word: string): number {
+  const c = firstChoseong(word);
+  return c == null ? 99 : (GROUP_RANK[c] ?? 90);
+}
+function byConsonant(words: string[]): string[] {
+  return words
+    .map((w, i) => ({ w, i }))
+    .sort((a, b) => rank(a.w) - rank(b.w) || a.i - b.i)
+    .map((x) => x.w);
+}
+
+// ── Curated data ─────────────────────────────────────────────────────────────
+const OED = ["한류","대박","먹방","애교","오빠","언니","누나","반찬","불고기","삼겹살","갈비","잡채","김밥","동치미","김치","막걸리","소주","한복","온돌","태권도","콩글리시","만화","트로트","스킨십","파이팅"];
+const CELEBS = ["세종대왕","이순신","유관순","안중근","김구","김연아","손흥민","박지성","류현진","봉준호","박찬욱","백종원","유재석","강호동","싸이"];
+const SONGS = ["강남스타일","봄날","좋은 날","벚꽃 엔딩","사건의 지평선","밤편지","첫사랑","너의 의미","빨간 맛","가시나","사랑을 했다","밤하늘의 별을"];
+const POPULAR = ["사랑","안녕","감사","행복","친구","오빠","대박","김치","한국","화이팅","예쁘다","맛있다"];
+const BEAUTIFUL = ["윤슬","미리내","노을","달빛","햇살","이슬","바람","하늘","별빛","단비","시나브로","그루잠","아름드리","산들바람","마음"];
+
+const KPOP: { group: string; members: string[] }[] = [
+  { group: "방탄소년단 (BTS)", members: ["진","슈가","제이홉","RM","지민","뷔","정국"] },
+  { group: "블랙핑크 (BLACKPINK)", members: ["지수","제니","로제","리사"] },
+  { group: "뉴진스 (NewJeans)", members: ["민지","하니","다니엘","해린","혜인"] },
+  { group: "에스파 (aespa)", members: ["카리나","지젤","윈터","닝닝"] },
+  { group: "아이브 (IVE)", members: ["안유진","가을","레이","장원영","리즈","이서"] },
+  { group: "트와이스 (TWICE)", members: ["나연","정연","모모","사나","지효","미나","다현","채영","쯔위"] },
+];
+
+function Chip({ text }: { text: string }) {
+  return (
+    <Link
+      href={`/?name=${encodeURIComponent(text)}`}
+      className="px-3 py-1.5 text-sm bg-white border border-violet-100 rounded-full text-slate-700 hover:border-violet-300 hover:text-violet-700 hover:shadow-sm transition"
+    >
+      {text}
+    </Link>
+  );
+}
+
+function Section({ emoji, title, sub, words }: { emoji: string; title: string; sub: string; words: string[] }) {
+  return (
+    <section className="mb-7 last:mb-0">
+      <h2 className="text-base font-semibold text-slate-800 flex items-center gap-1.5 mb-0.5">
+        <span>{emoji}</span><span>{title}</span>
+      </h2>
+      <p className="text-xs text-slate-400 mb-2.5">{sub}</p>
+      <div className="flex flex-wrap gap-1.5">
+        {byConsonant(words).map((w) => <Chip key={w} text={w} />)}
+      </div>
+    </section>
+  );
+}
+
+export default function KoreanWordsPage() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-violet-50 via-white to-purple-50/50 p-6">
+      <div className="max-w-2xl mx-auto pt-6">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-violet-400 hover:text-violet-600 text-xs font-medium transition mb-6"
+        >
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back
+        </Link>
+
+        <header className="mb-5">
+          <h1 className="text-2xl sm:text-3xl font-bold text-violet-900 tracking-tight mb-1.5">
+            Korean Words to Know <span className="text-violet-400">· 한글 단어</span>
+          </h1>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            Tap any word to see it in Korean fonts and Hangul Art. Ordered by initial consonant —
+            <span className="font-medium text-violet-500"> ㅇㅎ · ㅅㅈㅊ · ㅁㅂㅍ · ㄴㄷㅌㄹ · ㄱㅋ</span>.
+          </p>
+        </header>
+
+        <div className="bg-white rounded-2xl shadow-lg shadow-violet-200/40 p-6 sm:p-8">
+          <Section emoji="📖" title="Oxford English Dictionary" sub="옥스포드 영어 사전에 등재된 한글 단어" words={OED} />
+          <Section emoji="⭐" title="Famous Koreans" sub="한국 유명인" words={CELEBS} />
+
+          <section className="mb-7">
+            <h2 className="text-base font-semibold text-slate-800 flex items-center gap-1.5 mb-0.5">
+              <span>🎤</span><span>K-pop Members</span>
+            </h2>
+            <p className="text-xs text-slate-400 mb-3">K-POP 그룹별 가수</p>
+            <div className="space-y-3">
+              {KPOP.map((g) => (
+                <div key={g.group}>
+                  <div className="text-xs font-medium text-violet-500 mb-1.5">{g.group}</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {byConsonant(g.members).map((m) => <Chip key={g.group + m} text={m} />)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <Section emoji="🎵" title="Iconic Song Titles" sub="주요 한글 노래 제목" words={SONGS} />
+          <Section emoji="💜" title="Words Foreigners Love" sub="외국인들에게 인기 있는 단어" words={POPULAR} />
+          <Section emoji="🌸" title="Beautiful Hangul Words" sub="아름다운 한글 단어 (순우리말)" words={BEAUTIFUL} />
+        </div>
+
+        <Link
+          href="/"
+          className="block text-center bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium px-4 py-3 rounded-xl transition mt-6"
+        >
+          ← My Hangul Name
+        </Link>
+      </div>
+    </div>
+  );
+}
