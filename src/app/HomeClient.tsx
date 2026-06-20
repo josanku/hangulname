@@ -105,6 +105,22 @@ function getVoice(lang: string): SpeechSynthesisVoice | undefined {
   );
 }
 
+// Voice-first prompts (English fallback for languages not listed)
+const SAY_NAME: Record<string, string> = {
+  ko: "이름을 말해보세요", en: "Say your name", zh: "说出你的名字",
+  ja: "名前を話してください", es: "Di tu nombre", fr: "Dites votre nom",
+  de: "Sag deinen Namen", ar: "قل اسمك", ru: "Назовите ваше имя",
+  pt: "Diga seu nome", vi: "Nói tên của bạn", id: "Sebutkan nama Anda",
+  th: "พูดชื่อของคุณ", ms: "Sebut nama anda", hi: "अपना नाम बोलें",
+};
+const LISTENING: Record<string, string> = {
+  ko: "듣는 중…", en: "Listening…", zh: "聆听中…", ja: "聞き取り中…",
+  es: "Escuchando…", fr: "Écoute…", de: "Hört zu…", ar: "يستمع…",
+  ru: "Слушаю…", pt: "Ouvindo…", vi: "Đang nghe…", id: "Mendengarkan…",
+  th: "กำลังฟัง…", ms: "Mendengar…", hi: "सुन रहे हैं…",
+};
+const trv = (m: Record<string, string>, l: string) => m[l] ?? m.en;
+
 export default function HomeClient({ initialName }: { initialName?: string }) {
   const [lang, setLang] = useState<Lang>("en");
   const [input, setInput] = useState("");
@@ -127,6 +143,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   const [isListening, setIsListening] = useState(false);
   const [micSupported, setMicSupported] = useState(false);
   const recognitionRef = useRef<MinimalSpeechRecognition | null>(null);
+  // Always points at the latest convert() so the (mount-time) mic handler isn't stale
+  const convertRef = useRef<(name?: string) => void>(() => {});
   const [kakaoIOS, setKakaoIOS] = useState(false);
   const [jamoIndex, setJamoIndex] = useState(0);
 
@@ -214,8 +232,9 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     rec.onresult = (event) => {
       const transcript = event.results[0]?.[0]?.transcript ?? "";
       const cleaned = transcript.replace(/[.,]/g, "").trim();
-      if (cleaned) setInput(cleaned);
       setIsListening(false);
+      // Voice-first: speaking a name converts it immediately
+      if (cleaned) convertRef.current(cleaned);
     };
     rec.onerror = () => setIsListening(false);
     rec.onend = () => setIsListening(false);
@@ -268,8 +287,10 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
   const t = translations[lang];
 
-  const convert = async () => {
-    if (!input.trim()) return;
+  const convert = async (override?: string) => {
+    const name = (override ?? input).trim();
+    if (!name) return;
+    if (override !== undefined) setInput(name);
     setLoading(true);
     setError("");
     setResult(null);
@@ -286,13 +307,13 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
       const res = await fetch("/api/transliterate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: input.trim(), uiLang: lang }),
+        body: JSON.stringify({ name, uiLang: lang }),
       });
       const data = await res.json();
       clearInterval(jamoInterval);
       if (!res.ok) throw new Error(data.error);
       setResult(data);
-      setCurrentInput(input.trim());
+      setCurrentInput(name);
 
       const next = count + 1;
       setCount(next);
@@ -300,7 +321,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
       logAction({
         type: "conversion",
-        inputName: input.trim(),
+        inputName: name,
         uiLang: lang,
         sourceLang: data.sourceLang,
         results: data.variants?.map((v: Variant) => ({ country: v.country, options: v.options })),
@@ -312,6 +333,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
       setLoading(false);
     }
   };
+  convertRef.current = convert;
 
   const copy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -533,7 +555,37 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           </div>
         </div>
 
-        {/* Input */}
+        {/* Voice-first: prominent mic CTA (when supported) */}
+        {micSupported && (
+          <div className="flex flex-col items-center gap-2.5 mb-4">
+            <button
+              onClick={toggleMic}
+              aria-label={isListening ? (lang === "ko" ? "녹음 중지" : "Stop recording") : trv(SAY_NAME, lang)}
+              className={`flex items-center justify-center w-20 h-20 rounded-full transition shadow-lg
+                ${isListening
+                  ? "bg-red-500 text-white animate-pulse shadow-red-300/50"
+                  : "bg-violet-600 hover:bg-violet-500 text-white shadow-violet-300/40 hover:scale-105"}`}
+            >
+              {isListening ? (
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="6" width="12" height="12" rx="2" />
+                </svg>
+              ) : (
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="23" />
+                  <line x1="8" y1="23" x2="16" y2="23" />
+                </svg>
+              )}
+            </button>
+            <p className="text-sm font-medium text-violet-600">
+              {isListening ? trv(LISTENING, lang) : trv(SAY_NAME, lang)}
+            </p>
+          </div>
+        )}
+
+        {/* Input — type your name (secondary when voice is available) */}
         <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-violet-200 p-4 mb-3 shadow-sm transition-shadow focus-within:border-violet-400 focus-within:shadow-[0_0_0_3px_rgba(139,92,246,0.1)]">
           <div className="flex gap-2 items-center">
             <input
@@ -544,33 +596,10 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               placeholder={t.placeholder}
               dir="auto"
               className="flex-1 min-w-0 text-violet-900 placeholder:text-violet-300 focus:outline-none text-base bg-transparent"
-              autoFocus
+              autoFocus={!micSupported}
             />
-            {micSupported && (
-              <button
-                onClick={toggleMic}
-                aria-label={isListening ? (lang === "ko" ? "녹음 중지" : "Stop recording") : (lang === "ko" ? "음성으로 입력" : "Speak to input")}
-                className={`shrink-0 rounded-lg p-2.5 transition
-                  ${isListening
-                    ? "bg-red-500 text-white animate-pulse"
-                    : "text-violet-300 hover:text-violet-500 hover:bg-violet-50"}`}
-              >
-                {isListening ? (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <rect x="6" y="6" width="12" height="12" rx="2" />
-                  </svg>
-                ) : (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                    <line x1="12" y1="19" x2="12" y2="23" />
-                    <line x1="8" y1="23" x2="16" y2="23" />
-                  </svg>
-                )}
-              </button>
-            )}
             <button
-              onClick={convert}
+              onClick={() => convert()}
               disabled={loading || !input.trim()}
               className="shrink-0 bg-violet-600 hover:bg-violet-500 disabled:bg-violet-100 disabled:text-violet-300 text-white px-5 py-2.5 rounded-lg font-medium transition text-sm min-w-[80px]"
             >
