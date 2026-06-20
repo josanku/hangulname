@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import GalleryClient from "./GalleryClient";
 
-const BASE_URL = "https://hangulname.vercel.app";
+const BASE_URL = "https://myhangulname.com";
 
 export const metadata: Metadata = {
   title: "한글아트 갤러리 — K-POP 아이돌·한국 이름·인기 단어",

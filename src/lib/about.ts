@@ -45,7 +45,7 @@ const KO: AboutContent = {
     },
     {
       q: "변환 결과를 어디에 써도 되나요?",
-      a: "자유롭게 사용하셔도 됩니다. 명함, 학교/회사 등록 서류, 청첩장, 출입증, SNS 프로필, 한국어 학습 노트 등 어디든 가능합니다. 출처 표기는 필수가 아니지만 \"name.hangulmaru.com\"으로 공유해주시면 감사드려요.",
+      a: "자유롭게 사용하셔도 됩니다. 명함, 학교/회사 등록 서류, 청첩장, 출입증, SNS 프로필, 한국어 학습 노트 등 어디든 가능합니다. 출처 표기는 필수가 아니지만 \"myhangulname.com\"으로 공유해주시면 감사드려요.",
     },
     {
       q: "어떤 폰트를 선택해야 하나요?",
@@ -96,7 +96,7 @@ const EN: AboutContent = {
     },
     {
       q: "Can I use the results anywhere?",
-      a: "Yes, freely. Business cards, school/work registration, wedding invitations, ID badges, social media profiles, Korean study notes — wherever you need it. Attribution isn't required but a mention of \"name.hangulmaru.com\" is appreciated.",
+      a: "Yes, freely. Business cards, school/work registration, wedding invitations, ID badges, social media profiles, Korean study notes — wherever you need it. Attribution isn't required but a mention of \"myhangulname.com\" is appreciated.",
     },
     {
       q: "Which font should I pick?",
