@@ -1,0 +1,33 @@
+# My Hangul Name (내 한글 이름)
+
+> My Hangul Name is a free tool by Wehome that converts any name from 19 languages into its closest natural Korean (Hangul) spelling — based on actual pronunciation and Korea's official 국립국어원 외래어 표기법. Every result includes audio, IPA, 20+ font previews, and generative Hangul Art. No sign-up, no ads.
+
+Site: https://myhangulname.com
+
+## How it works
+- Type or say a name (e.g. "Caroline Smith") in any language.
+- Get the recommended Hangul spelling plus alternatives, by language of origin.
+- Listen to the pronunciation, copy the spelling, preview 20+ Korean fonts, or make Hangul Art.
+
+## Key pages
+- [Home — convert a name](https://myhangulname.com): main converter.
+- [About / What is Hangul Name](https://myhangulname.com/hangul-name): features, how-to, supported languages, Hunminjeongeum background.
+- [Korean Words to Know](https://myhangulname.com/korean-words): curated Korean words — Oxford English Dictionary entries, famous Koreans, K-pop groups & members, song titles, beautiful Hangul.
+- [Learn Hangul](https://myhangulname.com/learn-hangul): the Korean alphabet in 59 seconds.
+- [Hangul Art Gallery](https://myhangulname.com/gallery): generative art of popular names and words.
+
+## K-pop & celebrity pages (member names, fan words, songs in Hangul)
+- BTS 방탄소년단: https://myhangulname.com/bts
+- BLACKPINK 블랙핑크: https://myhangulname.com/blackpink
+- BIGBANG 빅뱅: https://myhangulname.com/bigbang
+- IU 아이유: https://myhangulname.com/iu
+- aespa 에스파: https://myhangulname.com/aespa
+- NewJeans 뉴진스: https://myhangulname.com/newjeans
+- (full list of 27 artists linked from /korean-words)
+
+## API
+- Free, CORS-enabled, no key. GET https://myhangulname.com/api/v1/transliterate?name=Caroline&lang=en
+- Docs: https://myhangulname.com/api-docs — OpenAPI: https://myhangulname.com/api/v1/openapi.json
+
+## About
+Built and operated by Wehome (https://wehome.me), Korea's only government-authorized home-sharing platform. "Your Home in Korea."

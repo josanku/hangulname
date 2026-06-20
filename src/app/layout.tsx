@@ -214,6 +214,19 @@ const jsonLd = {
         },
       ],
     },
+    {
+      "@type": "HowTo",
+      "@id": `${BASE_URL}/#howto`,
+      name: "How to write your name in Korean (Hangul)",
+      description: "Convert any name into its closest natural Korean Hangul spelling in seconds.",
+      totalTime: "PT15S",
+      step: [
+        { "@type": "HowToStep", position: 1, name: "Enter your name", text: "Type or say your name (e.g. Caroline Smith) in any language at myhangulname.com." },
+        { "@type": "HowToStep", position: 2, name: "Read the result", text: "The first card shows the recommended Hangul spelling; other cards show spellings by language of origin." },
+        { "@type": "HowToStep", position: 3, name: "Listen & copy", text: "Tap the speaker to hear the Korean pronunciation, then copy the spelling you like." },
+        { "@type": "HowToStep", position: 4, name: "Fonts & art", text: "Open the Font Gallery to preview 20+ Korean fonts, or make shareable Hangul Art." },
+      ],
+    },
   ],
 };
 
