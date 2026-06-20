@@ -26,6 +26,38 @@ export const metadata: Metadata = {
   },
 };
 
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "How accurate is the Hangul transliteration?",
+      acceptedAnswer: { "@type": "Answer", text: "Transliteration has no single right answer — the same name is often written differently by different Korean speakers. My Hangul Name shows the spelling a native speaker would pronounce closest to the original, plus useful alternatives, following Korea's official 국립국어원 외래어 표기법." },
+    },
+    {
+      "@type": "Question",
+      name: "Why are there multiple Korean spellings for one name?",
+      acceptedAnswer: { "@type": "Answer", text: "A name's pronunciation depends on its origin language — \"Caroline\" sounds different in English, French and German — so the same letters map to different Hangul. Pick the result whose language matches the name's origin; the first card is the top recommendation." },
+    },
+    {
+      "@type": "Question",
+      name: "Is it free? Do I need an account?",
+      acceptedAnswer: { "@type": "Answer", text: "Yes, completely free and ad-free, with no sign-up. It is built and run by Wehome, Korea's government-authorized home-sharing platform." },
+    },
+    {
+      "@type": "Question",
+      name: "Which languages are supported?",
+      acceptedAnswer: { "@type": "Answer", text: "19 languages: English, Korean, Chinese, Japanese, Spanish, French, German, Arabic, Russian, Portuguese, Vietnamese, Indonesian, Thai, Malay, Hindi, Bengali, Tagalog, Burmese and Mongolian. Type a name in its native script and it returns the Korean pronunciation." },
+    },
+  ],
+};
+
 export default function HangulNameLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+      {children}
+    </>
+  );
 }
