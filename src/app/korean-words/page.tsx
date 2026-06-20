@@ -100,11 +100,24 @@ export default function KoreanWordsPage() {
           </p>
         </header>
 
+        {/* Explore — related content pages */}
+        <nav className="flex flex-wrap gap-1.5 mb-5">
+          <Link href="/korean-sounds" className="px-3 py-1.5 text-xs font-medium bg-violet-600 text-white rounded-full hover:bg-violet-500 transition">
+            🔊 의성어·의태어 Sound Words
+          </Link>
+          <Link href="/name" className="px-3 py-1.5 text-xs font-medium bg-white border border-violet-200 text-violet-600 rounded-full hover:bg-violet-50 transition">
+            🔤 Names in Korean
+          </Link>
+          <a href="#kpop" className="px-3 py-1.5 text-xs font-medium bg-white border border-violet-200 text-violet-600 rounded-full hover:bg-violet-50 transition">
+            🎤 K-pop
+          </a>
+        </nav>
+
         <div className="bg-white rounded-2xl shadow-lg shadow-violet-200/40 p-6 sm:p-8">
           <Section emoji="📖" title="Oxford English Dictionary" sub="옥스포드 영어 사전에 등재된 한글 단어" words={OED} />
           <Section emoji="⭐" title="Famous Koreans" sub="한국 유명인" words={CELEBS} />
 
-          <section className="mb-7">
+          <section className="mb-7 scroll-mt-4" id="kpop">
             <h2 className="text-base font-semibold text-slate-800 flex items-center gap-1.5 mb-0.5">
               <span>🎤</span><span>K-pop Members</span>
             </h2>
