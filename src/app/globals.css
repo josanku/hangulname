@@ -99,3 +99,7 @@ body { background: var(--background); color: var(--foreground); font-family: 'Jo
   font-weight: 400 700;
   font-display: swap;
 }
+
+/* hide horizontal scrollbar on compact swatch rows */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

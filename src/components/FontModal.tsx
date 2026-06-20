@@ -340,6 +340,7 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
   const [generatingShare, setGeneratingShare] = useState(false);
   const [textColor, setTextColor] = useState<string>("#1e293b");
   const [bgColor, setBgColor] = useState<string | null>(null); // null = default gradient
+  const [fontScale, setFontScale] = useState<number>(1);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -356,8 +357,8 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
   const fontLabel = isKo ? font.labelKo : font.labelEn;
 
   const buildCanvas = useCallback(
-    (targetFont: typeof FONTS[number]) => buildFontCanvas({ text, originalName, font: targetFont, textColor, bgColor: bgColor ?? undefined }),
-    [text, originalName, textColor, bgColor],
+    (targetFont: typeof FONTS[number]) => buildFontCanvas({ text, originalName, font: targetFont, textColor, bgColor: bgColor ?? undefined, fontScale }),
+    [text, originalName, textColor, bgColor, fontScale],
   );
 
   const downloadImage = useCallback(async () => {
@@ -426,8 +427,8 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
                     fontFamily: font.css,
                     fontWeight: font.id === "hunmin-ebs" ? 900 : 700,
                     fontSize: arr.length >= 2
-                      ? "clamp(2.8rem, 12vw, 5rem)"
-                      : "clamp(3.5rem, 15vw, 6.5rem)",
+                      ? `calc(clamp(2.8rem, 12vw, 5rem) * ${fontScale})`
+                      : `calc(clamp(3.5rem, 15vw, 6.5rem) * ${fontScale})`,
                     lineHeight: 1.25,
                     color: textColor,
                     letterSpacing: "0.04em",
@@ -439,44 +440,60 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
             </div>
           </div>
 
-          {/* 글자색 · 배경색 선택 */}
+          {/* 글자색 · 배경색 · 글자크기 */}
           <div className="w-full flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-slate-400 w-12 shrink-0">{isKo ? "글자색" : "Text"}</span>
-              <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[10px] text-slate-400 w-8 shrink-0">{isKo ? "글자" : "Text"}</span>
+              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
                 {TEXT_SWATCHES.map((c) => (
                   <button
                     key={c}
                     onClick={() => setTextColor(c)}
                     aria-label={`text ${c}`}
-                    className={`w-6 h-6 rounded-full border transition ${textColor === c ? "ring-2 ring-offset-1 ring-blue-400 border-transparent" : "border-slate-200"}`}
+                    className={`w-5 h-5 shrink-0 rounded-full border transition ${textColor === c ? "ring-2 ring-blue-400 border-transparent" : "border-slate-200"}`}
                     style={{ background: c }}
                   />
                 ))}
-                <label className="w-6 h-6 rounded-full border border-slate-200 overflow-hidden cursor-pointer relative" title={isKo ? "직접 선택" : "Custom"}>
-                  <span className="absolute inset-0 flex items-center justify-center text-[10px] text-slate-400 pointer-events-none">+</span>
+                <label className="w-5 h-5 shrink-0 rounded-full border border-slate-200 overflow-hidden cursor-pointer relative" title={isKo ? "직접 선택" : "Custom"}>
+                  <span className="absolute inset-0 flex items-center justify-center text-[9px] text-slate-400 pointer-events-none">+</span>
                   <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="opacity-0 w-full h-full cursor-pointer" />
                 </label>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-slate-400 w-12 shrink-0">{isKo ? "배경색" : "BG"}</span>
-              <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[10px] text-slate-400 w-8 shrink-0">{isKo ? "배경" : "BG"}</span>
+              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
                 {BG_SWATCHES.map((c, idx) => (
                   <button
                     key={idx}
                     onClick={() => setBgColor(c)}
                     aria-label={c ? `bg ${c}` : "default"}
                     title={c === null ? (isKo ? "기본" : "Default") : undefined}
-                    className={`w-6 h-6 rounded-full border transition ${bgColor === c ? "ring-2 ring-offset-1 ring-blue-400 border-transparent" : "border-slate-200"} ${c === null ? "bg-gradient-to-br from-slate-50 to-blue-50" : ""}`}
+                    className={`w-5 h-5 shrink-0 rounded-full border transition ${bgColor === c ? "ring-2 ring-blue-400 border-transparent" : "border-slate-200"} ${c === null ? "bg-gradient-to-br from-slate-50 to-blue-50" : ""}`}
                     style={c ? { background: c } : undefined}
                   />
                 ))}
-                <label className="w-6 h-6 rounded-full border border-slate-200 overflow-hidden cursor-pointer relative" title={isKo ? "직접 선택" : "Custom"}>
-                  <span className="absolute inset-0 flex items-center justify-center text-[10px] text-slate-400 pointer-events-none">+</span>
+                <label className="w-5 h-5 shrink-0 rounded-full border border-slate-200 overflow-hidden cursor-pointer relative" title={isKo ? "직접 선택" : "Custom"}>
+                  <span className="absolute inset-0 flex items-center justify-center text-[9px] text-slate-400 pointer-events-none">+</span>
                   <input type="color" value={bgColor ?? "#ffffff"} onChange={(e) => setBgColor(e.target.value)} className="opacity-0 w-full h-full cursor-pointer" />
                 </label>
               </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-slate-400 w-8 shrink-0">{isKo ? "크기" : "Size"}</span>
+              <button
+                onClick={() => setFontScale((s) => Math.max(0.6, Math.round((s - 0.1) * 10) / 10))}
+                aria-label={isKo ? "작게" : "Smaller"}
+                className="w-7 h-7 shrink-0 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition text-base leading-none"
+              >−</button>
+              <div className="flex-1 h-1.5 bg-slate-100 rounded-full relative">
+                <div className="h-full bg-blue-400 rounded-full" style={{ width: `${((fontScale - 0.6) / 0.9) * 100}%` }} />
+              </div>
+              <button
+                onClick={() => setFontScale((s) => Math.min(1.5, Math.round((s + 0.1) * 10) / 10))}
+                aria-label={isKo ? "크게" : "Bigger"}
+                className="w-7 h-7 shrink-0 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition text-base leading-none"
+              >+</button>
             </div>
           </div>
 
