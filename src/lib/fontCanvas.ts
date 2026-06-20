@@ -33,6 +33,9 @@ interface BuildArgs {
   font: Font;
   // When true, color each jamo by category; default renders plain black.
   colorize?: boolean;
+  // Optional text/background overrides; default keeps the dark-on-gradient look.
+  textColor?: string;
+  bgColor?: string;
 }
 
 // ─── Jamo coloring (오방색 계열, 발음 위치 기준) ──────────────────────────────
@@ -124,7 +127,7 @@ function syllableRegions(
   return out;
 }
 
-export async function buildFontCanvas({ text, originalName, font, colorize = false }: BuildArgs): Promise<HTMLCanvasElement> {
+export async function buildFontCanvas({ text, originalName, font, colorize = false, textColor, bgColor }: BuildArgs): Promise<HTMLCanvasElement> {
   await document.fonts.load(`bold 80px ${font.css}`);
 
   const SCALE = 2;
@@ -135,12 +138,18 @@ export async function buildFontCanvas({ text, originalName, font, colorize = fal
   const ctx = canvas.getContext("2d")!;
   ctx.scale(SCALE, SCALE);
 
-  const grad = ctx.createLinearGradient(0, 0, W, H);
-  grad.addColorStop(0, "#f8fafc");
-  grad.addColorStop(1, "#eff6ff");
-  ctx.fillStyle = grad;
+  const baseColor = textColor ?? JAMO_COLORS.default;
+
   ctx.beginPath();
   ctx.roundRect(0, 0, W, H, 24);
+  if (bgColor) {
+    ctx.fillStyle = bgColor;
+  } else {
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, "#f8fafc");
+    grad.addColorStop(1, "#eff6ff");
+    ctx.fillStyle = grad;
+  }
   ctx.fill();
 
   const chars = Array.from(text.trim());
@@ -185,7 +194,7 @@ export async function buildFontCanvas({ text, originalName, font, colorize = fal
   // 한 글자를 그린다 (colorize일 때만 위치별 색 적용)
   const drawChar = (ch: string, penX: number, cy: number) => {
     if (!colorize) {
-      ctx.fillStyle = JAMO_COLORS.default;
+      ctx.fillStyle = baseColor;
       ctx.fillText(ch, penX, cy);
       return;
     }
