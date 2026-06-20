@@ -565,6 +565,16 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                   >
                     {lang === "ko" ? "59초 한글 배우기" : "Learn Hangul in 59s"}
                   </a>
+                  <a
+                    href="/api-docs"
+                    onClick={() => {
+                      setShowInfoMenu(false);
+                      logAction({ type: "api_docs_click", uiLang: lang });
+                    }}
+                    className="block w-full text-left px-3 py-2 text-xs text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition"
+                  >
+                    API
+                  </a>
                   <button
                     onClick={() => {
                       setAboutOpen("faq");
