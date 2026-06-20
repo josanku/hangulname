@@ -172,6 +172,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   // Always points at the latest convert() so the (mount-time) mic handler isn't stale
   const convertRef = useRef<(name?: string) => void>(() => {});
   const [kakaoIOS, setKakaoIOS] = useState(false);
+  const [inApp, setInApp] = useState<string | null>(null); // Instagram/Facebook/… in-app browser (iOS)
+  const [linkCopied, setLinkCopied] = useState(false);
   const [jamoIndex, setJamoIndex] = useState(0);
 
   const logAction = useCallback(async (data: Record<string, unknown>) => {
@@ -204,6 +206,24 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
       } else {
         setKakaoIOS(true);
       }
+    }
+
+    // ── Instagram / Facebook / LINE 인앱 브라우저 (마이크 등 제한) ──────────────
+    const inAppHit = [
+      { re: /Instagram/i, name: "Instagram" },
+      { re: /FBAN|FBAV|FB_IAB/i, name: "Facebook" },
+      { re: /\bLine\//i, name: "LINE" },
+    ].find((a) => a.re.test(ua));
+    if (inAppHit && !/KAKAOTALK/i.test(ua)) {
+      if (/Android/i.test(ua)) {
+        const intentUrl =
+          `intent://${window.location.host}${window.location.pathname}${window.location.search}` +
+          `#Intent;scheme=https;action=android.intent.action.VIEW;` +
+          `category=android.intent.category.BROWSABLE;end`;
+        window.location.replace(intentUrl);
+        return;
+      }
+      setInApp(inAppHit.name);
     }
 
     const detectedLang = detectLang();
@@ -422,6 +442,31 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         <p className="text-xs mt-0.5">
           우측 하단 <strong>···</strong> 메뉴 → <strong>다른 브라우저로 열기</strong>를 탭하세요
         </p>
+      </div>
+    )}
+    {inApp && (
+      <div className="fixed top-0 inset-x-0 z-50 bg-violet-600 text-white py-3 px-4 text-center shadow-lg">
+        <p className="text-sm font-bold">
+          {lang === "ko"
+            ? `${inApp} 앱 브라우저에서는 음성 입력(마이크)이 제한됩니다`
+            : `Voice input is blocked in the ${inApp} in-app browser`}
+        </p>
+        <p className="text-xs mt-0.5">
+          {lang === "ko"
+            ? <>우측 상단 <strong>···</strong> → <strong>외부 브라우저에서 열기</strong> (Safari/Chrome)</>
+            : <>Tap <strong>···</strong> (top right) → <strong>Open in external browser</strong> (Safari/Chrome)</>}
+        </p>
+        <button
+          onClick={() => {
+            try { navigator.clipboard.writeText(window.location.href); } catch { /* noop */ }
+            setLinkCopied(true);
+          }}
+          className="mt-1.5 text-[11px] underline underline-offset-2"
+        >
+          {linkCopied
+            ? (lang === "ko" ? "복사됨 — 브라우저에 붙여넣기" : "Copied — paste in your browser")
+            : (lang === "ko" ? "링크 복사하기" : "Copy link")}
+        </button>
       </div>
     )}
     <main
