@@ -695,8 +695,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
               className="text-center text-sm text-violet-400 leading-relaxed tracking-wide"
               style={{ fontFamily: "EBSHunminjeongeum, serif" }}
             >
-              <div>ㄱㅋ ㄴㄷㅌㄹ ㅁㅂㅍ ㅅㅈㅊ ㅇㅎ</div>
-              <div>ㆍ ㅡ ㅣ ㅏ ㅓ ㅗ ㅜ ㅑ ㅕ ㅛ ㅠ</div>
+              <div>ㅇㅎ ㅅㅈㅊ ㅁㅂㅍ ㄴㄷㅌㄹ ㄱㅋ</div>
+              <div>ㆍ ㅣ ㅡ ㅏ ㅓ ㅗ ㅜ ㅑ ㅕ ㅛ ㅠ</div>
             </div>
           </div>
         )}
