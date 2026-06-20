@@ -329,11 +329,17 @@ function ShareSheet({ text, originalName, imageDataUrl, imageBlob, isKo, uiLang,
 
 // ─── Font Modal ───────────────────────────────────────────────────────────────
 
+const TEXT_SWATCHES = ["#1e293b", "#000000", "#ffffff", "#6d28d9", "#2563eb", "#16a34a", "#dc2626", "#db2777", "#f59e0b"];
+// null = default gradient
+const BG_SWATCHES: (string | null)[] = [null, "#ffffff", "#0f172a", "#fff7ed", "#ecfdf5", "#eff6ff", "#fdf2f8", "#f5f3ff", "#fee2e2"];
+
 export default function FontModal({ text, originalName, isKo, uiLang, onClose, onLog, initialFontId, onOpenArt }: Props) {
   const [selectedFont, setSelectedFont] = useState<string>(initialFontId ?? FONTS[1].id);
   const [downloading, setDownloading] = useState(false);
   const [shareData, setShareData] = useState<{ dataUrl: string; blob: Blob } | null>(null);
   const [generatingShare, setGeneratingShare] = useState(false);
+  const [textColor, setTextColor] = useState<string>("#1e293b");
+  const [bgColor, setBgColor] = useState<string | null>(null); // null = default gradient
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -350,8 +356,8 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
   const fontLabel = isKo ? font.labelKo : font.labelEn;
 
   const buildCanvas = useCallback(
-    (targetFont: typeof FONTS[number]) => buildFontCanvas({ text, originalName, font: targetFont }),
-    [text, originalName],
+    (targetFont: typeof FONTS[number]) => buildFontCanvas({ text, originalName, font: targetFont, textColor, bgColor: bgColor ?? undefined }),
+    [text, originalName, textColor, bgColor],
   );
 
   const downloadImage = useCallback(async () => {
@@ -409,20 +415,21 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
           className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl flex flex-col items-center gap-5 p-8"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* 닫기 */}
+          {/* 닫기 — 모바일에서도 잘 보이도록 크게 */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-slate-300 hover:text-slate-500 transition p-1"
+            aria-label={isKo ? "닫기" : "Close"}
+            className="absolute top-3 right-3 z-10 flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
 
           {/* 이름 대형 표시 */}
           <div
-            className="w-full bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl flex items-center justify-center"
-            style={{ minHeight: "220px", padding: "2rem" }}
+            className={`w-full rounded-2xl flex items-center justify-center ${bgColor ? "" : "bg-gradient-to-br from-slate-50 to-blue-50"}`}
+            style={{ minHeight: "220px", padding: "2rem", background: bgColor ?? undefined }}
           >
             <div style={{ textAlign: "center" }}>
               {text.trim().split(/\s+/).map((part, i, arr) => (
@@ -435,13 +442,54 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
                       ? "clamp(2.8rem, 12vw, 5rem)"
                       : "clamp(3.5rem, 15vw, 6.5rem)",
                     lineHeight: 1.25,
-                    color: "#1e293b",
+                    color: textColor,
                     letterSpacing: "0.04em",
                   }}
                 >
                   {i === 0 ? part : arr.slice(1).join(" ")}
                 </div>
               )).filter((_, i) => i < 2)}
+            </div>
+          </div>
+
+          {/* 글자색 · 배경색 선택 */}
+          <div className="w-full flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-slate-400 w-12 shrink-0">{isKo ? "글자색" : "Text"}</span>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {TEXT_SWATCHES.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setTextColor(c)}
+                    aria-label={`text ${c}`}
+                    className={`w-6 h-6 rounded-full border transition ${textColor === c ? "ring-2 ring-offset-1 ring-blue-400 border-transparent" : "border-slate-200"}`}
+                    style={{ background: c }}
+                  />
+                ))}
+                <label className="w-6 h-6 rounded-full border border-slate-200 overflow-hidden cursor-pointer relative" title={isKo ? "직접 선택" : "Custom"}>
+                  <span className="absolute inset-0 flex items-center justify-center text-[10px] text-slate-400 pointer-events-none">+</span>
+                  <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="opacity-0 w-full h-full cursor-pointer" />
+                </label>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-slate-400 w-12 shrink-0">{isKo ? "배경색" : "BG"}</span>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {BG_SWATCHES.map((c, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setBgColor(c)}
+                    aria-label={c ? `bg ${c}` : "default"}
+                    title={c === null ? (isKo ? "기본" : "Default") : undefined}
+                    className={`w-6 h-6 rounded-full border transition ${bgColor === c ? "ring-2 ring-offset-1 ring-blue-400 border-transparent" : "border-slate-200"} ${c === null ? "bg-gradient-to-br from-slate-50 to-blue-50" : ""}`}
+                    style={c ? { background: c } : undefined}
+                  />
+                ))}
+                <label className="w-6 h-6 rounded-full border border-slate-200 overflow-hidden cursor-pointer relative" title={isKo ? "직접 선택" : "Custom"}>
+                  <span className="absolute inset-0 flex items-center justify-center text-[10px] text-slate-400 pointer-events-none">+</span>
+                  <input type="color" value={bgColor ?? "#ffffff"} onChange={(e) => setBgColor(e.target.value)} className="opacity-0 w-full h-full cursor-pointer" />
+                </label>
+              </div>
             </div>
           </div>
 
