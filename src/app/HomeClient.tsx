@@ -358,18 +358,6 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
       onClick={() => { setShowLangMenu(false); setShowInfoMenu(false); }}
     >
       <div className="w-full max-w-lg mx-auto">
-        {/* Top-left brand — click to return to the main page */}
-        <div className="flex items-center mb-4">
-          <button
-            onClick={goHome}
-            title={lang === "ko" ? "메인으로" : "Home"}
-            className="flex items-center gap-1.5 text-lg font-extrabold text-violet-900 tracking-tight hover:text-violet-600 transition"
-          >
-            <span aria-hidden>🇰🇷</span>
-            <span>한글이름</span>
-          </button>
-        </div>
-
         {/* Wehome Logo + Hangulmaru mark */}
         <div className="flex flex-col items-center gap-3 mb-8">
           <a
@@ -405,12 +393,19 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           </a>
         </div>
 
-        {/* Hero */}
+        {/* Hero — brand title doubles as a return-to-main link */}
         <div className="mb-10 text-center">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-violet-900 tracking-tight">
-            {t.title}
-          </h1>
-          <p className="text-sm text-violet-400 mt-1.5">
+          <button
+            onClick={goHome}
+            title={lang === "ko" ? "메인으로" : "Home"}
+            className="inline-block transition hover:opacity-80"
+          >
+            <h1 className="text-2xl sm:text-3xl font-bold text-violet-900 tracking-tight">
+              My Hangul Name
+            </h1>
+            <p className="text-base text-violet-500 font-medium mt-0.5">내 한글 이름</p>
+          </button>
+          <p className="text-sm text-violet-400 mt-2">
             {t.subtitle}
           </p>
         </div>

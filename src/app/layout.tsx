@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
 
   title: {
-    default: "My Name in Hangul | 내 이름을 한글로 — Korean Name Converter",
-    template: "%s | My Name in Hangul",
+    default: "My Hangul Name | 내 이름을 한글로 — Korean Name Converter",
+    template: "%s | My Hangul Name",
   },
 
   description:
@@ -83,8 +83,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: BASE_URL,
-    siteName: "My Name in Hangul | 한글이름",
-    title: "My Name in Hangul — Convert Any Name to Korean Hangul",
+    siteName: "My Hangul Name | 한글이름",
+    title: "My Hangul Name — Convert Any Name to Korean Hangul",
     description:
       "Free tool to convert any name from any language into Korean Hangul. Instant, accurate, with pronunciation guide. Used by K-pop fans, Korean learners & Korea travelers worldwide.",
     locale: "en_US",
@@ -95,7 +95,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@wehomeme",
     creator: "@wehomeme",
-    title: "My Name in Hangul | 내 이름을 한글로",
+    title: "My Hangul Name | 내 이름을 한글로",
     description:
       "Convert any name to Korean Hangul for free. Instant pronunciation guide. Perfect for K-pop fans & Korea travelers.",
   },
@@ -132,7 +132,7 @@ const jsonLd = {
     {
       "@type": "WebApplication",
       "@id": `${BASE_URL}/#app`,
-      name: "My Name in Hangul",
+      name: "My Hangul Name",
       alternateName: ["한글이름", "내 이름을 한글로", "Korean Name Converter", "Hangul Name Generator"],
       url: BASE_URL,
       description:
@@ -165,7 +165,7 @@ const jsonLd = {
       "@type": "WebSite",
       "@id": `${BASE_URL}/#website`,
       url: BASE_URL,
-      name: "My Name in Hangul",
+      name: "My Hangul Name",
       description: "Korean Hangul name converter for people worldwide",
       potentialAction: {
         "@type": "SearchAction",

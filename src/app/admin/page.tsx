@@ -144,7 +144,7 @@ export default function AdminPage() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 w-full max-w-sm">
           <h1 className="text-xl font-bold text-slate-800 mb-1">Admin</h1>
-          <p className="text-sm text-slate-400 mb-6">My Name in Hangul — 관리자</p>
+          <p className="text-sm text-slate-400 mb-6">My Hangul Name — 관리자</p>
           <form onSubmit={handleLogin} className="flex flex-col gap-3">
             <input
               type="password"
@@ -181,7 +181,7 @@ export default function AdminPage() {
           <div>
             <h1 className="text-xl font-bold text-slate-800">관리자 대시보드</h1>
             <div className="flex items-center gap-2 mt-0.5">
-              <p className="text-xs text-slate-400">My Name in Hangul · 60초 자동 갱신</p>
+              <p className="text-xs text-slate-400">My Hangul Name · 60초 자동 갱신</p>
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
                 stats.storage === "vercel-kv"
                   ? "bg-green-100 text-green-600"

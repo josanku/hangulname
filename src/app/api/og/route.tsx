@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
           background: "rgba(59,130,246,0.08)",
           borderRadius: 999,
         }}>
-          My Name in Hangul · myhangulname.com
+          My Hangul Name · myhangulname.com
         </div>
       </div>
     ),
