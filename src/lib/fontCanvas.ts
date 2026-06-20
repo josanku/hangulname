@@ -1,7 +1,7 @@
 export const FONTS = [
   // 훈민정음 두 종을 맨 앞에
   { id: "hunmin-hancom", labelKo: "훈민정음(한컴)", labelEn: "Hunminjeongeum(Hancom)", css: "HancomHunminjeongeum, serif" },
-  { id: "hunmin-ebs",    labelKo: "훈민정음(EBS)", labelEn: "Hunminjeongeum(EBS)",   css: "EBSHunminjeongeum, serif" },
+  { id: "hunmin-ebs",    labelKo: "훈민정음(EBS SB)", labelEn: "Hunminjeongeum(EBS SB)", css: "EBSHunminjeongeumSB, serif" },
   { id: "gungsuh",       labelKo: "궁서",          labelEn: "Gungsuh",               css: "JSongMyung, serif" },
   { id: "myeongjo",      labelKo: "명조",          labelEn: "Myeongjo",              css: "NanumMyeongjo, serif" },
   { id: "gothic",        labelKo: "고딕",          labelEn: "Gothic",                css: "NanumGothic, sans-serif" },

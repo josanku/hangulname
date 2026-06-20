@@ -496,10 +496,10 @@ export default function FontModal({ text, originalName, isKo, uiLang, onClose, o
             </div>
           </div>
 
-          {/* 폰트 이름 + 버튼 */}
-          <div className="flex items-center gap-3 w-full justify-between px-1">
+          {/* 폰트 이름 + 버튼 — 모바일에서는 줄을 나눠 버튼이 가리지 않게 */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 w-full px-1">
             <span className="text-xs text-slate-400">{fontLabel}</span>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 justify-center sm:justify-end">
               <button
                 onClick={downloadImage}
                 disabled={downloading}

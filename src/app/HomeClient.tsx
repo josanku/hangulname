@@ -787,7 +787,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             {/* 닿소리 라인 → 줄바꿈 → ㆍ로 시작하는 홀소리 라인 (EBS 훈민정음) */}
             <div
               className="text-center text-sm text-violet-400 leading-relaxed tracking-wide"
-              style={{ fontFamily: "EBSHunminjeongeum, serif" }}
+              style={{ fontFamily: "EBSHunminjeongeumSB, serif" }}
             >
               <div>ㅇㅎ ㅅㅈㅊ ㅁㅂㅍ ㄴㄷㅌㄹ ㄱㅋ</div>
               <div>ㆍ ㅣ ㅡ ㅏ ㅓ ㅗ ㅜ ㅑ ㅕ ㅛ ㅠ</div>
