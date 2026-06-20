@@ -409,9 +409,39 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             <h1 className="text-2xl sm:text-3xl font-bold text-violet-900 tracking-tight">
               My Hangul Name
             </h1>
-            <p className="text-base text-violet-500 font-medium mt-0.5">내 한글 이름</p>
+            <p className="text-xl sm:text-2xl text-violet-500 font-semibold mt-1">내 한글 이름</p>
           </button>
         </div>
+
+        {/* Voice-first: prominent mic CTA (when supported) */}
+        {micSupported && (
+          <div className="flex flex-col items-center gap-2.5 mb-4">
+            <button
+              onClick={toggleMic}
+              aria-label={isListening ? (lang === "ko" ? "녹음 중지" : "Stop recording") : trv(SAY_NAME, lang)}
+              className={`flex items-center justify-center w-20 h-20 rounded-full transition shadow-lg
+                ${isListening
+                  ? "bg-red-500 text-white animate-pulse shadow-red-300/50"
+                  : "bg-violet-600 hover:bg-violet-500 text-white shadow-violet-300/40 hover:scale-105"}`}
+            >
+              {isListening ? (
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="6" width="12" height="12" rx="2" />
+                </svg>
+              ) : (
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="23" />
+                  <line x1="8" y1="23" x2="16" y2="23" />
+                </svg>
+              )}
+            </button>
+            <p className="text-sm font-medium text-violet-600">
+              {isListening ? trv(LISTENING, lang) : trv(SAY_NAME, lang)}
+            </p>
+          </div>
+        )}
 
         {/* Menu bar */}
         <div className="flex items-center justify-end mb-2">
@@ -554,36 +584,6 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             </div>
           </div>
         </div>
-
-        {/* Voice-first: prominent mic CTA (when supported) */}
-        {micSupported && (
-          <div className="flex flex-col items-center gap-2.5 mb-4">
-            <button
-              onClick={toggleMic}
-              aria-label={isListening ? (lang === "ko" ? "녹음 중지" : "Stop recording") : trv(SAY_NAME, lang)}
-              className={`flex items-center justify-center w-20 h-20 rounded-full transition shadow-lg
-                ${isListening
-                  ? "bg-red-500 text-white animate-pulse shadow-red-300/50"
-                  : "bg-violet-600 hover:bg-violet-500 text-white shadow-violet-300/40 hover:scale-105"}`}
-            >
-              {isListening ? (
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="6" y="6" width="12" height="12" rx="2" />
-                </svg>
-              ) : (
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                  <line x1="12" y1="19" x2="12" y2="23" />
-                  <line x1="8" y1="23" x2="16" y2="23" />
-                </svg>
-              )}
-            </button>
-            <p className="text-sm font-medium text-violet-600">
-              {isListening ? trv(LISTENING, lang) : trv(SAY_NAME, lang)}
-            </p>
-          </div>
-        )}
 
         {/* Input — type your name (secondary when voice is available) */}
         <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-violet-200 p-4 mb-3 shadow-sm transition-shadow focus-within:border-violet-400 focus-within:shadow-[0_0_0_3px_rgba(139,92,246,0.1)]">
