@@ -49,14 +49,31 @@ interface Result {
 }
 
 const JAMO_STEPS = [
+  // 홀소리(모음) 라인 먼저
+  { jamo: "ㅣㅡ", label: "모음" },
+  { jamo: "ㅏㅓㅑㅕ", label: "양성" },
+  { jamo: "ㅗㅜㅛㅠ", label: "음성" },
+  // 닿소리(자음) 라인
   { jamo: "ㅇㅎ", label: "후음" },
   { jamo: "ㅅㅈㅊ", label: "치음" },
   { jamo: "ㅁㅂㅍ", label: "순음" },
   { jamo: "ㄱㄴㄷㅌㄹ", label: "설음" },
-  { jamo: "ㅣㅡ", label: "모음" },
-  { jamo: "ㅏㅓㅑㅕ", label: "양성" },
-  { jamo: "ㅗㅜㅛㅠ", label: "음성" },
 ];
+
+// 진행 표시 도형: ㅇ(연한 하늘색 원) · ㅅ(연두색 세모) · ㅁ(연보라 네모) 3종을 순환
+const SHAPE_COLORS = ["#7dd3fc", "#86efac", "#c4b5fd"];
+function ProgressShape({ idx, active, prev }: { idx: number; active: boolean; prev: boolean }) {
+  const kind = idx % 3;
+  const color = SHAPE_COLORS[kind];
+  const motion = `${active ? "scale-125 opacity-100 drop-shadow-md" : prev ? "scale-105 opacity-70" : "scale-90 opacity-40"} transition-all duration-300`;
+  if (kind === 0) return <span className={`block w-4 h-4 rounded-full ${motion}`} style={{ background: color }} />;
+  if (kind === 2) return <span className={`block w-4 h-4 rounded-[3px] ${motion}`} style={{ background: color }} />;
+  return (
+    <svg className={`w-4 h-4 ${motion}`} viewBox="0 0 24 24" aria-hidden>
+      <polygon points="12,3 22,21 2,21" fill={color} />
+    </svg>
+  );
+}
 
 function SpeakerIcon({ active }: { active: boolean }) {
   return (
@@ -647,16 +664,17 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           <div className="flex items-center justify-center gap-3 py-6 mb-2">
             {JAMO_STEPS.map((step, idx) => (
               <div key={idx} className="flex flex-col items-center gap-1.5">
-                <div className={`w-4 h-4 rounded-full transition-all duration-300 ${
-                  idx === jamoIndex
-                    ? "bg-violet-500 shadow-lg shadow-violet-400/60 scale-125"
-                    : idx === (jamoIndex - 1 + JAMO_STEPS.length) % JAMO_STEPS.length
-                      ? "bg-violet-300 scale-105"
-                      : "bg-violet-100 scale-90"
-                }`} />
-                <span className={`text-[10px] font-medium transition-colors duration-300 ${
-                  idx === jamoIndex ? "text-violet-600" : "text-violet-300"
-                }`}>{step.jamo}</span>
+                <ProgressShape
+                  idx={idx}
+                  active={idx === jamoIndex}
+                  prev={idx === (jamoIndex - 1 + JAMO_STEPS.length) % JAMO_STEPS.length}
+                />
+                <span
+                  className={`text-[11px] font-medium transition-colors duration-300 ${
+                    idx === jamoIndex ? "text-violet-600" : "text-violet-300"
+                  }`}
+                  style={{ fontFamily: "EBSHunminjeongeum, serif" }}
+                >{step.jamo}</span>
               </div>
             ))}
           </div>
