@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FONTS, buildFontCanvas, downloadCanvasPng, type Font } from "@/lib/fontCanvas";
+import { FONTS, buildFontCanvas, downloadCanvasPng, saveCanvasImage, type Font } from "@/lib/fontCanvas";
 import ShareLinkModal from "@/components/ShareLinkModal";
 
 interface Props {
@@ -134,7 +134,7 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
     setDownloadingId(font.id);
     try {
       const canvas = await buildFontCanvas({ text: currentText, originalName: effectiveOriginal, font, colorize });
-      await downloadCanvasPng(canvas, `${currentText}_${font.id}.png`);
+      await saveCanvasImage(canvas, `${currentText}_${font.id}.png`);
       onLog?.({ type: "gallery_download_one", name: currentText, font: font.id, uiLang });
     } finally {
       setDownloadingId(null);
