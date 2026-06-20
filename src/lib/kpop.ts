@@ -125,11 +125,11 @@ export const ARTIST_MAP: Record<string, Artist> = Object.fromEntries(
   ARTISTS.map((a) => [a.slug, a]),
 );
 
-// ── Consonant ordering: ㅇㅎ → ㅅㅈㅊ → ㅁㅂㅍ → ㄴㄷㅌㄹ → ㄱㅋ ────────────────
+// ── Consonant ordering: ㅇㅎ · ㅅㅆㅈㅉㅊ · ㅁㅂㅃㅍ · ㄴㄷㄸㅌㄹ · ㄱㄲㅋ ─────────
 const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
-const GROUP_RANK: Record<string, number> = {};
-[["ㅇ","ㅎ"], ["ㅅ","ㅆ","ㅈ","ㅉ","ㅊ"], ["ㅁ","ㅂ","ㅃ","ㅍ"], ["ㄴ","ㄷ","ㄸ","ㅌ","ㄹ"], ["ㄱ","ㄲ","ㅋ"]]
-  .forEach((g, i) => g.forEach((c) => { GROUP_RANK[c] = i; }));
+const ORDER = "ㅇㅎㅅㅆㅈㅉㅊㅁㅂㅃㅍㄴㄷㄸㅌㄹㄱㄲㅋ";
+const RANK: Record<string, number> = {};
+[...ORDER].forEach((c, i) => { RANK[c] = i; });
 
 function firstChoseong(word: string): string | null {
   for (const ch of word) {
@@ -140,7 +140,7 @@ function firstChoseong(word: string): string | null {
 }
 function rank(word: string): number {
   const c = firstChoseong(word);
-  return c == null ? 99 : (GROUP_RANK[c] ?? 90);
+  return c == null ? 999 : (RANK[c] ?? 900);
 }
 export function byConsonant(words: string[]): string[] {
   return words.map((w, i) => ({ w, i })).sort((a, b) => rank(a.w) - rank(b.w) || a.i - b.i).map((x) => x.w);
