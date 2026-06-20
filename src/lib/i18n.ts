@@ -2,7 +2,7 @@ export const translations = {
   ko: {
     title: "내 이름을 한글로",
     subtitle: "어떤 언어의 이름이든 한글 발음으로",
-    placeholder: "예: 민준 · 지우 · 서연",
+    placeholder: "이름을 말하거나 입력하세요 (예: Caroline)",
     convert: "변환", converting: "분석중",
     copy: "복사", copied: "복사됨",
     listen: "한글 발음 듣기", listenOriginal: "원어 발음",
@@ -18,7 +18,7 @@ export const translations = {
   en: {
     title: "My Hangul Name",
     subtitle: "Get your name in Korean",
-    placeholder: "e.g. Caroline · Emma · Michael · Olivia",
+    placeholder: "Say or type your name, like Caroline",
     convert: "Convert", converting: "Analyzing",
     copy: "Copy", copied: "Copied!",
     listen: "Listen in Korean", listenOriginal: "Original",
@@ -34,7 +34,7 @@ export const translations = {
   zh: {
     title: "我的名字韩文版",
     subtitle: "将任何语言的姓名转换为韩文发音",
-    placeholder: "例: 李娜 · 王芳 · 习近平 · 张伟",
+    placeholder: "说出或输入你的名字，例如 Caroline",
     convert: "转换", converting: "分析中",
     copy: "复制", copied: "已复制",
     listen: "韩文发音", listenOriginal: "原语发音",
@@ -50,7 +50,7 @@ export const translations = {
   ja: {
     title: "自分の名前をハングルで",
     subtitle: "あらゆる言語の名前を韓国語発音に変換",
-    placeholder: "例: 田中 · 佐藤 · 鈴木 · 高橋",
+    placeholder: "名前を話すか入力してください（例: Caroline）",
     convert: "変換", converting: "解析中",
     copy: "コピー", copied: "コピー済",
     listen: "韓国語で聞く", listenOriginal: "原語の発音",
@@ -66,7 +66,7 @@ export const translations = {
   es: {
     title: "Mi nombre en hangul",
     subtitle: "Convierte cualquier nombre a pronunciación coreana",
-    placeholder: "Ej: María · Carlos · José · Carmen",
+    placeholder: "Di o escribe tu nombre, p. ej. Caroline",
     convert: "Convertir", converting: "Analizando",
     copy: "Copiar", copied: "¡Copiado!",
     listen: "Escuchar en coreano", listenOriginal: "Pronunciación original",
@@ -82,7 +82,7 @@ export const translations = {
   fr: {
     title: "Mon prénom en hangul",
     subtitle: "Convertissez n'importe quel nom en prononciation coréenne",
-    placeholder: "Ex: Marie · Pierre · Sophie · Jean",
+    placeholder: "Dites ou saisissez votre nom, ex. Caroline",
     convert: "Convertir", converting: "Analyse...",
     copy: "Copier", copied: "Copié !",
     listen: "Écouter en coréen", listenOriginal: "Prononciation originale",
@@ -98,7 +98,7 @@ export const translations = {
   de: {
     title: "Mein Name auf Hangul",
     subtitle: "Jeden Namen in koreanische Aussprache umwandeln",
-    placeholder: "z.B.: Anna · Michael · Lisa · Thomas",
+    placeholder: "Sag oder tippe deinen Namen, z. B. Caroline",
     convert: "Konvertieren", converting: "Analysiere...",
     copy: "Kopieren", copied: "Kopiert!",
     listen: "Auf Koreanisch hören", listenOriginal: "Originalaussprache",
@@ -114,7 +114,7 @@ export const translations = {
   ar: {
     title: "اسمي بالهانغول",
     subtitle: "تحويل أي اسم إلى النطق الكوري",
-    placeholder: "مثال: محمد · فاطمة · علي · عائشة",
+    placeholder: "قل أو اكتب اسمك، مثل Caroline",
     convert: "تحويل", converting: "جارٍ التحليل",
     copy: "نسخ", copied: "تم النسخ",
     listen: "استمع بالكورية", listenOriginal: "النطق الأصلي",
@@ -130,7 +130,7 @@ export const translations = {
   ru: {
     title: "Моё имя на хангыле",
     subtitle: "Конвертация любого имени в корейское произношение",
-    placeholder: "Напр.: Caroline · 习近平 · محمد",
+    placeholder: "Скажите или введите имя, напр. Caroline",
     convert: "Конвертировать", converting: "Анализ...",
     copy: "Копировать", copied: "Скопировано!",
     listen: "Слушать по-корейски", listenOriginal: "Оригинальное произношение",
@@ -146,7 +146,7 @@ export const translations = {
   pt: {
     title: "Meu nome em hangul",
     subtitle: "Converta qualquer nome para pronúncia coreana",
-    placeholder: "Ex: Caroline · 习近平 · محمد",
+    placeholder: "Diga ou digite seu nome, ex. Caroline",
     convert: "Converter", converting: "Analisando",
     copy: "Copiar", copied: "Copiado!",
     listen: "Ouvir em coreano", listenOriginal: "Pronúncia original",
@@ -162,7 +162,7 @@ export const translations = {
   vi: {
     title: "Tên tôi bằng Hangul",
     subtitle: "Chuyển đổi tên từ mọi ngôn ngữ sang tiếng Hàn",
-    placeholder: "VD: Caroline · 习近平 · 安倍晋三 · محمد",
+    placeholder: "Nói hoặc nhập tên của bạn, ví dụ Caroline",
     convert: "Chuyển đổi", converting: "Đang phân tích",
     copy: "Sao chép", copied: "Đã sao chép!",
     listen: "Nghe tiếng Hàn", listenOriginal: "Phát âm gốc",
@@ -178,7 +178,7 @@ export const translations = {
   id: {
     title: "Nama Saya dalam Hangul",
     subtitle: "Konversi nama dari bahasa apapun ke pengucapan Korea",
-    placeholder: "Mis: Caroline · 习近平 · 安倍晋三 · محمد",
+    placeholder: "Ucapkan atau ketik nama Anda, mis. Caroline",
     convert: "Konversi", converting: "Menganalisis",
     copy: "Salin", copied: "Disalin!",
     listen: "Dengar dalam Korea", listenOriginal: "Pengucapan asli",
@@ -194,7 +194,7 @@ export const translations = {
   th: {
     title: "ชื่อของฉันเป็นฮันกึล",
     subtitle: "แปลงชื่อจากทุกภาษาเป็นการออกเสียงภาษาเกาหลี",
-    placeholder: "เช่น: Caroline · 习近平 · 安倍晋三 · محمد",
+    placeholder: "พูดหรือพิมพ์ชื่อของคุณ เช่น Caroline",
     convert: "แปลง", converting: "กำลังวิเคราะห์",
     copy: "คัดลอก", copied: "คัดลอกแล้ว!",
     listen: "ฟังเป็นภาษาเกาหลี", listenOriginal: "เสียงต้นฉบับ",
@@ -210,7 +210,7 @@ export const translations = {
   ms: {
     title: "Nama Saya dalam Hangul",
     subtitle: "Tukar nama dari mana-mana bahasa ke sebutan Korea",
-    placeholder: "Cth: Caroline · 习近平 · 安倍晋三 · محمد",
+    placeholder: "Sebut atau taip nama anda, cth. Caroline",
     convert: "Tukar", converting: "Menganalisis",
     copy: "Salin", copied: "Disalin!",
     listen: "Dengar dalam Korea", listenOriginal: "Sebutan asal",
@@ -226,7 +226,7 @@ export const translations = {
   hi: {
     title: "मेरा नाम हांगुल में",
     subtitle: "किसी भी भाषा के नाम को कोरियाई उच्चारण में बदलें",
-    placeholder: "उदा: Caroline · 习近平 · 安倍晋三 · محمد",
+    placeholder: "अपना नाम बोलें या लिखें, जैसे Caroline",
     convert: "बदलें", converting: "विश्लेषण हो रहा है",
     copy: "कॉपी करें", copied: "कॉपी हो गया!",
     listen: "कोरियाई में सुनें", listenOriginal: "मूल उच्चारण",
@@ -242,7 +242,7 @@ export const translations = {
   bn: {
     title: "হাঙ্গুলে আমার নাম",
     subtitle: "যেকোনো ভাষার নাম কোরিয়ান উচ্চারণে রূপান্তর করুন",
-    placeholder: "যেমন: Caroline · 习近平 · 安倍晋三 · محمد",
+    placeholder: "আপনার নাম বলুন বা টাইপ করুন, যেমন Caroline",
     convert: "রূপান্তর", converting: "বিশ্লেষণ হচ্ছে",
     copy: "কপি", copied: "কপি হয়েছে!",
     listen: "কোরিয়ানে শুনুন", listenOriginal: "মূল উচ্চারণ",
@@ -258,7 +258,7 @@ export const translations = {
   tl: {
     title: "Ang Aking Pangalan sa Hangul",
     subtitle: "I-convert ang pangalan mula sa anumang wika sa Korean",
-    placeholder: "Hal: Caroline · 习近平 · 安倍晋三 · محمد",
+    placeholder: "Sabihin o i-type ang pangalan mo, hal. Caroline",
     convert: "I-convert", converting: "Sinusuri",
     copy: "Kopyahin", copied: "Nakopya na!",
     listen: "Pakinggan sa Korean", listenOriginal: "Orihinal na pagbigkas",
@@ -274,7 +274,7 @@ export const translations = {
   my: {
     title: "ဟန်ဂူးဖြင့် ကျွန်ုပ်အမည်",
     subtitle: "မည်သည့်ဘာသာစကား နာမည်မဆို ကိုရီးယားအသံထွက်သို့ ပြောင်းရန်",
-    placeholder: "ဥပမာ: Caroline · 习近平 · محمد",
+    placeholder: "သင့်နာမည်ကို ပြောပါ သို့မဟုတ် ရိုက်ထည့်ပါ (ဥပမာ Caroline)",
     convert: "ပြောင်းရန်", converting: "ခွဲခြမ်းနေသည်",
     copy: "ကူးယူ", copied: "ကူးယူပြီး!",
     listen: "ကိုရီးယားဖြင့်နားထောင်ရန်", listenOriginal: "မူရင်းအသံ",
@@ -290,7 +290,7 @@ export const translations = {
   mn: {
     title: "Миний нэр хангулаар",
     subtitle: "Аль ч хэлний нэрийг Солонгос дуудлагаар хөрвүүл",
-    placeholder: "Жш: Caroline · 习近平 · 安倍晋三 · محمد",
+    placeholder: "Нэрээ хэлэх эсвэл бичнэ үү, жнь Caroline",
     convert: "Хөрвүүлэх", converting: "Шинжилж байна",
     copy: "Хуулах", copied: "Хуулсан!",
     listen: "Солонгосоор сонсох", listenOriginal: "Эх дуудлага",
