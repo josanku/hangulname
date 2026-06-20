@@ -60,8 +60,9 @@ const JAMO_STEPS = [
   { jamo: "ㄱㄴㄷㅌㄹ", label: "설음" },
 ];
 
-// 진행 표시 도형: ㅇ(연한 하늘색 원) · ㅅ(연두색 세모) · ㅁ(연보라 네모) 3종을 순환
-const SHAPE_COLORS = ["#7dd3fc", "#86efac", "#c4b5fd"];
+// 진행 표시 도형: ㅇ(원)·ㅅ(세모)·ㅁ(네모) 한 쌍을 3쌍 — 파스텔 blue·green·red
+const PROGRESS_LEN = 9; // 3 triples
+const SHAPE_COLORS = ["#93c5fd", "#86efac", "#fca5a5"]; // blue / green / red (pastel)
 function ProgressShape({ idx, active, prev }: { idx: number; active: boolean; prev: boolean }) {
   const kind = idx % 3;
   const color = SHAPE_COLORS[kind];
@@ -319,7 +320,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
     let idx = 0;
     const jamoInterval = setInterval(() => {
-      idx = (idx + 1) % JAMO_STEPS.length;
+      idx = (idx + 1) % PROGRESS_LEN;
       setJamoIndex(idx);
     }, 220);
 
@@ -669,22 +670,22 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         </div>
         )}
 
-        {/* Loading progress indicator */}
+        {/* Loading progress indicator — 3 sets of ㅇ·ㅅ·ㅁ (원세네 세쌍) */}
         {loading && (
-          <div className="flex items-center justify-center gap-3 py-6 mb-2">
-            {JAMO_STEPS.map((step, idx) => (
-              <div key={idx} className="flex flex-col items-center gap-1.5">
-                <ProgressShape
-                  idx={idx}
-                  active={idx === jamoIndex}
-                  prev={idx === (jamoIndex - 1 + JAMO_STEPS.length) % JAMO_STEPS.length}
-                />
-                <span
-                  className={`text-[11px] font-medium transition-colors duration-300 ${
-                    idx === jamoIndex ? "text-violet-600" : "text-violet-300"
-                  }`}
-                  style={{ fontFamily: "EBSHunminjeongeum, serif" }}
-                >{step.jamo}</span>
+          <div className="flex items-center justify-center gap-4 py-6 mb-2">
+            {[0, 1, 2].map((g) => (
+              <div key={g} className="flex items-end gap-1.5">
+                {[0, 1, 2].map((s) => {
+                  const i = g * 3 + s;
+                  return (
+                    <ProgressShape
+                      key={i}
+                      idx={i}
+                      active={i === jamoIndex}
+                      prev={i === (jamoIndex - 1 + PROGRESS_LEN) % PROGRESS_LEN}
+                    />
+                  );
+                })}
               </div>
             ))}
           </div>
