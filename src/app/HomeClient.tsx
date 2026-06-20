@@ -738,26 +738,17 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         </div>
         )}
 
-        {/* Discover — Korean Words to Know */}
+        {/* Discover — small text link */}
         {showInput && (
-          <a
-            href="/korean-words"
-            onClick={() => logAction({ type: "korean_words_click", source: "home_card", uiLang: lang })}
-            className="flex items-center gap-3 mb-8 bg-white/80 hover:bg-white border border-violet-200 hover:border-violet-300 rounded-xl px-4 py-3 shadow-sm hover:shadow transition"
-          >
-            <span className="text-2xl shrink-0">📚</span>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-violet-900">
-                {lang === "ko" ? "알아두면 좋은 한글 단어" : "Korean Words to Know"}
-              </div>
-              <div className="text-xs text-violet-400 truncate">
-                {lang === "ko" ? "옥스포드 사전 · K-POP · 아름다운 한글" : "Oxford dictionary · K-pop · beautiful Hangul"}
-              </div>
-            </div>
-            <svg className="w-4 h-4 text-violet-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </a>
+          <div className="text-center mb-8">
+            <a
+              href="/korean-words"
+              onClick={() => logAction({ type: "korean_words_click", source: "home_link", uiLang: lang })}
+              className="text-xs text-violet-400 hover:text-violet-600 underline underline-offset-2 transition"
+            >
+              {lang === "ko" ? "알아두면 좋은 한글 단어 · K-POP · 아름다운 한글 →" : "Korean words to know · K-pop · beautiful Hangul →"}
+            </a>
+          </div>
         )}
 
         {/* Error */}
@@ -980,24 +971,6 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
         {/* Footer */}
         <footer className="mt-12 pb-6 text-center" dir="ltr">
-          {/* Internal links — crawlable site navigation */}
-          <nav className="flex flex-wrap justify-center gap-x-3 gap-y-1.5 mb-7 text-xs text-violet-400">
-            <a href="/hangul-name" className="hover:text-violet-600 transition">About</a>
-            <span className="text-violet-200">·</span>
-            <a href="/korean-words" className="hover:text-violet-600 transition">Korean Words</a>
-            <span className="text-violet-200">·</span>
-            <a href="/name" className="hover:text-violet-600 transition">Names in Korean</a>
-            <span className="text-violet-200">·</span>
-            <a href="/bts" className="hover:text-violet-600 transition">BTS</a>
-            <span className="text-violet-200">·</span>
-            <a href="/iu" className="hover:text-violet-600 transition">IU</a>
-            <span className="text-violet-200">·</span>
-            <a href="/gallery" className="hover:text-violet-600 transition">Hangul Art</a>
-            <span className="text-violet-200">·</span>
-            <a href="/learn-hangul" className="hover:text-violet-600 transition">Learn Hangul</a>
-            <span className="text-violet-200">·</span>
-            <a href="/api-docs" className="hover:text-violet-600 transition">API</a>
-          </nav>
           <a
             href="https://wehome.me"
             target="_blank"
