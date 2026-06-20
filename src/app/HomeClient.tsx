@@ -986,6 +986,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             <span className="text-violet-200">·</span>
             <a href="/korean-words" className="hover:text-violet-600 transition">Korean Words</a>
             <span className="text-violet-200">·</span>
+            <a href="/name" className="hover:text-violet-600 transition">Names in Korean</a>
+            <span className="text-violet-200">·</span>
             <a href="/bts" className="hover:text-violet-600 transition">BTS</a>
             <span className="text-violet-200">·</span>
             <a href="/iu" className="hover:text-violet-600 transition">IU</a>
