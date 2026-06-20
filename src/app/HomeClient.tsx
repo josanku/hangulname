@@ -934,6 +934,22 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
 
         {/* Footer */}
         <footer className="mt-12 pb-6 text-center" dir="ltr">
+          {/* Internal links — crawlable site navigation */}
+          <nav className="flex flex-wrap justify-center gap-x-3 gap-y-1.5 mb-7 text-xs text-violet-400">
+            <a href="/hangul-name" className="hover:text-violet-600 transition">About</a>
+            <span className="text-violet-200">·</span>
+            <a href="/korean-words" className="hover:text-violet-600 transition">Korean Words</a>
+            <span className="text-violet-200">·</span>
+            <a href="/bts" className="hover:text-violet-600 transition">BTS</a>
+            <span className="text-violet-200">·</span>
+            <a href="/iu" className="hover:text-violet-600 transition">IU</a>
+            <span className="text-violet-200">·</span>
+            <a href="/gallery" className="hover:text-violet-600 transition">Hangul Art</a>
+            <span className="text-violet-200">·</span>
+            <a href="/learn-hangul" className="hover:text-violet-600 transition">Learn Hangul</a>
+            <span className="text-violet-200">·</span>
+            <a href="/api-docs" className="hover:text-violet-600 transition">API</a>
+          </nav>
           <a
             href="https://wehome.me"
             target="_blank"

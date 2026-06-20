@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { byConsonant } from "@/lib/kpop";
+import { byConsonant, ARTISTS } from "@/lib/kpop";
 
 const BASE = "https://myhangulname.com";
 
@@ -67,9 +67,18 @@ function Section({ emoji, title, sub, words }: { emoji: string; title: string; s
   );
 }
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Korean Words to Know",
+  url: `${BASE}/korean-words`,
+  hasPart: ARTISTS.map((a) => ({ "@type": "MusicGroup", name: a.en, alternateName: a.ko, url: `${BASE}/${a.slug}` })),
+};
+
 export default function KoreanWordsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-violet-50 via-white to-purple-50/50 p-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="max-w-2xl mx-auto pt-6">
         <Link
           href="/"
