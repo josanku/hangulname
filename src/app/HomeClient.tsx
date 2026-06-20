@@ -142,6 +142,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   const [artText, setArtText] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [micSupported, setMicSupported] = useState(false);
+  // input area collapses after a conversion; user can expand it again
+  const [showInput, setShowInput] = useState(true);
   const recognitionRef = useRef<MinimalSpeechRecognition | null>(null);
   // Always points at the latest convert() so the (mount-time) mic handler isn't stale
   const convertRef = useRef<(name?: string) => void>(() => {});
@@ -281,6 +283,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     setError("");
     setFeedback(null);
     setCurrentInput("");
+    setShowInput(true);
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
     logAction({ type: "go_home", uiLang: lang });
   };
@@ -314,6 +317,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
       if (!res.ok) throw new Error(data.error);
       setResult(data);
       setCurrentInput(name);
+      setShowInput(false); // collapse the input area after a successful conversion
 
       const next = count + 1;
       setCount(next);
@@ -414,7 +418,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         </div>
 
         {/* Voice-first: prominent mic CTA (when supported) */}
-        {micSupported && (
+        {showInput && micSupported && (
           <div className="flex flex-col items-center gap-2.5 mb-4">
             <button
               onClick={toggleMic}
@@ -585,7 +589,23 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
           </div>
         </div>
 
-        {/* Input — type your name (secondary when voice is available) */}
+        {/* Input — type your name (collapses after a conversion) */}
+        {!showInput ? (
+          <button
+            onClick={() => setShowInput(true)}
+            className="w-full flex items-center justify-center gap-2 bg-white/70 hover:bg-white border border-violet-200 rounded-xl px-4 py-2.5 mb-4 text-sm text-violet-500 hover:text-violet-700 transition"
+          >
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+            </svg>
+            <span className="truncate">
+              {currentInput
+                ? `${currentInput} — ${lang === "ko" ? "다른 이름 입력" : "try another name"}`
+                : (lang === "ko" ? "이름 입력하기" : "Enter a name")}
+            </span>
+          </button>
+        ) : (
         <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-violet-200 p-4 mb-3 shadow-sm transition-shadow focus-within:border-violet-400 focus-within:shadow-[0_0_0_3px_rgba(139,92,246,0.1)]">
           <div className="flex gap-2 items-center">
             <input
@@ -620,6 +640,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             </button>
           </div>
         </div>
+        )}
 
         {/* Loading progress indicator */}
         {loading && (
@@ -642,6 +663,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         )}
 
         {/* Quick Examples */}
+        {showInput && (
         <div className="flex flex-wrap justify-center gap-1.5 mb-8">
           {[
             { text: "한글", emoji: "📖" },
@@ -663,6 +685,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             </button>
           ))}
         </div>
+        )}
 
         {/* Error */}
         {error && (
@@ -674,10 +697,6 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         {/* Results */}
         {result && (
           <div className="grid gap-3">
-            {result.origin && (
-              <p className="text-xs text-violet-400 px-1">{result.origin}</p>
-            )}
-
             {/* 원어 발음 카드 */}
             <div className="bg-violet-50/60 border border-violet-200 rounded-xl px-4 py-3 flex items-center gap-3">
               <div className="flex-1 min-w-0">
@@ -699,6 +718,11 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
                 <SpeakerIcon active={playing === "original"} />
               </button>
             </div>
+
+            {/* 입력한 이름에 대한 설명은 카드 아래에 */}
+            {result.origin && (
+              <p className="text-xs text-violet-400 px-1 -mt-1">{result.origin}</p>
+            )}
 
             {/* 한글 변환 카드들 */}
             {result.variants.map((v, i) => {
