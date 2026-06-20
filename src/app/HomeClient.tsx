@@ -11,6 +11,8 @@ import NameCardModal from "@/components/NameCardModal";
 import ShareLinkModal from "@/components/ShareLinkModal";
 import KoreaBackground from "@/components/KoreaBackground";
 import FeedbackButton from "@/components/FeedbackButton";
+import { wordForDay } from "@/lib/wordOfDay";
+import type { SoundEntry } from "@/lib/sounds";
 
 type AboutKey = "hangulname" | "hunminjeong" | "wehome" | "faq";
 type ShareKind = "site" | "result";
@@ -160,6 +162,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   const [galleryText, setGalleryText] = useState<string | null>(null);
   const [artText, setArtText] = useState<string | null>(null);
   const [cardData, setCardData] = useState<{ korean: string; original: string; pronun?: string; tagline?: string } | null>(null);
+  const [wotd, setWotd] = useState<SoundEntry | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [micSupported, setMicSupported] = useState(false);
   // input area collapses after a conversion; user can expand it again
@@ -181,6 +184,9 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
       // ignore
     }
   }, []);
+
+  // Word of the day (computed client-side so it changes at KST midnight)
+  useEffect(() => { setWotd(wordForDay()); }, []);
 
   useEffect(() => {
     const ua = navigator.userAgent;
@@ -746,6 +752,28 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             </button>
           ))}
         </div>
+        )}
+
+        {/* Word of the day — click opens the font gallery; changes daily at KST midnight */}
+        {showInput && wotd && (
+          <div className="text-center mb-3">
+            <div className="text-[11px] text-violet-400 mb-1">{lang === "ko" ? "오늘의 한글 단어" : "Word of the day"}</div>
+            <button
+              onClick={() => {
+                setGalleryText(wotd.word);
+                logAction({ type: "wotd_click", name: wotd.word, uiLang: lang });
+              }}
+              className="inline-flex items-baseline gap-2 bg-white border border-violet-200 hover:border-violet-300 rounded-full px-4 py-1.5 shadow-sm hover:shadow transition"
+            >
+              <span className="text-base font-bold text-violet-900" lang="ko">{wotd.word}</span>
+              <span className="text-[11px] text-slate-400">{wotd.en || wotd.romaja}</span>
+            </button>
+            <div className="mt-1">
+              <a href="/word-of-the-day" className="text-[10px] text-violet-300 hover:text-violet-500 underline underline-offset-2">
+                {lang === "ko" ? "뜻·용례 보기 →" : "meaning & example →"}
+              </a>
+            </div>
+          </div>
         )}
 
         {/* Discover — small text link */}
