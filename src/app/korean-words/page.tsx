@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { byConsonant } from "@/lib/kpop";
 
 const BASE = "https://myhangulname.com";
 
@@ -16,33 +17,10 @@ export const metadata: Metadata = {
   },
 };
 
-// ── Consonant ordering: ㅇㅎ → ㅅㅈㅊ → ㅁㅂㅍ → ㄴㄷㅌㄹ → ㄱㅋ ──────────────
-const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
-const GROUP_RANK: Record<string, number> = {};
-[["ㅇ","ㅎ"], ["ㅅ","ㅆ","ㅈ","ㅉ","ㅊ"], ["ㅁ","ㅂ","ㅃ","ㅍ"], ["ㄴ","ㄷ","ㄸ","ㅌ","ㄹ"], ["ㄱ","ㄲ","ㅋ"]]
-  .forEach((g, i) => g.forEach((c) => { GROUP_RANK[c] = i; }));
-
-function firstChoseong(word: string): string | null {
-  for (const ch of word) {
-    const code = ch.codePointAt(0)!;
-    if (code >= 0xac00 && code <= 0xd7a3) return CHO[Math.floor((code - 0xac00) / 588)];
-  }
-  return null;
-}
-function rank(word: string): number {
-  const c = firstChoseong(word);
-  return c == null ? 99 : (GROUP_RANK[c] ?? 90);
-}
-function byConsonant(words: string[]): string[] {
-  return words
-    .map((w, i) => ({ w, i }))
-    .sort((a, b) => rank(a.w) - rank(b.w) || a.i - b.i)
-    .map((x) => x.w);
-}
 
 // ── Curated data ─────────────────────────────────────────────────────────────
 const OED = ["한류","대박","먹방","애교","오빠","언니","누나","반찬","불고기","삼겹살","갈비","잡채","김밥","동치미","김치","막걸리","소주","한복","온돌","태권도","콩글리시","만화","트로트","스킨십","파이팅"];
-const CELEBS = ["세종대왕","이순신","유관순","안중근","김구","김연아","손흥민","박지성","류현진","봉준호","박찬욱","백종원","유재석","강호동","싸이"];
+const CELEBS = ["세종대왕","이순신","유관순","안중근","김구","한강","손흥민","이강인","김민재","황희찬","봉준호","박찬욱","송강호","이정재","마동석","박서준","차은우","임영웅","안세영","신유빈","김연아","김연경","박지성","류현진","백종원","유재석"];
 const SONGS = ["강남스타일","봄날","좋은 날","벚꽃 엔딩","사건의 지평선","밤편지","첫사랑","너의 의미","빨간 맛","가시나","사랑을 했다","밤하늘의 별을"];
 const POPULAR = ["사랑","안녕","감사","행복","친구","오빠","대박","김치","한국","화이팅","예쁘다","맛있다"];
 const BEAUTIFUL = ["윤슬","미리내","노을","달빛","햇살","이슬","바람","하늘","별빛","단비","시나브로","그루잠","아름드리","산들바람","마음"];
