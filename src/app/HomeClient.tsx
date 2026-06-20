@@ -165,6 +165,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
   const [wotd, setWotd] = useState<SoundEntry | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [micSupported, setMicSupported] = useState(false);
+  const [micHint, setMicHint] = useState("");
   // input area collapses after a conversion; user can expand it again
   const [showInput, setShowInput] = useState(true);
   const recognitionRef = useRef<MinimalSpeechRecognition | null>(null);
@@ -247,45 +248,64 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Speech Recognition (STT) setup ──────────────────────────────────────────
+  // ── Speech Recognition (STT) — detect support only ──────────────────────────
   useEffect(() => {
     if (typeof window === "undefined") return;
     const w = window as unknown as { SpeechRecognition?: SRConstructor; webkitSpeechRecognition?: SRConstructor };
+    setMicSupported(!!(w.SpeechRecognition ?? w.webkitSpeechRecognition));
+    return () => { try { recognitionRef.current?.abort(); } catch { /* noop */ } };
+  }, []);
+
+  // Create a fresh recognition instance per start (a reused one gets stuck on
+  // mobile, esp. iOS) and surface errors so taps never silently do nothing.
+  const startMic = () => {
+    const w = window as unknown as { SpeechRecognition?: SRConstructor; webkitSpeechRecognition?: SRConstructor };
     const SR = w.SpeechRecognition ?? w.webkitSpeechRecognition;
-    if (!SR) { setMicSupported(false); return; }
-    setMicSupported(true);
+    if (!SR) return;
+    try { recognitionRef.current?.abort(); } catch { /* noop */ }
+
     const rec = new SR();
+    rec.lang = SPEECH_LANG[lang] ?? "en-US";
     rec.continuous = false;
     rec.interimResults = false;
     rec.onresult = (event) => {
       const transcript = event.results[0]?.[0]?.transcript ?? "";
       const cleaned = transcript.replace(/[.,]/g, "").trim();
       setIsListening(false);
-      // Voice-first: speaking a name converts it immediately
       if (cleaned) convertRef.current(cleaned);
     };
-    rec.onerror = () => setIsListening(false);
+    rec.onerror = (e) => {
+      setIsListening(false);
+      const err = (e as { error?: string })?.error;
+      if (err === "not-allowed" || err === "service-not-allowed") {
+        setMicHint(lang === "ko" ? "마이크 권한을 허용해 주세요" : "Please allow microphone access");
+      } else if (err === "no-speech") {
+        setMicHint(lang === "ko" ? "소리가 안 들렸어요. 다시 시도하거나 입력하세요" : "Didn't catch that — try again or type");
+      } else if (err && err !== "aborted") {
+        setMicHint(lang === "ko" ? "음성 인식이 어려워요. 아래에 입력해 주세요" : "Voice input unavailable — please type below");
+      }
+    };
     rec.onend = () => setIsListening(false);
     recognitionRef.current = rec;
-    return () => { try { rec.abort(); } catch { /* noop */ } };
-  }, []);
 
-  const toggleMic = () => {
-    const rec = recognitionRef.current;
-    if (!rec) return;
-    if (isListening) {
-      try { rec.stop(); } catch { /* noop */ }
-      setIsListening(false);
-      return;
-    }
-    rec.lang = SPEECH_LANG[lang] ?? "en-US";
     try {
       rec.start();
       setIsListening(true);
+      setMicHint("");
       logAction({ type: "mic_start", uiLang: lang, speechLang: rec.lang });
     } catch {
       setIsListening(false);
+      setMicHint(lang === "ko" ? "음성 인식을 시작할 수 없어요. 아래에 입력해 주세요" : "Couldn't start voice — please type below");
     }
+  };
+
+  const toggleMic = () => {
+    if (isListening) {
+      try { recognitionRef.current?.stop(); } catch { /* noop */ }
+      setIsListening(false);
+      return;
+    }
+    startMic();
   };
 
   const openGallery = (text: string) => {
@@ -470,6 +490,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             <p className="text-sm font-medium text-violet-600">
               {isListening ? trv(LISTENING, lang) : trv(SAY_NAME, lang)}
             </p>
+            {micHint && <p className="text-xs text-rose-400 mt-1">{micHint}</p>}
           </div>
         )}
 
