@@ -389,9 +389,6 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             </h1>
             <p className="text-base text-violet-500 font-medium mt-0.5">내 한글 이름</p>
           </button>
-          <p className="text-sm text-violet-400 mt-2">
-            {t.subtitle}
-          </p>
         </div>
 
         {/* Menu bar */}
