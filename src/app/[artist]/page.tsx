@@ -61,8 +61,32 @@ export default async function ArtistPage({ params }: { params: Promise<{ artist:
   // other artists for the footer nav
   const others = ARTISTS.filter((x) => x.slug !== a.slug);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": a.type === "group" ? "MusicGroup" : "Person",
+        name: a.en,
+        alternateName: a.ko,
+        url: `${BASE}/${a.slug}`,
+        ...(a.type === "group" && a.members?.length
+          ? { member: a.members.map((m) => ({ "@type": "Person", name: m })) }
+          : {}),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "My Hangul Name", item: BASE },
+          { "@type": "ListItem", position: 2, name: "Korean Words", item: `${BASE}/korean-words` },
+          { "@type": "ListItem", position: 3, name: a.en, item: `${BASE}/${a.slug}` },
+        ],
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-violet-100 via-white to-purple-50/50 p-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="max-w-2xl mx-auto pt-6">
         <Link
           href="/korean-words"
