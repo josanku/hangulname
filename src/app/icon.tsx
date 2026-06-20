@@ -16,31 +16,32 @@ export default async function Icon() {
           width: 64, height: 64,
           borderRadius: 14,
           background: "white",
-          border: "2.5px solid #e2e8f0",
+          border: "2px solid #ddd6fe",
           display: "flex",
           position: "relative",
           overflow: "hidden",
         }}
       >
+        {/* "한" = ㅎ(파랑) + ㅏ(초록) + ㄴ(빨강) — 자모 색상 규칙과 동일 */}
         {/* ㅎ — 파랑 */}
         <div style={{
-          position: "absolute", top: 1, left: 4,
-          fontSize: 28, fontWeight: 700,
-          color: "#3b82f6", fontFamily: "NanumGothic", lineHeight: 1,
+          position: "absolute", top: 0, left: 6,
+          fontSize: 32, fontWeight: 700,
+          color: "#2563eb", fontFamily: "NanumGothic", lineHeight: 1,
           display: "flex",
         }}>ㅎ</div>
-        {/* ㅏ — 라임 */}
+        {/* ㅏ — 초록 */}
         <div style={{
-          position: "absolute", top: 14, right: 5,
-          fontSize: 23, fontWeight: 700,
-          color: "#65a30d", fontFamily: "NanumGothic", lineHeight: 1,
+          position: "absolute", top: 9, right: 6,
+          fontSize: 33, fontWeight: 700,
+          color: "#16a34a", fontFamily: "NanumGothic", lineHeight: 1,
           display: "flex",
         }}>ㅏ</div>
         {/* ㄴ — 빨강 */}
         <div style={{
-          position: "absolute", bottom: 2, left: 5,
-          fontSize: 23, fontWeight: 700,
-          color: "#ef4444", fontFamily: "NanumGothic", lineHeight: 1,
+          position: "absolute", bottom: 0, left: 6,
+          fontSize: 31, fontWeight: 700,
+          color: "#dc2626", fontFamily: "NanumGothic", lineHeight: 1,
           display: "flex",
         }}>ㄴ</div>
       </div>

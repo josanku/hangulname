@@ -5,7 +5,32 @@
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(xargs kill)",
+      "Bash(npx next *)",
+      "Skill(deep-research)",
+      "Skill(deep-research:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "Bash(git checkout *)",
+      "Bash(gh pr create --title '한글폰트\\(상상꽃길체\\) 추가 · 폰트 갤러리 우선 노출 · 브랜딩 리프레시' --body ' *)",
+      "Bash(gh pr *)",
+      "Bash(git pull *)",
+      "Bash(git fetch *)",
+      "Bash(git merge *)",
+      "Bash(cd /tmp && npm i @napi-rs/canvas >/dev/null 2>&1 && echo \"installed\"; ls /System/Library/Fonts/Supplemental/ 2>/dev/null | grep -iE \"gothic|nanum|apple\" | head; ls /Library/Fonts /System/Library/Fonts 2>/dev/null | grep -iE \"AppleSDGothic|Apple\" | head)",
+      "Read(//System/Library/Fonts/Supplemental/**)",
+      "Read(//Library/Fonts/**)",
+      "Bash(curl -s -o /dev/null -w \"HTTP:%{http_code}\\\\n\" https://name.hangulmaru.com)",
+      "Bash(node -e ' *)",
+      "Bash(curl -sS -o /dev/null -w \"/favicon.ico HTTP:%{http_code} type:%{content_type} size:%{size_download}\\\\n\" https://myhangulname.com/favicon.ico)",
+      "Bash(curl -sS -o /dev/null -w \"/icon HTTP:%{http_code} type:%{content_type} size:%{size_download}\\\\n\" https://myhangulname.com/icon)",
+      "Bash(curl -sf -o /tmp/icon.png \"http://localhost:3000/icon\")",
+      "Bash(break)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(pkill -f \"next-server\")",
+      "Bash(git rm *)"
     ]
   }
 }
