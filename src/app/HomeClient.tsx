@@ -848,8 +848,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             />
             <p className="text-violet-500 text-sm font-medium mt-2.5">Your Home in Korea</p>
             <p className="text-violet-400 text-xs mt-0.5">Live Locally, Stay Safely.</p>
-            <p className="text-violet-300 text-[10px] leading-relaxed max-w-xs mx-auto mt-2.5">
-              Powered by <span className="font-semibold text-violet-400">Wehome.me</span>, Korea&apos;s only government-authorized home sharing platform.
+            <p className="text-slate-400 text-[10px] leading-relaxed max-w-xs mx-auto mt-2.5">
+              Powered by Wehome.me, Korea&apos;s only government-authorized home sharing platform.
             </p>
           </a>
         </footer>
