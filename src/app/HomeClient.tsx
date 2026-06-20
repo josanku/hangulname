@@ -736,6 +736,28 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         </div>
         )}
 
+        {/* Discover — Korean Words to Know */}
+        {showInput && (
+          <a
+            href="/korean-words"
+            onClick={() => logAction({ type: "korean_words_click", source: "home_card", uiLang: lang })}
+            className="flex items-center gap-3 mb-8 bg-white/80 hover:bg-white border border-violet-200 hover:border-violet-300 rounded-xl px-4 py-3 shadow-sm hover:shadow transition"
+          >
+            <span className="text-2xl shrink-0">📚</span>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold text-violet-900">
+                {lang === "ko" ? "알아두면 좋은 한글 단어" : "Korean Words to Know"}
+              </div>
+              <div className="text-xs text-violet-400 truncate">
+                {lang === "ko" ? "옥스포드 사전 · K-POP · 아름다운 한글" : "Oxford dictionary · K-pop · beautiful Hangul"}
+              </div>
+            </div>
+            <svg className="w-4 h-4 text-violet-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </a>
+        )}
+
         {/* Error */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
