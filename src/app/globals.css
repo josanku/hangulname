@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&family=Black+Han+Sans&family=Gaegu:wght@700&family=Do+Hyeon&family=Jua&family=Yeon+Sung&family=Kirang+Haerang&family=Nanum+Pen+Script&family=Gugi&family=Gamja+Flower&family=Hi+Melody&family=Single+Day&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Nanum+Brush+Script&family=Black+Han+Sans&family=Gaegu:wght@700&family=Do+Hyeon&family=Jua&family=Yeon+Sung&family=Kirang+Haerang&family=Nanum+Pen+Script&family=Gugi&family=Gamja+Flower&family=Hi+Melody&family=Single+Day&display=swap');
 @import "tailwindcss";
 
 @keyframes hg-fadeout {
@@ -7,7 +7,7 @@
 }
 
 :root { --background: #ffffff; --foreground: #171717; }
-body { background: var(--background); color: var(--foreground); font-family: 'NanumGothic', Arial, sans-serif; }
+body { background: var(--background); color: var(--foreground); font-family: 'Jost', 'NanumGothic', Arial, sans-serif; }
 
 /* ── 자체 호스팅 폰트 (public/fonts/) ── */
 
