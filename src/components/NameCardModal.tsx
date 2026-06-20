@@ -74,7 +74,7 @@ export default function NameCardModal({ korean, original, pronun, tagline, isKo,
         await navigator.share({
           files: [file],
           title: `${korean} — My Hangul Name`,
-          text: isKo ? `${original} → ${korean} 🇰🇷 내 한글 이름 카드!` : `${original} → ${korean} 🇰🇷 My name in Korean!`,
+          text: isKo ? `${original} → ${korean} 🇰🇷 나의 한글 이름 카드!` : `${original} → ${korean} 🇰🇷 My name in Korean!`,
         });
         onLog?.({ type: "namecard_share", name: korean, font: fontId, uiLang });
       } else {

@@ -504,7 +504,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             <h1 className="text-2xl sm:text-3xl font-bold text-violet-900 tracking-tight">
               My Hangul Name
             </h1>
-            <p className="text-xl sm:text-2xl text-violet-500 font-semibold mt-1">내 한글 이름</p>
+            <p className="text-xl sm:text-2xl text-violet-500 font-semibold mt-1">나의 한글 이름</p>
           </button>
         </div>
 
