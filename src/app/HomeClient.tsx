@@ -670,24 +670,34 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
         </div>
         )}
 
-        {/* Loading progress indicator — 3 sets of ㅇ·ㅅ·ㅁ (원세네 세쌍) */}
+        {/* Loading progress indicator — 3 sets of ㅇ·ㅅ·ㅁ (원세네 세쌍) + 자모 라인 */}
         {loading && (
-          <div className="flex items-center justify-center gap-4 py-6 mb-2">
-            {[0, 1, 2].map((g) => (
-              <div key={g} className="flex items-end gap-1.5">
-                {[0, 1, 2].map((s) => {
-                  const i = g * 3 + s;
-                  return (
-                    <ProgressShape
-                      key={i}
-                      idx={i}
-                      active={i === jamoIndex}
-                      prev={i === (jamoIndex - 1 + PROGRESS_LEN) % PROGRESS_LEN}
-                    />
-                  );
-                })}
-              </div>
-            ))}
+          <div className="flex flex-col items-center gap-3 py-6 mb-2">
+            <div className="flex items-center justify-center gap-4">
+              {[0, 1, 2].map((g) => (
+                <div key={g} className="flex items-end gap-1.5">
+                  {[0, 1, 2].map((s) => {
+                    const i = g * 3 + s;
+                    return (
+                      <ProgressShape
+                        key={i}
+                        idx={i}
+                        active={i === jamoIndex}
+                        prev={i === (jamoIndex - 1 + PROGRESS_LEN) % PROGRESS_LEN}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+            {/* 닿소리 라인 → 줄바꿈 → ㆍ로 시작하는 홀소리 라인 (EBS 훈민정음) */}
+            <div
+              className="text-center text-sm text-violet-400 leading-relaxed tracking-wide"
+              style={{ fontFamily: "EBSHunminjeongeum, serif" }}
+            >
+              <div>ㄱㅋ ㄴㄷㅌㄹ ㅁㅂㅍ ㅅㅈㅊ ㅇㅎ</div>
+              <div>ㆍ ㅡ ㅣ ㅏ ㅓ ㅗ ㅜ ㅑ ㅕ ㅛ ㅠ</div>
+            </div>
           </div>
         )}
 
