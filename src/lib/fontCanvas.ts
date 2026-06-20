@@ -36,6 +36,8 @@ interface BuildArgs {
   // Optional text/background overrides; default keeps the dark-on-gradient look.
   textColor?: string;
   bgColor?: string;
+  // Relative font-size multiplier (1 = auto-fit max). <1 shrinks; >1 is capped by fit.
+  fontScale?: number;
 }
 
 // ─── Jamo coloring (오방색 계열, 발음 위치 기준) ──────────────────────────────
@@ -127,7 +129,7 @@ function syllableRegions(
   return out;
 }
 
-export async function buildFontCanvas({ text, originalName, font, colorize = false, textColor, bgColor }: BuildArgs): Promise<HTMLCanvasElement> {
+export async function buildFontCanvas({ text, originalName, font, colorize = false, textColor, bgColor, fontScale = 1 }: BuildArgs): Promise<HTMLCanvasElement> {
   const weight = font.id === "hunmin-ebs" ? "900" : "bold";
   // Load the regular (400) face first so single-weight fonts (brush, Baemin,
   // etc.) actually load — otherwise requesting only the bold face, which they
@@ -182,8 +184,8 @@ export async function buildFontCanvas({ text, originalName, font, colorize = fal
     return lines;
   };
 
-  // 세로로도 들어맞을 때까지 글자 크기를 줄인다
-  let fs = 100;
+  // 세로로도 들어맞을 때까지 글자 크기를 줄인다 (fontScale로 키우거나 줄임 — 넘치면 자동 축소)
+  let fs = Math.round(Math.min(150, Math.max(40, 100 * fontScale)));
   let lines = layout(fs);
   while (lines.length * fs * 1.28 > H * 0.62 && fs > 32) {
     fs -= 6;
