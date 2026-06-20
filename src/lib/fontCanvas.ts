@@ -128,7 +128,14 @@ function syllableRegions(
 }
 
 export async function buildFontCanvas({ text, originalName, font, colorize = false, textColor, bgColor }: BuildArgs): Promise<HTMLCanvasElement> {
-  await document.fonts.load(`bold 80px ${font.css}`);
+  const weight = font.id === "hunmin-ebs" ? "900" : "bold";
+  // Load the regular (400) face first so single-weight fonts (brush, Baemin,
+  // etc.) actually load — otherwise requesting only the bold face, which they
+  // lack, leaves the font unloaded and the canvas falls back to a default font.
+  await document.fonts.load(`80px ${font.css}`);
+  try { await document.fonts.load(`${weight} 80px ${font.css}`); } catch { /* no bold/heavy face */ }
+  // give font registration a tick to settle (some browsers resolve load() early)
+  if (document.fonts.status !== "loaded") { try { await document.fonts.ready; } catch { /* noop */ } }
 
   const SCALE = 2;
   const W = 640, H = 360;
@@ -153,7 +160,6 @@ export async function buildFontCanvas({ text, originalName, font, colorize = fal
   ctx.fill();
 
   const chars = Array.from(text.trim());
-  const weight = font.id === "hunmin-ebs" ? "900" : "bold";
   const maxW = W * 0.9;
 
   // 주어진 글자 크기로 음절을 줄바꿈 (한글은 공백이 없어 글자 단위로 줄넘김)
