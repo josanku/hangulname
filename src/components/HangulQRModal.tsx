@@ -49,7 +49,7 @@ export default function HangulQRModal({ text, originalName, isKo, uiLang, onClos
       const qrCode = new QRCodeStylingModule({
         width: 600,
         height: 600,
-        data: shareUrl || "https://name.hangulmaru.com",
+        data: shareUrl || "https://myhangulname.com",
         margin: 20,
         qrOptions: {
           typeNumber: 0,

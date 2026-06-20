@@ -916,7 +916,7 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
     )}
 
     {shareOpen !== null && (() => {
-      const origin = typeof window !== "undefined" ? window.location.origin : "https://name.hangulmaru.com";
+      const origin = typeof window !== "undefined" ? window.location.origin : "https://myhangulname.com";
       const isResult = shareOpen === "result" && currentInput && result;
       const primaryHangul = isResult ? (result.variants[0]?.options[0] ?? result.variants[0]?.phonetic ?? "") : "";
       const shareUrl = isResult

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getCached } from "@/lib/store";
 import HomeClient from "./HomeClient";
 
-const BASE_URL = "https://hangulname.vercel.app";
+const BASE_URL = "https://myhangulname.com";
 
 type Props = {
   searchParams: Promise<{ name?: string }>;

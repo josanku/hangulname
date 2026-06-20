@@ -234,7 +234,7 @@ export async function buildFontCanvas({ text, originalName, font, colorize = fal
   ctx.font = `400 13px NanumGothic, sans-serif`;
   ctx.fillStyle = "#cbd5e1";
   ctx.textAlign = "right";
-  ctx.fillText("name.hangulmaru.com", W - 20, H - 14);
+  ctx.fillText("myhangulname.com", W - 20, H - 14);
 
   return canvas;
 }
