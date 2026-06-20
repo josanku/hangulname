@@ -358,24 +358,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
       onClick={() => { setShowLangMenu(false); setShowInfoMenu(false); }}
     >
       <div className="w-full max-w-lg mx-auto">
-        {/* Wehome Logo + Hangulmaru mark */}
-        <div className="flex flex-col items-center gap-3 mb-8">
-          <a
-            href="https://wehome.me"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="transition hover:opacity-80"
-            onClick={() => logAction({ type: "wehome_top_logo_click", uiLang: lang })}
-          >
-            <Image
-              src="/wehome-logo.png"
-              alt="Welcome Home Wehome"
-              width={1982}
-              height={1021}
-              priority
-              className="h-11 w-auto opacity-90"
-            />
-          </a>
+        {/* Hangulmaru mark */}
+        <div className="flex flex-col items-center mb-8">
           <a
             href="https://hangulmaru.com"
             target="_blank"
@@ -858,12 +842,18 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             onClick={() => logAction({ type: "wehome_footer_click", uiLang: lang })}
             className="inline-block transition hover:opacity-80"
           >
-            <p className="text-violet-400/70 text-[11px] leading-relaxed max-w-xs mx-auto">
-              Powered by <span className="font-semibold text-violet-500">Wehome.me</span>, Korea&apos;s only government-authorized home sharing platform.
+            <Image
+              src="/wehome-logo.png"
+              alt="Welcome Home Wehome"
+              width={1982}
+              height={1021}
+              className="h-9 w-auto mx-auto opacity-90"
+            />
+            <p className="text-violet-500 text-sm font-medium mt-2.5">Your Home in Korea</p>
+            <p className="text-violet-400 text-xs mt-0.5">Live Locally, Stay Safely.</p>
+            <p className="text-violet-300 text-[10px] leading-relaxed max-w-xs mx-auto mt-2.5">
+              Powered by <span className="font-semibold text-violet-400">Wehome.me</span>, Korea&apos;s only government-authorized home sharing platform.
             </p>
-            <p className="text-violet-900 font-bold text-sm mt-3">Wehome</p>
-            <p className="text-violet-400 text-xs">Your Home in Korea</p>
-            <p className="text-violet-300 text-[11px] mt-0.5">Live Locally, Stay Safely.</p>
           </a>
         </footer>
       </div>
