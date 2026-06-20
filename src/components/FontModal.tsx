@@ -103,7 +103,7 @@ function ShareSheet({ text, originalName, imageDataUrl, imageBlob, isKo, uiLang,
   const [nativeSharing, setNativeSharing] = useState(false);
 
   const shareUrl = `${window.location.origin}/?name=${encodeURIComponent(originalName)}`;
-  const shareTitle = isKo ? "내 이름을 한글로" : "My Name in Hangul";
+  const shareTitle = isKo ? "내 이름을 한글로" : "My Hangul Name";
 
   // 플랫폼별 최적화된 공유 텍스트
   const mainMsg = isKo

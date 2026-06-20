@@ -3,7 +3,7 @@ import { readFileSync } from "fs";
 import { join } from "path";
 
 export const runtime = "nodejs";
-export const alt = "My Name in Hangul — 내 이름을 한글로";
+export const alt = "My Hangul Name — 내 이름을 한글로";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -55,7 +55,7 @@ export default async function OGImage() {
           color: "#3b82f6",
           fontFamily: "NanumGothic",
           marginTop: 10, display: "flex",
-        }}>My Name in Hangul</div>
+        }}>My Hangul Name</div>
 
         <div style={{
           fontSize: 24, fontWeight: 400,

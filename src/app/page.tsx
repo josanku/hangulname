@@ -21,7 +21,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const koreanName = cached?.variants?.[0]?.options?.[0];
   if (!koreanName) return {};
 
-  const title = `${nameTrimmed} → ${koreanName} 🇰🇷 | My Name in Hangul`;
+  const title = `${nameTrimmed} → ${koreanName} 🇰🇷 | My Hangul Name`;
   const description =
     `${nameTrimmed} is "${koreanName}" in Korean Hangul! ` +
     `Find out what your name looks like in Korean. #Hangul #한글 #HangulName`;

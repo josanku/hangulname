@@ -16,7 +16,7 @@ export const translations = {
     dir: "ltr" as const,
   },
   en: {
-    title: "My Name in Hangul",
+    title: "My Hangul Name",
     subtitle: "Get your name in Korean",
     placeholder: "e.g. Caroline · Emma · Michael · Olivia",
     convert: "Convert", converting: "Analyzing",
