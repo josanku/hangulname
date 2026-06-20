@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ARTISTS, ARTIST_MAP, byConsonant } from "@/lib/kpop";
 
-const BASE = "https://myhangulname.com";
+const BASE = "https://www.myhangulname.com";
 
 export const dynamicParams = false;
 

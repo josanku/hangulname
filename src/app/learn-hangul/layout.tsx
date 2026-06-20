@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const BASE_URL = "https://myhangulname.com";
+const BASE_URL = "https://www.myhangulname.com";
 
 export const metadata: Metadata = {
   title: "Learn Hangul in 59 Seconds — Korean Alphabet Guide",

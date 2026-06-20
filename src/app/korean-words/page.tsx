@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { byConsonant, ARTISTS } from "@/lib/kpop";
 
-const BASE = "https://myhangulname.com";
+const BASE = "https://www.myhangulname.com";
 
 export const metadata: Metadata = {
   title: "Korean Words to Know — OED, K-pop, Songs & Beautiful Hangul",

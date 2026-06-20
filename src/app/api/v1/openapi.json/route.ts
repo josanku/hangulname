@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const BASE = "https://myhangulname.com";
+const BASE = "https://www.myhangulname.com";
 
 const spec = {
   openapi: "3.0.3",

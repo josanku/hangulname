@@ -90,7 +90,7 @@ export default function FontGallery({ text, originalName, isKo, uiLang, onClose,
   const shareTitle = tr(SHARE_MODAL_TITLE, uiLang);
   const shareUrl = typeof window !== "undefined"
     ? `${window.location.origin}/?name=${encodeURIComponent(originalName)}`
-    : `https://myhangulname.com/?name=${encodeURIComponent(originalName)}`;
+    : `https://www.myhangulname.com/?name=${encodeURIComponent(originalName)}`;
   const shareText = `${isCustom ? "" : originalName + " → "}${currentText} 🇰🇷 — ${subtitleLabel}`;
 
   const apply = () => {

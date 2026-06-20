@@ -89,7 +89,7 @@ export default function HangulArtModal({ text, originalName, isKo, uiLang, onClo
 
   const shareUrl = typeof window !== "undefined"
     ? `${window.location.origin}/?name=${encodeURIComponent(originalName || currentText)}`
-    : `https://myhangulname.com/?name=${encodeURIComponent(originalName || currentText)}`;
+    : `https://www.myhangulname.com/?name=${encodeURIComponent(originalName || currentText)}`;
   const shareText = isKo
     ? `${originalName ? originalName + " → " : ""}${currentText} 🎨 한글아트로 만들어 보세요!`
     : `${originalName ? originalName + " → " : ""}${currentText} 🎨 Make it as Hangul Art!`;

@@ -25,7 +25,7 @@ export default function robots(): MetadataRoute.Robots {
       // AI crawlers: allow everything except admin (APIs are fine to read)
       ...AI_BOTS.map((ua) => ({ userAgent: ua, allow: "/", disallow: ["/admin"] })),
     ],
-    sitemap: "https://myhangulname.com/sitemap.xml",
-    host: "https://myhangulname.com",
+    sitemap: "https://www.myhangulname.com/sitemap.xml",
+    host: "https://www.myhangulname.com",
   };
 }

@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 import { ARTISTS } from "@/lib/kpop";
 
-const BASE = "https://myhangulname.com";
+const BASE = "https://www.myhangulname.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

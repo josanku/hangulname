@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-const BASE = "https://myhangulname.com";
+const BASE = "https://www.myhangulname.com";
 
 export const metadata: Metadata = {
   title: "API — My Hangul Name",

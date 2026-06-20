@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const BASE_URL = "https://myhangulname.com";
+const BASE_URL = "https://www.myhangulname.com";
 
 export const metadata: Metadata = {
   title: "What is Hangul Name? Write Any Foreign Name in Korean",
