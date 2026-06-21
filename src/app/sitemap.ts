@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/korean-words`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE}/korean-sounds`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE}/word-of-the-day`, lastModified: now, changeFrequency: "daily", priority: 0.6 },
+    { url: `${BASE}/borahaehangul`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE}/name`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     ...ARTISTS.map((a) => ({
       url: `${BASE}/${a.slug}`,
