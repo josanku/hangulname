@@ -125,8 +125,13 @@ export default function KoreanWordsPage() {
             <div className="space-y-4">
               {KPOP.map((g) => (
                 <div key={g.group}>
-                  <div className="text-xs font-medium text-violet-500 mb-1.5">
+                  <div className="text-xs font-medium text-violet-500 mb-1.5 flex flex-wrap items-center gap-x-2">
                     <Link href={`/${g.slug}`} className="hover:underline">{g.group} →</Link>
+                    {g.slug === "bts" && (
+                      <a href="/borahaehangul" className="text-[10px] font-semibold text-fuchsia-600 bg-fuchsia-50 border border-fuchsia-200 rounded-full px-2 py-0.5 hover:bg-fuchsia-100 transition">
+                        💜 보라해한글 · K-POPSTAY BUSAN 2026
+                      </a>
+                    )}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {byConsonant(g.members).map((m) => <Chip key={g.group + m} text={m} />)}

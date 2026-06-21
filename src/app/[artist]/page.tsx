@@ -106,6 +106,20 @@ export default async function ArtistPage({ params }: { params: Promise<{ artist:
           <p className="text-sm text-violet-400 mt-1.5">tap any word to see it in Korean fonts &amp; Hangul Art</p>
         </header>
 
+        {a.slug === "bts" && (
+          <a
+            href="/borahaehangul"
+            className="flex items-center gap-3 mb-5 bg-gradient-to-r from-fuchsia-600 to-violet-600 text-white rounded-2xl px-4 py-3 shadow-md shadow-fuchsia-300/40 hover:opacity-95 transition"
+          >
+            <span className="text-2xl shrink-0">💜</span>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-bold">보라해 한글 챌린지 · Borahae Hangul</div>
+              <div className="text-xs text-white/80">K-POPSTAY BUSAN 2026 · 스티커 &amp; 챌린지</div>
+            </div>
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+          </a>
+        )}
+
         <div className="bg-white rounded-2xl shadow-lg shadow-violet-200/50 p-6 sm:p-8 space-y-7">
           {a.type === "group" && a.members?.length ? (
             <Section title="Members · 멤버" sub="ㅇㅎ ㅅㅈㅊ ㅁㅂㅍ ㄴㄷㅌㄹ ㄱㅋ 순" words={a.members} />
