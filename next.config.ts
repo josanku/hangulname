@@ -15,6 +15,13 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // Serve the static Borahae Hangul page (copied into public/borahaehangul)
+  async rewrites() {
+    return [
+      { source: "/borahaehangul", destination: "/borahaehangul/index.html" },
+      { source: "/borahaehangul/", destination: "/borahaehangul/index.html" },
+    ];
+  },
 };
 
 export default nextConfig;
