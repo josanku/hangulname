@@ -5,6 +5,8 @@ export const FONTS = [
   { id: "gungsuh",       labelKo: "궁서",          labelEn: "Gungsuh",               css: "JSongMyung, serif" },
   { id: "myeongjo",      labelKo: "명조",          labelEn: "Myeongjo",              css: "NanumMyeongjo, serif" },
   { id: "gothic",        labelKo: "고딕",          labelEn: "Gothic",                css: "NanumGothic, sans-serif" },
+  { id: "seoul-hangang", labelKo: "서울한강",      labelEn: "Seoul Hangang",         css: "SeoulHangang, sans-serif" },
+  { id: "seoul-namsan",  labelKo: "서울남산",      labelEn: "Seoul Namsan",          css: "SeoulNamsan, sans-serif" },
   { id: "pretendard",    labelKo: "Pretendard",    labelEn: "Pretendard",            css: "Pretendard, sans-serif" },
   { id: "gowun-batang",  labelKo: "고운바탕",  labelEn: "Gowun Batang",  css: "GowunBatang, serif" },
   { id: "hahmlet",       labelKo: "함렛",      labelEn: "Hahmlet",       css: "Hahmlet, serif" },
