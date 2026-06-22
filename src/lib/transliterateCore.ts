@@ -107,7 +107,11 @@ export async function transliterateName(rawName: string, uiLang = "en"): Promise
 
   const key = cacheKey(name);
   const cached = await getCached(key);
-  if (cached) return cached as unknown as TransliterateResult;
+  if (cached) {
+    const data = cached as unknown as TransliterateResult;
+    await appendLog({ type: "conversion", inputName: name, uiLang, sourceLang: data.sourceLang, cached: true });
+    return data;
+  }
 
   let message;
   try {
