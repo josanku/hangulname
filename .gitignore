@@ -36,6 +36,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local analytics store (production uses Vercel KV; committing this stale
+# snapshot would mask the real, empty state on a KV-less deploy)
+/data
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
