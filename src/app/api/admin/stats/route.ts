@@ -13,6 +13,7 @@ interface LogEntry {
   font?: string;
   platform?: string;
   value?: string;
+  country?: string;
 }
 
 function auth(req: NextRequest): boolean {
@@ -88,6 +89,31 @@ export async function GET(req: NextRequest) {
     convCountryCount[c] = (convCountryCount[c] ?? 0) + 1;
   }
 
+  // Names converted per day → lets admin see WHAT was searched on a given day
+  const namesByDay: Record<string, Record<string, number>> = {};
+  for (const e of conversions) {
+    if (!e.ts || !e.inputName) continue;
+    const day = bucket(e.ts, "day");
+    (namesByDay[day] ??= {})[e.inputName] = (namesByDay[day][e.inputName] ?? 0) + 1;
+  }
+  const dailyNames = Object.entries(namesByDay)
+    .map(([day, names]) =>
+      [day, Object.entries(names).sort(([, a], [, b]) => b - a)] as [string, [string, number][]],
+    )
+    .sort(([a], [b]) => b.localeCompare(a));
+
+  // Recent conversion feed (newest first) — a live "who searched what just now" view
+  const recent = conversions
+    .slice(-120)
+    .reverse()
+    .map((e) => ({
+      ts: e.ts,
+      inputName: e.inputName ?? "",
+      uiLang: e.uiLang ?? "",
+      sourceLang: e.sourceLang ?? "",
+      country: e.country ?? "unknown",
+    }));
+
   const allFeedback = await getAllFeedback();
 
   // Daily detailed stats: visits, conversions, hangul art downloads per day
@@ -134,6 +160,8 @@ export async function GET(req: NextRequest) {
     dailyDetails: Object.entries(dailyDetails)
       .sort(([a], [b]) => b.localeCompare(a)) // Most recent first
       .slice(0, 60), // Last 60 days
+    dailyNames,
+    recent,
     langCount:       tally(conversions, "uiLang"),
     sourceLangCount: tally(conversions.map(e => ({ ...e, sl: e.sourceLang?.split("-")[0] ?? "unknown" })), "sl" as keyof LogEntry),
     topNames: Object.entries(nameCount).sort(([, a], [, b]) => b - a).slice(0, 50),

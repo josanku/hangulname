@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Fragment } from "react";
 
 interface FeedbackEntry {
   ts: string;
@@ -21,6 +21,8 @@ interface Stats {
   weekly: [string, number][];
   monthly: [string, number][];
   dailyDetails: [string, { visits: number; conversions: number; hangulartDownloads: number }][];
+  dailyNames: [string, [string, number][]][];
+  recent: { ts: string; inputName: string; uiLang: string; sourceLang: string; country: string }[];
   langCount: [string, number][];
   sourceLangCount: [string, number][];
   topNames: [string, number][];
@@ -108,6 +110,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [period, setPeriod] = useState<"daily" | "weekly" | "monthly">("daily");
   const [tab, setTab] = useState<Tab>("stats");
+  const [expandedDay, setExpandedDay] = useState<string | null>(null);
 
   const fetchStats = useCallback(async (pass: string) => {
     setLoading(true);
@@ -171,6 +174,7 @@ export default function AdminPage() {
   if (!stats) return null;
 
   const chartData = period === "daily" ? stats.daily : period === "weekly" ? stats.weekly : stats.monthly;
+  const namesByDay: Record<string, [string, number][]> = Object.fromEntries(stats.dailyNames ?? []);
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
@@ -237,11 +241,39 @@ export default function AdminPage() {
               ))}
             </div>
 
+            {/* Recent activity feed */}
+            <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+              <div className="p-5 border-b border-slate-100 flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                </span>
+                <h2 className="text-sm font-bold text-slate-800">최근 변환 활동</h2>
+                <span className="text-xs text-slate-400">최근 {(stats.recent ?? []).length}건</span>
+              </div>
+              {(stats.recent ?? []).length === 0 ? (
+                <div className="p-8 text-center text-slate-400 text-sm">아직 변환 기록이 없습니다.</div>
+              ) : (
+                <div className="max-h-80 overflow-y-auto divide-y divide-slate-50">
+                  {(stats.recent ?? []).map((r, i) => (
+                    <div key={i} className="flex items-center gap-3 px-5 py-2.5 hover:bg-slate-50 transition">
+                      <span className="text-base shrink-0">{flag(r.country)}</span>
+                      <span className="text-sm font-medium text-slate-700 truncate flex-1">{r.inputName || "—"}</span>
+                      {r.uiLang && <span className="text-[10px] uppercase text-slate-400 shrink-0">{r.uiLang}</span>}
+                      <span className="text-xs text-slate-400 shrink-0 tabular-nums">
+                        {r.ts ? new Date(r.ts).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }) : ""}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Daily Details Table */}
             <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
               <div className="p-5 border-b border-slate-100 bg-gradient-to-r from-blue-50 to-purple-50">
                 <h2 className="text-sm font-bold text-slate-800">📅 일별 상세 통계</h2>
-                <p className="text-xs text-slate-500 mt-0.5">오늘부터 최근 60일</p>
+                <p className="text-xs text-slate-500 mt-0.5">오늘부터 최근 60일 · 날짜를 누르면 그날 변환한 이름이 펼쳐집니다</p>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -259,33 +291,58 @@ export default function AdminPage() {
                       const d = new Date(date + "T00:00:00");
                       const isToday = date === new Date().toISOString().slice(0, 10);
                       const dayOfWeek = ["일", "월", "화", "수", "목", "금", "토"][d.getDay()];
-                      const [year, month, day] = date.split("-");
+                      const [, month, day] = date.split("-");
+                      const names = namesByDay[date] ?? [];
+                      const isOpen = expandedDay === date;
                       return (
-                        <tr key={date} className={`hover:bg-slate-50 transition ${isToday ? "bg-blue-50/50" : ""}`}>
-                          <td className="px-4 py-3 font-mono text-slate-700">
-                            <span className={isToday ? "font-bold text-blue-600" : ""}>
-                              {month}/{day}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-slate-500">
-                            <span className={`inline-block px-2 py-0.5 rounded text-xs ${
-                              dayOfWeek === "토" ? "bg-blue-100 text-blue-600" :
-                              dayOfWeek === "일" ? "bg-red-100 text-red-600" :
-                              "bg-slate-100 text-slate-600"
-                            }`}>
-                              {dayOfWeek}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-right font-semibold text-sky-600">
-                            {data.visits.toLocaleString()}
-                          </td>
-                          <td className="px-4 py-3 text-right font-semibold text-blue-600">
-                            {data.conversions.toLocaleString()}
-                          </td>
-                          <td className="px-4 py-3 text-right font-semibold text-pink-600">
-                            {data.hangulartDownloads.toLocaleString()}
-                          </td>
-                        </tr>
+                        <Fragment key={date}>
+                          <tr
+                            onClick={() => names.length && setExpandedDay(isOpen ? null : date)}
+                            className={`transition ${names.length ? "cursor-pointer hover:bg-slate-50" : ""} ${isToday ? "bg-blue-50/50" : ""} ${isOpen ? "bg-blue-50" : ""}`}
+                          >
+                            <td className="px-4 py-3 font-mono text-slate-700">
+                              <span className={isToday ? "font-bold text-blue-600" : ""}>
+                                {names.length > 0 && (
+                                  <span className="inline-block text-slate-300 mr-1 text-[10px]">{isOpen ? "▼" : "▶"}</span>
+                                )}
+                                {month}/{day}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-slate-500">
+                              <span className={`inline-block px-2 py-0.5 rounded text-xs ${
+                                dayOfWeek === "토" ? "bg-blue-100 text-blue-600" :
+                                dayOfWeek === "일" ? "bg-red-100 text-red-600" :
+                                "bg-slate-100 text-slate-600"
+                              }`}>
+                                {dayOfWeek}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-right font-semibold text-sky-600">
+                              {data.visits.toLocaleString()}
+                            </td>
+                            <td className="px-4 py-3 text-right font-semibold text-blue-600">
+                              {data.conversions.toLocaleString()}
+                            </td>
+                            <td className="px-4 py-3 text-right font-semibold text-pink-600">
+                              {data.hangulartDownloads.toLocaleString()}
+                            </td>
+                          </tr>
+                          {isOpen && names.length > 0 && (
+                            <tr className="bg-slate-50/70">
+                              <td colSpan={5} className="px-4 py-3">
+                                <div className="text-[11px] text-slate-400 mb-2">{month}/{day} 변환한 이름 ({names.length}종)</div>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {names.map(([name, count]) => (
+                                    <span key={name} className="inline-flex items-center gap-1 bg-white border border-slate-200 rounded-full px-2.5 py-1 text-xs text-slate-700">
+                                      {name}
+                                      {count > 1 && <span className="text-[10px] text-blue-500 font-semibold">×{count}</span>}
+                                    </span>
+                                  ))}
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
                       );
                     })}
                   </tbody>
