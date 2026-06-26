@@ -26,6 +26,7 @@ interface Stats {
   langCount: [string, number][];
   sourceLangCount: [string, number][];
   topNames: [string, number][];
+  topNamesByLang: Record<string, [string, number][]>;
   fontCount: [string, number][];
   platformCount: [string, number][];
   countryCount: [string, number][];
@@ -108,6 +109,7 @@ export default function AdminPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [feedbacks, setFeedbacks] = useState<FeedbackEntry[]>([]);
   const [loading, setLoading] = useState(false);
+  const [nameLang, setNameLang] = useState<string>("all");
   const [period, setPeriod] = useState<"daily" | "weekly" | "monthly">("daily");
   const [tab, setTab] = useState<Tab>("stats");
   const [expandedDay, setExpandedDay] = useState<string | null>(null);
@@ -421,18 +423,54 @@ export default function AdminPage() {
             </div>
 
             {/* 인기 이름 */}
-            <div className="bg-white rounded-2xl border border-slate-100 p-5">
-              <h2 className="text-sm font-semibold text-slate-700 mb-4">인기 검색 이름 Top 50</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
-                {stats.topNames.map(([name, count], i) => (
-                  <div key={name} className="flex items-center gap-2 py-1.5 px-3 bg-slate-50 rounded-xl">
-                    <span className="text-xs text-slate-300 w-5 shrink-0">{i + 1}</span>
-                    <span className="text-sm font-medium text-slate-700 truncate flex-1">{name}</span>
-                    <span className="text-xs text-slate-400 shrink-0">{count}</span>
+            {(() => {
+              // 언어 칩: '전체' + UI 언어들(많이 쓰인 순). topNamesByLang에 있는 언어만 노출
+              const byLang = stats.topNamesByLang ?? {};
+              const langOrder = stats.langCount
+                .map(([l]) => l)
+                .filter((l) => byLang[l]?.length);
+              for (const l of Object.keys(byLang)) {
+                if (!langOrder.includes(l)) langOrder.push(l);
+              }
+              const list = nameLang === "all" ? stats.topNames : (byLang[nameLang] ?? []);
+              const chip = (key: string, label: string) => (
+                <button
+                  key={key}
+                  onClick={() => setNameLang(key)}
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                    nameLang === key
+                      ? "bg-blue-500 text-white"
+                      : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+              return (
+                <div className="bg-white rounded-2xl border border-slate-100 p-5">
+                  <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+                    <h2 className="text-sm font-semibold text-slate-700">인기 검색 이름 Top 50</h2>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {chip("all", "전체")}
+                      {langOrder.map((l) => chip(l, l === "unknown" ? "기타" : l.toUpperCase()))}
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
+                  {list.length === 0 ? (
+                    <p className="text-sm text-slate-400 py-4 text-center">데이터 없음</p>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                      {list.map(([name, count], i) => (
+                        <div key={name} className="flex items-center gap-2 py-1.5 px-3 bg-slate-50 rounded-xl">
+                          <span className="text-xs text-slate-300 w-5 shrink-0">{i + 1}</span>
+                          <span className="text-sm font-medium text-slate-700 truncate flex-1">{name}</span>
+                          <span className="text-xs text-slate-400 shrink-0">{count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </>
         )}
 

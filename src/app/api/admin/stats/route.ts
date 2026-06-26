@@ -66,9 +66,20 @@ export async function GET(req: NextRequest) {
   };
 
   const nameCount: Record<string, number> = {};
+  // Per-UI-language name tallies → lets admin sort popular names by language
+  const nameCountByLang: Record<string, Record<string, number>> = {};
   for (const e of conversions) {
-    if (e.inputName) nameCount[e.inputName] = (nameCount[e.inputName] ?? 0) + 1;
+    if (!e.inputName) continue;
+    nameCount[e.inputName] = (nameCount[e.inputName] ?? 0) + 1;
+    const lang = e.uiLang || "unknown";
+    (nameCountByLang[lang] ??= {})[e.inputName] = (nameCountByLang[lang][e.inputName] ?? 0) + 1;
   }
+  const topNamesByLang: Record<string, [string, number][]> = Object.fromEntries(
+    Object.entries(nameCountByLang).map(([lang, names]) => [
+      lang,
+      Object.entries(names).sort(([, a], [, b]) => b - a).slice(0, 50),
+    ]),
+  );
 
   const platformCount: Record<string, number> = {};
   for (const e of shares) {
@@ -165,6 +176,7 @@ export async function GET(req: NextRequest) {
     langCount:       tally(conversions, "uiLang"),
     sourceLangCount: tally(conversions.map(e => ({ ...e, sl: e.sourceLang?.split("-")[0] ?? "unknown" })), "sl" as keyof LogEntry),
     topNames: Object.entries(nameCount).sort(([, a], [, b]) => b - a).slice(0, 50),
+    topNamesByLang,
     fontCount:    tally(fontSelects, "font"),
     platformCount: Object.entries(platformCount).sort(([, a], [, b]) => b - a),
     countryCount:  Object.entries(countryCount).sort(([, a], [, b]) => b - a),
