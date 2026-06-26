@@ -38,6 +38,21 @@ async function ensureDataDir() {
   try { await fs.mkdir(DATA_DIR, { recursive: true }); } catch { /* ignore */ }
 }
 
+/**
+ * @vercel/kv (Upstash) has automaticDeserialization ON by default, so values we
+ * store as JSON strings come back already parsed as objects. The old read code
+ * also called JSON.parse on them, which threw on the now-object value and made
+ * the surrounding try/catch return [] — silently wiping every stat. coerce()
+ * accepts either shape so existing KV data stays readable after this fix.
+ */
+function coerce(x: unknown): Record<string, unknown> | null {
+  if (x && typeof x === "object") return x as Record<string, unknown>;
+  if (typeof x === "string") {
+    try { return JSON.parse(x) as Record<string, unknown>; } catch { return null; }
+  }
+  return null;
+}
+
 // ─── Logs ─────────────────────────────────────────────────────────────────────
 
 export async function appendLog(entry: Record<string, unknown>): Promise<void> {
@@ -63,9 +78,10 @@ export async function getAllLogs(): Promise<Record<string, unknown>[]> {
   const kv = await getKV();
   if (kv) {
     try {
-      const items = await kv.lrange(KV_LOGS, 0, -1) as string[];
-      // lrange returns newest-first (lpush order); reverse for chronological
-      return items.reverse().map((s) => JSON.parse(s));
+      const items = await kv.lrange(KV_LOGS, 0, -1) as unknown[];
+      // lrange returns newest-first (lpush order); reverse for chronological.
+      // Entries come back already deserialized by @vercel/kv — see coerce().
+      return items.reverse().map(coerce).filter(Boolean) as Record<string, unknown>[];
     } catch { return []; }
   }
 
@@ -81,8 +97,8 @@ export async function getCached(key: string): Promise<Record<string, unknown> | 
   const kv = await getKV();
   if (kv) {
     try {
-      const val = await kv.hget(KV_CACHE, key) as string | null;
-      return val ? JSON.parse(val) : null;
+      const val = await kv.hget(KV_CACHE, key);
+      return coerce(val);
     } catch { return null; }
   }
 
@@ -155,8 +171,8 @@ export async function getAllFeedback(): Promise<Record<string, unknown>[]> {
   const kv = await getKV();
   if (kv) {
     try {
-      const items = await kv.lrange(KV_FEEDBACK, 0, -1) as string[];
-      return items.reverse().map((s) => JSON.parse(s));
+      const items = await kv.lrange(KV_FEEDBACK, 0, -1) as unknown[];
+      return items.reverse().map(coerce).filter(Boolean) as Record<string, unknown>[];
     } catch { return []; }
   }
 
