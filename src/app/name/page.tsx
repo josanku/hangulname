@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { NAMES } from "@/lib/names";
+import { popularSearchedNames } from "@/lib/popularNames";
 
 const BASE = "https://www.myhangulname.com";
+
+// Revalidate daily so the "Most searched" list stays fresh.
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "Names in Korean — Write Any Name in Hangul",
@@ -17,8 +21,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function NamesHubPage() {
+export default async function NamesHubPage() {
   const sorted = [...NAMES].sort((a, b) => a.name.localeCompare(b.name));
+  const trending = await popularSearchedNames(40);
   return (
     <div className="min-h-screen bg-gradient-to-b from-violet-50 via-white to-purple-50/50 p-6">
       <div className="max-w-2xl mx-auto pt-6">
@@ -37,7 +42,21 @@ export default function NamesHubPage() {
           </p>
         </header>
 
+        {trending.length > 0 && (
+          <section className="bg-white rounded-2xl shadow-lg shadow-violet-200/40 p-5 sm:p-6 mb-5">
+            <h2 className="text-sm font-semibold text-violet-900 mb-3">🔥 Most searched names</h2>
+            <div className="flex flex-wrap gap-1.5">
+              {trending.map((n) => (
+                <Link key={n.slug} href={`/name/${n.slug}`} className="px-3 py-1.5 text-sm bg-violet-50 border border-violet-100 rounded-full text-violet-700 hover:border-violet-300 hover:shadow-sm transition">
+                  {n.name}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         <div className="bg-white rounded-2xl shadow-lg shadow-violet-200/40 p-5 sm:p-6">
+          <h2 className="text-sm font-semibold text-violet-900 mb-3">Popular names A–Z</h2>
           <div className="flex flex-wrap gap-1.5">
             {sorted.map((n) => (
               <Link key={n.slug} href={`/name/${n.slug}`} className="px-3 py-1.5 text-sm bg-white border border-violet-100 rounded-full text-slate-700 hover:border-violet-300 hover:text-violet-700 hover:shadow-sm transition">
