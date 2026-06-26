@@ -142,7 +142,7 @@ const LISTENING: Record<string, string> = {
 };
 const trv = (m: Record<string, string>, l: string) => m[l] ?? m.en;
 
-export default function HomeClient({ initialName, seoSlot }: { initialName?: string; seoSlot?: React.ReactNode }) {
+export default function HomeClient({ initialName }: { initialName?: string }) {
   const [lang, setLang] = useState<Lang>("en");
   const [input, setInput] = useState("");
   const [result, setResult] = useState<Result | null>(null);
@@ -1098,10 +1098,17 @@ export default function HomeClient({ initialName, seoSlot }: { initialName?: str
           </a>
         )}
 
-        {seoSlot}
+        {/* Quiet links to content/SEO pages (kept off the main flow, linked here) */}
+        <nav className="mt-10 flex items-center justify-center gap-3 text-xs text-violet-400" dir="ltr">
+          <a href="/faq" className="hover:text-violet-600 transition">FAQ</a>
+          <span className="text-violet-200" aria-hidden>·</span>
+          <a href="/name" className="hover:text-violet-600 transition">Names in Korean</a>
+          <span className="text-violet-200" aria-hidden>·</span>
+          <a href="/api-docs" className="hover:text-violet-600 transition">API</a>
+        </nav>
 
         {/* Footer */}
-        <footer className="mt-12 pb-6 text-center" dir="ltr">
+        <footer className="mt-6 pb-6 text-center" dir="ltr">
           <a
             href="https://wehome.me"
             target="_blank"

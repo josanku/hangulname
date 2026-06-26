@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { getCached } from "@/lib/store";
 import HomeClient from "./HomeClient";
-import HomeSeoContent from "@/components/HomeSeoContent";
 
 const BASE_URL = "https://www.myhangulname.com";
 
@@ -51,5 +50,5 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default async function Page({ searchParams }: Props) {
   const { name } = await searchParams;
-  return <HomeClient initialName={name?.trim()} seoSlot={<HomeSeoContent />} />;
+  return <HomeClient initialName={name?.trim()} />;
 }
