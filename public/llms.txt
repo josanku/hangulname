@@ -28,6 +28,7 @@ Site: https://www.myhangulname.com
 ## API
 - Free, CORS-enabled, no key. GET https://www.myhangulname.com/api/v1/transliterate?name=Caroline&lang=en
 - Docs: https://www.myhangulname.com/api-docs — OpenAPI: https://www.myhangulname.com/api/v1/openapi.json
+- MCP server (for Claude / agents): https://www.myhangulname.com/api/mcp — tool `transliterate_name`
 
 ## About
 Built and operated by Wehome (https://wehome.me), Korea's only government-authorized home-sharing platform. "Your Home in Korea."
