@@ -142,7 +142,7 @@ const LISTENING: Record<string, string> = {
 };
 const trv = (m: Record<string, string>, l: string) => m[l] ?? m.en;
 
-export default function HomeClient({ initialName }: { initialName?: string }) {
+export default function HomeClient({ initialName, seoSlot }: { initialName?: string; seoSlot?: React.ReactNode }) {
   const [lang, setLang] = useState<Lang>("en");
   const [input, setInput] = useState("");
   const [result, setResult] = useState<Result | null>(null);
@@ -1072,6 +1072,8 @@ export default function HomeClient({ initialName }: { initialName?: string }) {
             {feedback === "up" ? t.feedbackThanks : t.feedbackYes}
           </button>
         </div>
+
+        {seoSlot}
 
         {/* Footer */}
         <footer className="mt-12 pb-6 text-center" dir="ltr">

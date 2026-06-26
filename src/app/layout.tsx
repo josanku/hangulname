@@ -130,6 +130,21 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@type": "Organization",
+      "@id": `${BASE_URL}/#org`,
+      name: "Wehome",
+      alternateName: "Wehome.me",
+      url: "https://wehome.me",
+      logo: `${BASE_URL}/wehome-logo.png`,
+      description:
+        "Korea's government-authorized home-sharing platform, and the maker of My Hangul Name.",
+      sameAs: [
+        "https://wehome.me",
+        "https://x.com/wehomeme",
+        "https://twitter.com/wehomeme",
+      ],
+    },
+    {
       "@type": "WebApplication",
       "@id": `${BASE_URL}/#app`,
       name: "My Hangul Name",
@@ -154,12 +169,8 @@ const jsonLd = {
         "20+ Korean font styles",
       ],
       inLanguage: ["en", "ko", "zh", "ja", "es", "fr", "de", "ar", "ru", "pt", "vi", "id", "th", "ms", "hi", "bn", "tl", "my", "mn"],
-      author: {
-        "@type": "Organization",
-        name: "Wehome.me",
-        url: "https://wehome.me",
-        sameAs: ["https://wehome.me"],
-      },
+      author: { "@id": `${BASE_URL}/#org` },
+      publisher: { "@id": `${BASE_URL}/#org` },
     },
     {
       "@type": "WebSite",
@@ -167,6 +178,7 @@ const jsonLd = {
       url: BASE_URL,
       name: "My Hangul Name",
       description: "Korean Hangul name converter for people worldwide",
+      publisher: { "@id": `${BASE_URL}/#org` },
       potentialAction: {
         "@type": "SearchAction",
         target: {
