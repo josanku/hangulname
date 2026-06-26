@@ -1073,6 +1073,31 @@ export default function HomeClient({ initialName, seoSlot }: { initialName?: str
           </button>
         </div>
 
+        {/* Contextual funnel CTA — only after a result, leading to Wehome (the operator) */}
+        {result && currentInput && (
+          <a
+            href="https://wehome.me"
+            target="_blank"
+            rel="noopener noreferrer"
+            dir="ltr"
+            onClick={() => logAction({ type: "wehome_result_cta_click", inputName: currentInput, uiLang: lang })}
+            className="mt-6 flex items-center gap-3 rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50 to-fuchsia-50 px-4 py-3 hover:border-violet-300 hover:shadow-sm transition"
+          >
+            <span className="text-xl shrink-0" aria-hidden>🇰🇷</span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-sm font-semibold text-violet-900">
+                {lang === "ko" ? "한국 여행 계획 중이세요?" : "Planning a trip to Korea?"}
+              </span>
+              <span className="block text-xs text-violet-500 leading-snug">
+                {lang === "ko"
+                  ? "Wehome에서 합법 숙소와 현지 지원으로 안전하게 머무세요."
+                  : "Stay with Wehome — government-authorized homes & 24/7 local support."}
+              </span>
+            </span>
+            <span className="text-violet-400 text-sm shrink-0" aria-hidden>→</span>
+          </a>
+        )}
+
         {seoSlot}
 
         {/* Footer */}
