@@ -83,7 +83,7 @@ Rules:
  * Core name → Hangul transliteration, shared by the internal and public APIs.
  * Throws TransliterateError (with an HTTP status) on bad input or upstream failure.
  */
-export async function transliterateName(rawName: string, uiLang = "en"): Promise<TransliterateResult> {
+export async function transliterateName(rawName: string, uiLang = "en", log = true): Promise<TransliterateResult> {
   const name = (rawName ?? "").trim();
   if (!name) throw new TransliterateError("Please provide a name", 400);
   if (name.length > 60) throw new TransliterateError("Name is too long (max 60 chars)", 400);
@@ -101,7 +101,7 @@ export async function transliterateName(rawName: string, uiLang = "en"): Promise
       }],
       origin: uiLang === "ko" ? "이미 한글로 입력되었습니다" : "Already in Hangul (Korean script)",
     };
-    await appendLog({ type: "conversion", inputName: name, uiLang, sourceLang: "ko-KR", cached: false });
+    if (log) await appendLog({ type: "conversion", inputName: name, uiLang, sourceLang: "ko-KR", cached: false });
     return data;
   }
 
@@ -109,7 +109,7 @@ export async function transliterateName(rawName: string, uiLang = "en"): Promise
   const cached = await getCached(key);
   if (cached) {
     const data = cached as unknown as TransliterateResult;
-    await appendLog({ type: "conversion", inputName: name, uiLang, sourceLang: data.sourceLang, cached: true });
+    if (log) await appendLog({ type: "conversion", inputName: name, uiLang, sourceLang: data.sourceLang, cached: true });
     return data;
   }
 
@@ -135,6 +135,6 @@ export async function transliterateName(rawName: string, uiLang = "en"): Promise
   }
 
   await setCached(key, data as unknown as Record<string, unknown>);
-  await appendLog({ type: "conversion", inputName: name, uiLang, sourceLang: data.sourceLang, cached: false });
+  if (log) await appendLog({ type: "conversion", inputName: name, uiLang, sourceLang: data.sourceLang, cached: false });
   return data;
 }
