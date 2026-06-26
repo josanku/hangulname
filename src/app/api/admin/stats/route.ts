@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
   const copies       = logs.filter((l) => l.type === "copy");
   const fontSelects  = logs.filter((l) => l.type === "font_select");
   const visits       = logs.filter((l) => l.type === "visit");
-  const wehomeClicks = logs.filter((l) => l.type === "wehome_click");
+  const wehomeClicks = logs.filter((l) => l.type?.startsWith("wehome")); // footer + modal + result CTA
 
   const byPeriod = (period: "day" | "week" | "month") => {
     const map: Record<string, number> = {};
