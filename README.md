@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# My Hangul Name — Korean (Hangul) name converter & free API
 
-## Getting Started
+Convert any name, from any language, into its natural Korean (Hangul) spelling — based on real
+pronunciation and Korea's official 외래어 표기법 transcription rules. Free, instant, with a
+pronunciation guide, 20+ fonts, and shareable Hangul art.
 
-First, run the development server:
+🔗 **Live:** https://www.myhangulname.com · **Built & operated by [Wehome](https://wehome.me)**
+
+---
+
+## 🧩 Free API (no key, CORS-enabled)
+
+Convert a name to Hangul over plain HTTP. No sign-up, no API key. Best-effort rate limit ~30 req/min/IP.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+curl "https://www.myhangulname.com/api/v1/transliterate?name=Caroline"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```jsonc
+{
+  "sourceLang": "en-US",
+  "variants": [
+    { "country": "United States", "flag": "🇺🇸",
+      "options": ["캐롤라인", "캐롤린"], "phonetic": "캘로린", "ipa": "/ˈkærəlaɪn/" }
+  ],
+  "origin": "A name of French origin meaning 'free woman'."
+}
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **GET** `/api/v1/transliterate?name=<name>&lang=<en|ko|ja|zh|…>`
+- **POST** `/api/v1/transliterate` with `{ "name": "...", "lang": "en" }`
+- **OpenAPI:** https://www.myhangulname.com/api/v1/openapi.json
+- **Docs & live examples:** https://www.myhangulname.com/api-docs
+- **Postman collection:** [`/my-hangul-name.postman_collection.json`](https://www.myhangulname.com/my-hangul-name.postman_collection.json)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🤖 Use it in Claude / agents (MCP)
 
-## Learn More
+A hosted [Model Context Protocol](https://modelcontextprotocol.io) server exposes one tool,
+`transliterate_name`, so Claude and other agents can convert names natively.
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Claude Code
+claude mcp add --transport http my-hangul-name https://www.myhangulname.com/api/mcp
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Or add `https://www.myhangulname.com/api/mcp` as a **custom connector** in Claude Desktop / claude.ai.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ✨ Features
 
-## Deploy on Vercel
+- 19 input languages, auto-detected (English, Chinese, Japanese, Spanish, French, German, Arabic,
+  Russian, Portuguese, Vietnamese, Indonesian, Thai, Malay, Hindi, Bengali, Filipino, Burmese,
+  Mongolian, Korean)
+- Multiple accepted spellings + IPA + Korean text-to-speech
+- 20+ Korean fonts, downloadable name cards & Hangul art
+- Per-name pages (`/name/<name>`) and an FAQ at `/faq`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Development
+
+```bash
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production build
+```
+
+Built with Next.js 16. Transliteration is LLM-backed and cached (Vercel KV in production).
