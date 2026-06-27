@@ -1,0 +1,48 @@
+{
+  "info": {
+    "name": "My Hangul Name API",
+    "description": "Free, CORS-enabled API to convert any name from 19 languages into its closest natural Korean (Hangul) spelling, with pronunciation (IPA) and origin. No API key required. Docs: https://www.myhangulname.com/api-docs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://www.myhangulname.com/api/v1" }
+  ],
+  "item": [
+    {
+      "name": "Transliterate a name (GET)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/transliterate?name=Caroline&lang=en",
+          "host": ["{{baseUrl}}"],
+          "path": ["transliterate"],
+          "query": [
+            { "key": "name", "value": "Caroline", "description": "Name in any language (required, max 60 chars)" },
+            { "key": "lang", "value": "en", "description": "UI language for text fields (optional, default en)" }
+          ]
+        },
+        "description": "Returns the closest Korean (Hangul) spelling(s) for a name, with IPA and origin."
+      },
+      "response": []
+    },
+    {
+      "name": "Transliterate a name (POST)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Caroline\",\n  \"lang\": \"en\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/transliterate",
+          "host": ["{{baseUrl}}"],
+          "path": ["transliterate"]
+        },
+        "description": "Same as GET, with the name in a JSON body."
+      },
+      "response": []
+    }
+  ]
+}

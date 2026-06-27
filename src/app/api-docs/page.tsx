@@ -7,12 +7,34 @@ export const metadata: Metadata = {
   title: "API — My Hangul Name",
   description:
     "Free, CORS-enabled API to convert any name into Korean (Hangul). Use it from the CLI, your app, or as a Claude (MCP) tool. No API key required.",
+  keywords: [
+    "Korean name API", "name to Hangul API", "Korean transliteration API",
+    "Korean romanization API", "Hangul converter API", "free Korean API",
+    "transliteration API", "MCP server Korean", "Claude MCP Korean name",
+  ],
   alternates: { canonical: `${BASE}/api-docs` },
   openGraph: {
     title: "My Hangul Name API",
     description: "Convert any name to Korean Hangul via a free HTTP API.",
     url: `${BASE}/api-docs`,
     type: "article",
+  },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebAPI",
+  name: "My Hangul Name API",
+  description:
+    "Free, CORS-enabled HTTP API that converts any name from 19 languages into its closest natural Korean (Hangul) spelling, with pronunciation (IPA) and origin. No API key required. Also available as an MCP server for Claude and agents.",
+  url: `${BASE}/api-docs`,
+  documentation: `${BASE}/api-docs`,
+  termsOfService: `${BASE}/api-docs`,
+  provider: { "@type": "Organization", name: "Wehome", url: "https://wehome.me" },
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  potentialAction: {
+    "@type": "ConsumeAction",
+    target: `${BASE}/api/v1/transliterate?name={name}`,
   },
 };
 
@@ -27,6 +49,7 @@ function Code({ children }: { children: string }) {
 export default function ApiDocsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-violet-50 via-white to-purple-50/50 p-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="max-w-2xl mx-auto pt-6">
         <Link
           href="/"
@@ -66,6 +89,25 @@ POST ${BASE}/api/v1/transliterate   { "name": "Caroline", "lang": "en" }`}</Code
           </section>
 
           <section>
+            <h2 className="text-base font-semibold text-slate-800 mb-2">JavaScript</h2>
+            <Code>{`const res = await fetch(
+  "${BASE}/api/v1/transliterate?name=Caroline"
+);
+const data = await res.json();
+console.log(data.variants[0].options[0]); // 캐롤라인`}</Code>
+          </section>
+
+          <section>
+            <h2 className="text-base font-semibold text-slate-800 mb-2">Python</h2>
+            <Code>{`import requests
+r = requests.get(
+    "${BASE}/api/v1/transliterate",
+    params={"name": "Caroline"},
+)
+print(r.json()["variants"][0]["options"][0])  # 캐롤라인`}</Code>
+          </section>
+
+          <section>
             <h2 className="text-base font-semibold text-slate-800 mb-2">Response</h2>
             <Code>{`{
   "sourceLang": "en-US",
@@ -82,24 +124,24 @@ POST ${BASE}/api/v1/transliterate   { "name": "Caroline", "lang": "en" }`}</Code
 }`}</Code>
             <p className="text-xs text-slate-500 mt-2">
               OpenAPI spec: <a href="/api/v1/openapi.json" className="text-violet-600 underline">/api/v1/openapi.json</a>
+              {" · "}
+              Postman: <a href="/my-hangul-name.postman_collection.json" className="text-violet-600 underline">collection</a>
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-slate-800 mb-2">Use it from Claude (MCP / CLI)</h2>
+            <h2 className="text-base font-semibold text-slate-800 mb-2">Use it in Claude (MCP)</h2>
             <p className="text-sm text-slate-600 leading-relaxed mb-3">
-              The endpoint is a plain HTTP GET, so you can call it directly from Claude Code, a shell
-              script, or any HTTP client. A minimal one-liner you can drop into a script or an MCP
-              tool:
+              A hosted <strong>Model Context Protocol</strong> server exposes a{" "}
+              <code>transliterate_name</code> tool, so Claude and other agents can convert names
+              natively — no wrapper needed.
             </p>
-            <Code>{`# shell
-name="Caroline"
-curl -s "${BASE}/api/v1/transliterate?name=$name" | jq -r '.variants[0].options[0]'
-# → 캐롤라인`}</Code>
+            <Code>{`# Claude Code
+claude mcp add --transport http my-hangul-name ${BASE}/api/mcp`}</Code>
             <p className="text-xs text-slate-500 mt-3 leading-relaxed">
-              To expose it as a native Claude tool, wrap this call in a small MCP server
-              (<code>transliterate_name(name, lang)</code>) that fetches the URL above and returns the
-              JSON — then register it with <code>claude mcp add</code>.
+              Or add <code>{`${BASE}/api/mcp`}</code> as a <strong>custom connector</strong> in Claude
+              Desktop / claude.ai. Prefer plain HTTP? The GET endpoint above works from any client or
+              shell script too.
             </p>
           </section>
 
