@@ -113,13 +113,16 @@ export default function AdminPage() {
   const [period, setPeriod] = useState<"daily" | "weekly" | "monthly">("daily");
   const [tab, setTab] = useState<Tab>("stats");
   const [expandedDay, setExpandedDay] = useState<string | null>(null);
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
 
   const fetchStats = useCallback(async (pass: string) => {
     setLoading(true);
     try {
+      // no-store: never serve a cached (stale) stats/feedback response — the
+      // dashboard must always reflect the very latest logs.
       const [statsRes, fbRes] = await Promise.all([
-        fetch("/api/admin/stats", { headers: { Authorization: `Bearer ${pass}` } }),
-        fetch("/api/feedback",    { headers: { Authorization: `Bearer ${pass}` } }),
+        fetch("/api/admin/stats", { headers: { Authorization: `Bearer ${pass}` }, cache: "no-store" }),
+        fetch("/api/feedback",    { headers: { Authorization: `Bearer ${pass}` }, cache: "no-store" }),
       ]);
       if (statsRes.status === 401) { setAuthError(true); return; }
       setStats(await statsRes.json());
@@ -127,6 +130,7 @@ export default function AdminPage() {
       setFeedbacks(fbData.feedbacks ?? []);
       setAuthed(true);
       setAuthError(false);
+      setUpdatedAt(new Date());
     } finally {
       setLoading(false);
     }
@@ -195,13 +199,19 @@ export default function AdminPage() {
               }`}>
                 {stats.storage === "vercel-kv" ? "Vercel KV ✓" : "⚠ 로컬 파일"}
               </span>
+              {updatedAt && (
+                <span className="text-[10px] text-slate-400">
+                  마지막 갱신 {updatedAt.toLocaleTimeString("ko-KR")}
+                </span>
+              )}
             </div>
           </div>
           <button
             onClick={() => fetchStats(password)}
-            className="text-xs text-blue-500 hover:text-blue-600 border border-blue-200 rounded-xl px-3 py-1.5 transition"
+            disabled={loading}
+            className="text-xs text-blue-500 hover:text-blue-600 disabled:text-slate-300 border border-blue-200 rounded-xl px-3 py-1.5 transition"
           >
-            새로고침
+            {loading ? "갱신 중…" : "새로고침"}
           </button>
         </div>
 

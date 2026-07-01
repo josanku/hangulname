@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllLogs, getCacheSize, getAllFeedback, usingKV } from "@/lib/store";
 
+// Never cache admin stats — always reflect the latest logs.
+export const dynamic = "force-dynamic";
+
 const ADMIN_PASS = process.env.ADMIN_PASSWORD ?? "33hangul";
 
 interface LogEntry {
