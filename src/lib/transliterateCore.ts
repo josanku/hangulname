@@ -10,10 +10,15 @@ const client = new Anthropic();
  *
  * This is the backstop behind the per-client rate limits: even if those are
  * evaded (rotating IPs, a KV outage downgrading them to per-instance), the
- * day's bill cannot exceed this number of calls. Normal traffic is ~20/day,
- * so the default leaves a wide margin. Raise it with DAILY_LLM_CALL_CAP.
+ * day's bill cannot exceed this number of calls.
+ *
+ * Normal traffic is ~20 conversions/day, so 200 is 10x headroom while keeping
+ * a bad day cheap. Relaunching after an abuse incident, the cost of the cap
+ * being too low (some users see "try again tomorrow") is much smaller than the
+ * cost of it being too high. Raise it with DAILY_LLM_CALL_CAP as real traffic
+ * grows — no redeploy of this file needed.
  */
-const DAILY_LLM_CALL_CAP = Number(process.env.DAILY_LLM_CALL_CAP ?? 1000);
+const DAILY_LLM_CALL_CAP = Number(process.env.DAILY_LLM_CALL_CAP ?? 200);
 
 export interface TransliterateResult {
   sourceLang: string;
