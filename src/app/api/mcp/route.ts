@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { transliterateName, TransliterateError } from "@/lib/transliterateCore";
+import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 
 // Minimal Model Context Protocol (MCP) server over Streamable HTTP, with no
 // external dependencies. Exposes one tool — transliterate_name — so MCP clients
 // (Claude Desktop / Claude Code "custom connectors", and other agents) can use
 // the Hangul converter as a native tool. JSON-RPC 2.0; stateless.
+
+// Same budget as the public REST API — an agent calling the tool is the same
+// kind of consumer as a script hitting /api/v1.
+const POLICY = { perMinute: 10, perDay: 200 };
 
 const SERVER_INFO = { name: "my-hangul-name", version: "1.0.0" };
 const DEFAULT_PROTOCOL = "2025-06-18";
@@ -93,6 +98,17 @@ export async function POST(req: NextRequest) {
       const toolName = params?.name as string | undefined;
       const args = (params?.arguments as Record<string, unknown>) ?? {};
       if (toolName !== "transliterate_name") return error(id, -32602, `Unknown tool: ${toolName}`);
+
+      // Only tool calls can spend credits — initialize/tools/list/ping are a
+      // free handshake and must stay unthrottled or clients fail to connect.
+      const verdict = await checkRateLimit("mcp", clientIp(req.headers), POLICY);
+      if (!verdict.ok) {
+        return result(id, {
+          content: [{ type: "text", text: "Rate limit exceeded. Please try again later." }],
+          isError: true,
+        });
+      }
+
       const name = typeof args.name === "string" ? args.name : "";
       const lang = typeof args.lang === "string" ? args.lang : "en";
       try {
