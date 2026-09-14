@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { transliterateName, TransliterateError } from "@/lib/transliterateCore";
+import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 
 // Public API: https://www.myhangulname.com/api/v1/transliterate
 // CORS-enabled, GET (?name=&lang=) or POST ({name, lang}).
@@ -11,36 +12,24 @@ const CORS: Record<string, string> = {
   "Cache-Control": "public, max-age=3600",
 };
 
-// Best-effort per-instance rate limit. Serverless instances are ephemeral, so
-// this only throttles within a warm instance; for hard limits use a KV store.
-const LIMIT = 30;
-const WINDOW_MS = 60_000;
-const hits = new Map<string, { count: number; reset: number }>();
-
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  const e = hits.get(ip);
-  if (!e || now > e.reset) {
-    hits.set(ip, { count: 1, reset: now + WINDOW_MS });
-    return false;
-  }
-  e.count += 1;
-  return e.count > LIMIT;
-}
-
-function clientIp(req: NextRequest): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anon";
-}
+// Shared, KV-backed limits. The previous in-memory Map reset on every cold
+// start, so a parallel caller was never actually throttled — see rateLimit.ts.
+const POLICY = { perMinute: 10, perDay: 200 };
 
 export function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS });
 }
 
 async function handle(name: string, lang: string, ip: string) {
-  if (rateLimited(ip)) {
+  const verdict = await checkRateLimit("api", ip, POLICY);
+  if (!verdict.ok) {
+    const detail =
+      verdict.limit === "day"
+        ? "Daily quota exceeded. Try again tomorrow."
+        : "Rate limit exceeded. Please try again in a minute.";
     return NextResponse.json(
-      { error: "Rate limit exceeded. Please try again in a minute." },
-      { status: 429, headers: CORS },
+      { error: detail },
+      { status: 429, headers: { ...CORS, "Retry-After": String(verdict.retryAfter) } },
     );
   }
   try {
@@ -57,12 +46,12 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const name = searchParams.get("name") ?? "";
   const lang = searchParams.get("lang") ?? searchParams.get("uiLang") ?? "en";
-  return handle(name, lang, clientIp(req));
+  return handle(name, lang, clientIp(req.headers));
 }
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const name = typeof body.name === "string" ? body.name : "";
   const lang = body.lang ?? body.uiLang ?? "en";
-  return handle(name, lang, clientIp(req));
+  return handle(name, lang, clientIp(req.headers));
 }

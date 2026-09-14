@@ -1,7 +1,19 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { getCached, setCached, appendLog } from "@/lib/store";
+import { getCached, setCached, appendLog, bumpCounter } from "@/lib/store";
 
 const client = new Anthropic();
+
+/**
+ * Hard ceiling on billable Claude calls per UTC day, across every route and
+ * every caller. Cache hits and already-Hangul input never reach it, so this
+ * counts actual spend and nothing else.
+ *
+ * This is the backstop behind the per-client rate limits: even if those are
+ * evaded (rotating IPs, a KV outage downgrading them to per-instance), the
+ * day's bill cannot exceed this number of calls. Normal traffic is ~20/day,
+ * so the default leaves a wide margin. Raise it with DAILY_LLM_CALL_CAP.
+ */
+const DAILY_LLM_CALL_CAP = Number(process.env.DAILY_LLM_CALL_CAP ?? 1000);
 
 export interface TransliterateResult {
   sourceLang: string;
@@ -113,6 +125,16 @@ export async function transliterateName(rawName: string, uiLang = "en", log = tr
     return data;
   }
 
+  // Everything past this point is billable. Spend one unit of the day's budget
+  // before calling out; a null counter means KV is unavailable (local dev), in
+  // which case there is no shared budget to enforce.
+  const today = new Date().toISOString().slice(0, 10);
+  const spentToday = await bumpCounter(`hg:llm:calls:${today}`, 172_800);
+  if (spentToday !== null && spentToday > DAILY_LLM_CALL_CAP) {
+    console.error(`[transliterate] daily cap reached — ${spentToday}/${DAILY_LLM_CALL_CAP} calls`);
+    throw new TransliterateError("Daily capacity reached. Please try again tomorrow.", 503);
+  }
+
   let message;
   try {
     message = await client.messages.create({
@@ -121,7 +143,16 @@ export async function transliterateName(rawName: string, uiLang = "en", log = tr
       system: buildSystem(uiLang),
       messages: [{ role: "user", content: `Name: ${name}` }],
     });
-  } catch {
+  } catch (err) {
+    // Log the upstream cause. A bare `catch {}` here made auth / credit /
+    // rate-limit failures indistinguishable from each other in production.
+    const detail =
+      err instanceof Anthropic.APIError
+        ? `status=${err.status} type=${err.type} request_id=${err.requestID} ${err.message}`
+        : err instanceof Error
+          ? `${err.name}: ${err.message}`
+          : String(err);
+    console.error("[transliterate] Anthropic API call failed —", detail);
     throw new TransliterateError("Transliteration service unavailable", 502);
   }
 

@@ -142,6 +142,29 @@ export async function getCacheSize(): Promise<number> {
   } catch { return 0; }
 }
 
+// ─── Counters (rate limits, spend caps) ──────────────────────────────────────
+
+/**
+ * Atomically increment a counter and return its new value, attaching a TTL on
+ * the first write so expired buckets clean themselves up.
+ *
+ * Returns null when KV is not configured or the write fails — callers treat
+ * that as "no shared counter available" and fall back to a local limiter
+ * rather than failing the request.
+ */
+export async function bumpCounter(key: string, ttlSeconds: number): Promise<number | null> {
+  const kv = await getKV();
+  if (!kv) return null;
+  try {
+    const value = await kv.incr(key);
+    if (value === 1) await kv.expire(key, ttlSeconds);
+    return value;
+  } catch (e) {
+    console.error("KV bumpCounter error:", e);
+    return null;
+  }
+}
+
 export const usingKV = isKVConfigured;
 
 // ─── Feedback ─────────────────────────────────────────────────────────────────
